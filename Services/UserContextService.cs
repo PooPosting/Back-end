@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿#nullable enable
+using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using PicturesAPI.Interfaces;
 

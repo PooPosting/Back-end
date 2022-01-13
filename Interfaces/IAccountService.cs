@@ -8,6 +8,6 @@ public interface IAccountService
 {
     AccountDto GetAccountById(Guid id);
     IEnumerable<AccountDto> GetAllAccounts();
-    void UpdateAccount(Guid id, PutAccountDto dto);
+    void UpdateAccount(PutAccountDto dto);
     void DeleteAccount(Guid id);
 }

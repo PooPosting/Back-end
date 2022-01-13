@@ -1,5 +1,4 @@
-﻿using System;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using PicturesAPI.Entities;
@@ -19,10 +18,8 @@ public class ResourceOperationRequirementHandler : AuthorizationHandler<Resource
             context.Succeed(requirement);
         }
 
-        var userId = context.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value;
-        var userRole = context.User.FindFirst(c => c.Type == ClaimTypes.Role).Value;
-
-        Console.WriteLine(userRole + ", " + userId);
+        var userId = context.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
+        var userRole = context.User.FindFirst(c => c.Type == ClaimTypes.Role)!.Value;
         
         if (resource.AccountId.ToString() == userId)
         {

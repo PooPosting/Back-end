@@ -87,7 +87,7 @@ public class PictureService : IPictureService
         if (dto.Description != null) picture!.Description = dto.Description;
         if (dto.Name != null) picture!.Name = dto.Name;
         if (dto.Url != null) picture!.Url = dto.Url;
-        if (dto.Tags != null) picture!.Tags = string.Join(" ", dto.Tags);
+        if (dto.Tags != null) picture!.Tags = string.Join(" ", dto.Tags).ToLower();
         _dbContext.SaveChanges();
     }
         

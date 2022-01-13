@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Security.Claims;
 using AutoMapper;
 using AutoMapper.Internal;
 using Microsoft.AspNetCore.Identity;
@@ -20,18 +21,21 @@ public class AccountService : IAccountService
     private readonly IMapper _mapper;
     private readonly IPasswordHasher<Account> _passwordHasher;
     private readonly ILogger<AccountService> _logger;
+    private readonly IAccountContextService _accountContextService;
 
     public AccountService(
         IMapper mapper,
         PictureDbContext dbContext, 
         IPasswordHasher<Account> passwordHasher, 
-        ILogger<AccountService> logger)
+        ILogger<AccountService> logger,
+        IAccountContextService accountContextService)
             
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _passwordHasher = passwordHasher;
         _logger = logger;
+        _accountContextService = accountContextService;
     }
         
     public AccountDto GetAccountById(Guid id)
@@ -62,9 +66,11 @@ public class AccountService : IAccountService
         return result;
     }
         
-    public void UpdateAccount(Guid id, PutAccountDto dto)
+    public void UpdateAccount(PutAccountDto dto)
     {
-        var account = _dbContext.Accounts.SingleOrDefault(a => a.Id == id);
+        var user = _accountContextService.User;
+        var id = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
+        var account = _dbContext.Accounts.SingleOrDefault(a => a.Id.ToString() == id);
         if (account is null) throw new NotFoundException("There's not such an account with that ID");
             
         var passwordHashed = _passwordHasher.HashPassword(account, dto.Password);

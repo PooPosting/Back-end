@@ -39,10 +39,11 @@ public class AccountController : ControllerBase
     }
 
     [HttpPut]
+    [Authorize]
     [Route("{id}")]
-    public ActionResult UpdateAccount([FromRoute] Guid id, [FromBody] PutAccountDto dto)
+    public ActionResult UpdateAccount([FromBody] PutAccountDto dto)
     {
-        _accountService.UpdateAccount(id, dto);
+        _accountService.UpdateAccount(dto);
         return NoContent();
     }
 

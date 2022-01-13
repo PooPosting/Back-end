@@ -24,7 +24,10 @@ public class Account
         
     [AllowNull]
     public virtual List<Picture> Pictures { get; set; }
-
+    
+    [AllowNull]
+    public string LikedTags { get; set; }
+    
     public DateTime AccountCreated { get; set; }
         
     [DefaultValue(1)]

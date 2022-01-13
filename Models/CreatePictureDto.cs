@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using PicturesAPI.Entities;
 
 namespace PicturesAPI.Models;
 
@@ -14,7 +15,7 @@ public class CreatePictureDto
     [MaxLength(400)]
     public string Description { get; set; }
         
-    [MaxLength(400)]
+    [MaxLength(20)]
     public List<string> Tags { get; set; }
         
     [Required] [MinLength(16)] [MaxLength(500)]

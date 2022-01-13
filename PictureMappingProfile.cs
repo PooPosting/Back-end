@@ -16,7 +16,7 @@ public class PictureMappingProfile : Profile
             .ForMember(
                 p => p.Tags,
                 c => c
-                    .MapFrom(s => s.Tags.Split()))
+                    .MapFrom(s => GetTags(s.Tags) ))
             .ForMember(
                 p => p.Likes,
                 m => m
@@ -38,6 +38,12 @@ public class PictureMappingProfile : Profile
             .ForMember(
                 p => p.Tags,
                 p => p
-                    .MapFrom(c => string.Join(" ", c.Tags)));
+                    .MapFrom(c => string.Join(" ", c.Tags).ToLower()));
+    }
+
+    private static List<string> GetTags(string tags)
+    {
+        var tagList = tags.Split(' ').ToList();
+        return tagList;
     }
 }
