@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace PicturesAPI.Models;
+namespace PicturesAPI.Models.Dtos;
 
 public class PictureDto
 {

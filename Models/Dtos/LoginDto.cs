@@ -1,4 +1,4 @@
-﻿namespace PicturesAPI.Models;
+﻿namespace PicturesAPI.Models.Dtos;
 
 public class LoginDto
 {

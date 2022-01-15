@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using PicturesAPI.Entities;
 
-namespace PicturesAPI.Models;
+namespace PicturesAPI.Models.Dtos;
 
 public class AccountDto
 {

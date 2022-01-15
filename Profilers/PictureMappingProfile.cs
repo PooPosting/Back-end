@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using PicturesAPI.Entities;
-using PicturesAPI.Models;
+using PicturesAPI.Models.Dtos;
 
-namespace PicturesAPI;
+namespace PicturesAPI.Profilers;
 
 public class PictureMappingProfile : Profile
 {

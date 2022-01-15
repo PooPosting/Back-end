@@ -30,7 +30,7 @@ public class PictureLikingService : IPictureLikingService
         _accountContextService = accountContextService;
     }
     
-    public LikeOperationResult LikePicture(Guid id)
+    public LikeOperationResult Like(Guid id)
     {
         var user = _accountContextService.User;
         var picture = _dbContext.Pictures
@@ -56,7 +56,7 @@ public class PictureLikingService : IPictureLikingService
         }
     }
 
-    public LikeOperationResult DisLikePicture(Guid id)
+    public LikeOperationResult DisLike(Guid id)
     {
         var user = _accountContextService.User;
         var picture = _dbContext.Pictures
@@ -83,7 +83,8 @@ public class PictureLikingService : IPictureLikingService
         
     }
 
-
+    // PRIVATE METHODS | PRIVATE METHODS | PRIVATE METHODS | PRIVATE METHODS | PRIVATE METHODS | PRIVATE METHODS 
+    
     private LikeOperationResult RemoveLike(Picture picture, Account account)
     {
         var likeToRemove = _dbContext.Likes.SingleOrDefault(l => l.Liked == picture && l.Liker == account);
@@ -91,11 +92,11 @@ public class PictureLikingService : IPictureLikingService
         var pictureTags = picture.Tags.Split(' ').ToList();
         var likedTags = account.LikedTags.Split(' ').ToList();
         
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++) 
         {
             likedTags.Remove(pictureTags[i]);
         }
-        
+
         account.LikedTags = string.Join(' ', likedTags);
 
         _dbContext.Likes.Remove(likeToRemove!);

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using PicturesAPI.Entities;
+using PicturesAPI.Enums;
 
 namespace PicturesAPI.Authorization;
 

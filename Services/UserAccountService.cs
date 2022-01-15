@@ -13,6 +13,7 @@ using PicturesAPI.Entities;
 using PicturesAPI.Exceptions;
 using PicturesAPI.Interfaces;
 using PicturesAPI.Models;
+using PicturesAPI.Models.Dtos;
 
 namespace PicturesAPI.Services;
 
@@ -38,7 +39,7 @@ public class UserAccountService : IUserAccountService
         _authenticationSettings = authenticationSettings;
     }
         
-    public Guid CreateAccount(CreateAccountDto dto)
+    public Guid Create(CreateAccountDto dto)
     {
         var newAccount = new Account()
         {

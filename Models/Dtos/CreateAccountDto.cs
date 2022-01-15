@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using PicturesAPI.Entities;
 
-namespace PicturesAPI.Models;
+namespace PicturesAPI.Models.Dtos;
 
 public class CreateAccountDto
 {

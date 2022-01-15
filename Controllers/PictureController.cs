@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using PicturesAPI.Interfaces;
 using PicturesAPI.Models;
-using PicturesAPI.Services;
+using PicturesAPI.Models.Dtos;
 
 namespace PicturesAPI.Controllers;
 
@@ -27,19 +25,29 @@ public class PictureController : ControllerBase
     [HttpGet]
     [EnableQuery]
     [AllowAnonymous]
-    public ActionResult<List<PictureDto>> GetAllPictures()
+    public ActionResult<PagedResult<PictureDto>> GetAllPictures([FromQuery] PictureQuery query)
     {
-        var pictures = _pictureService.GetAllPictures();
+        var pictures = _pictureService.GetAll(query);
+        return Ok(pictures);
+    }
+
+    // only for testing
+    [HttpGet]
+    [EnableQuery]
+    [AllowAnonymous]
+    [Route("odata")]
+    public ActionResult<PagedResult<PictureDto>> GetAllOData()
+    {
+        var pictures = _pictureService.GetAllOdata();
         return Ok(pictures);
     }
 
     [HttpGet]
-    [EnableQuery]        
     [AllowAnonymous]
     [Route("{id}")]
     public ActionResult<PictureDto> GetSinglePictureById([FromRoute] Guid id)
     {
-        var picture = _pictureService.GetSinglePictureById(id);
+        var picture = _pictureService.GetById(id);
         return Ok(picture);
     }
 
@@ -47,7 +55,7 @@ public class PictureController : ControllerBase
     [Route("create")]
     public ActionResult PostPicture([FromBody] CreatePictureDto dto)
     {
-        var pictureId = _pictureService.CreatePicture(dto);
+        var pictureId = _pictureService.Create(dto);
         
         return Created($"api/picture/{pictureId}", null);
     }
@@ -56,7 +64,7 @@ public class PictureController : ControllerBase
     [Route("{id}")]
     public ActionResult PutPictureUpdate([FromRoute] Guid id, [FromBody] PutPictureDto dto)
     {
-        _pictureService.PutPicture(id, dto);
+        _pictureService.Put(id, dto);
         return NoContent();
     }
 
@@ -64,7 +72,7 @@ public class PictureController : ControllerBase
     [Route("{id}/voteup")]
     public ActionResult PatchPictureVoteUp([FromRoute] Guid id)
     {
-        var likeOperationResult = _pictureLikingService.LikePicture(id);
+        var likeOperationResult = _pictureLikingService.Like(id);
         return Ok(likeOperationResult);
     }
         
@@ -72,7 +80,7 @@ public class PictureController : ControllerBase
     [Route("{id}/votedown")]
     public ActionResult PatchPictureVoteDown([FromRoute] Guid id)
     {
-        var likeOperationResult = _pictureLikingService.DisLikePicture(id);
+        var likeOperationResult = _pictureLikingService.DisLike(id);
         return Ok(likeOperationResult);
     }
 
@@ -80,7 +88,7 @@ public class PictureController : ControllerBase
     [Route("{id}")]
     public ActionResult DeletePicture([FromRoute] Guid id)
     {
-        _pictureService.DeletePicture(id);
+        _pictureService.Delete(id);
         return NoContent();
     }
 

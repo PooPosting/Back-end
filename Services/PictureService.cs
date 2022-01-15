@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PicturesAPI.Authorization;
 using PicturesAPI.Entities;
+using PicturesAPI.Enums;
 using PicturesAPI.Exceptions;
 using PicturesAPI.Interfaces;
 using PicturesAPI.Models;
+using PicturesAPI.Models.Dtos;
 
 namespace PicturesAPI.Services;
 
@@ -30,21 +33,47 @@ public class PictureService : IPictureService
         _authorizationService = authorizationService;
         _accountContextService = accountContextService;
     }
+    
+    public PagedResult<PictureDto> GetAll(PictureQuery query)
+    {
+        var baseQuery = _dbContext.Pictures
+            .Include(p => p.Account)
+            .Include(p => p.Likes)
+            .Include(p => p.Dislikes)
+            .Where(p => query.SearchPhrase == null ||
+                        (p.Name.ToLower().Contains(query.SearchPhrase.ToLower()) ||
+                         p.Tags.ToLower().Contains(query.SearchPhrase.ToLower())));
+        
+        var pictures = baseQuery
+            .Skip(query.PageSize * (query.PageNumber - 1))
+            .Take(query.PageSize)
+            .ToList();
 
-    public IEnumerable<PictureDto> GetAllPictures()
+        
+        if (pictures.Count == 0) throw new NotFoundException("pictures not found");
+        
+        var resultCount = baseQuery.Count();
+
+        var pictureDtos = _mapper.Map<List<PictureDto>>(pictures).ToList();
+        var result = new PagedResult<PictureDto>(pictureDtos, resultCount, query.PageSize, query.PageNumber);
+        return result;
+    }
+    
+    public IEnumerable<PictureDto> GetAllOdata()
     {
         var pictures = _dbContext.Pictures
             .Include(p => p.Account)
             .Include(p => p.Likes)
             .Include(p => p.Dislikes)
             .ToList();
-
+        
         if (pictures.Count == 0) throw new NotFoundException("pictures not found");
-        var result = _mapper.Map<List<PictureDto>>(pictures).ToList();
+        var result = _mapper.Map<List<PictureDto>>(pictures);
+        
         return result;
     }
-        
-    public PictureDto GetSinglePictureById(Guid id)
+    
+    public PictureDto GetById(Guid id)
     {
         var picture = _dbContext.Pictures
             .Include(p => p.Likes)
@@ -56,7 +85,7 @@ public class PictureService : IPictureService
         return result;
     }
 
-    public Guid CreatePicture(CreatePictureDto dto)
+    public Guid Create(CreatePictureDto dto)
     {
         var id = _accountContextService.GetAccountId;
         if (id is null) throw new InvalidAuthTokenException();
@@ -73,7 +102,7 @@ public class PictureService : IPictureService
         return picture.Id;
     }
 
-    public void PutPicture(Guid id, PutPictureDto dto)
+    public void Put(Guid id, PutPictureDto dto)
     {
         var picture = _dbContext.Pictures.SingleOrDefault(p => p.Id == id);
         if (picture is null) throw new NotFoundException("There's not such a picture with that ID");
@@ -91,7 +120,7 @@ public class PictureService : IPictureService
         _dbContext.SaveChanges();
     }
         
-    public void DeletePicture(Guid id)
+    public void Delete(Guid id)
     {
         _logger.LogWarning($"Picture with id: {id} DELETE action invoked");
         var user = _accountContextService.User;

@@ -12,6 +12,7 @@ using PicturesAPI.Entities;
 using PicturesAPI.Exceptions;
 using PicturesAPI.Interfaces;
 using PicturesAPI.Models;
+using PicturesAPI.Models.Dtos;
 
 namespace PicturesAPI.Services;
 
@@ -38,7 +39,7 @@ public class AccountService : IAccountService
         _accountContextService = accountContextService;
     }
         
-    public AccountDto GetAccountById(Guid id)
+    public AccountDto GetById(Guid id)
     {
         var account = _dbContext.Accounts
             .Include(a => a.Pictures)
@@ -52,7 +53,31 @@ public class AccountService : IAccountService
         return result;
     }
 
-    public IEnumerable<AccountDto> GetAllAccounts()
+    public PagedResult<AccountDto> GetAll(AccountQuery query)
+    {
+        var baseQuery = _dbContext.Accounts
+            .Include(p => p.Pictures)
+            .Include(p => p.Likes)
+            .Include(p => p.Dislikes)
+            .Where(p => query.SearchPhrase == null || p.Nickname.ToLower().Contains(query.SearchPhrase.ToLower()));
+        
+        var accounts = baseQuery
+            .Skip(query.PageSize * (query.PageNumber - 1))
+            .Take(query.PageSize)
+            .ToList();
+
+        
+        if (accounts.Count == 0) throw new NotFoundException("pictures not found");
+        
+        var resultCount = baseQuery.Count();
+
+        var accountDtos = _mapper.Map<List<AccountDto>>(accounts).ToList();
+        var result = new PagedResult<AccountDto>(accountDtos, resultCount, query.PageSize, query.PageNumber);
+        
+        return result;
+    }
+
+    public IEnumerable<AccountDto> GetAllOdata()
     {
         var accounts = _dbContext.Accounts
             .Include(a => a.Pictures)
@@ -66,7 +91,7 @@ public class AccountService : IAccountService
         return result;
     }
         
-    public void UpdateAccount(PutAccountDto dto)
+    public void Update(PutAccountDto dto)
     {
         var user = _accountContextService.User;
         var id = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
@@ -80,8 +105,7 @@ public class AccountService : IAccountService
         _dbContext.SaveChanges();
     }
 
-    [SuppressMessage("ReSharper", "TemplateIsNotCompileTimeConstantProblem")]
-    public void DeleteAccount(Guid id)
+    public void Delete(Guid id)
     {
         _logger.LogWarning($"Account with id: {id} DELETE action invoked");
         var account = _dbContext.Accounts.SingleOrDefault(a => a.Id == id);

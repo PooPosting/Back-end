@@ -15,6 +15,7 @@ using PicturesAPI.Entities;
 using PicturesAPI.Interfaces;
 using PicturesAPI.Middleware;
 using PicturesAPI.Models;
+using PicturesAPI.Models.Dtos;
 using PicturesAPI.Models.Validators;
 using PicturesAPI.Services;
 
@@ -56,9 +57,9 @@ public class Startup
             });
 
         services.AddAuthorization();
-            
+
         services.AddControllers().AddFluentValidation()
-            .AddOData(options => options.Filter().Select().OrderBy().Count().Expand().SetMaxTop(50).SkipToken());
+            .AddOData(options => options.Select().Expand().Filter().Count().OrderBy().SkipToken());
 
         services.AddScoped<IAuthorizationHandler, ResourceOperationRequirementHandler>();
         services.AddDbContext<PictureDbContext>();
@@ -71,6 +72,8 @@ public class Startup
         services.AddScoped<ErrorHandlingMiddleware>();
         services.AddScoped<RequestTimeMiddleware>();
         services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
+        services.AddScoped<IValidator<AccountQuery>, AccountQueryValidator>();
+        services.AddScoped<IValidator<PictureQuery>, PictureQueryValidator>();
         services.AddScoped<IValidator<PutAccountDto>, PutAccountDtoValidator>();
         services.AddScoped<IValidator<CreateAccountDto>, CreateAccountDtoValidator>();
         services.AddAutoMapper(this.GetType().Assembly);

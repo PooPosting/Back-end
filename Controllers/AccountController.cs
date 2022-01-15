@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using PicturesAPI.Interfaces;
 using PicturesAPI.Models;
+using PicturesAPI.Models.Dtos;
 
 namespace PicturesAPI.Controllers;
 
@@ -20,22 +21,30 @@ public class AccountController : ControllerBase
         _accountService = accountService;
         _userAccountService = userAccountService;
     }
-        
+     
     [HttpGet]
-    [EnableQuery]
-    public ActionResult<List<AccountDto>> GetAllAccounts()
-    {
-        var accounts = _accountService.GetAllAccounts();
-        return Ok(accounts);
-    }
-        
-    [HttpGet]
-    [EnableQuery]
     [Route("{id}")]
     public ActionResult<AccountDto> GetAccountById([FromRoute] Guid id)
     {
-        var account = _accountService.GetAccountById(id);
+        var account = _accountService.GetById(id);
         return Ok(account);
+    }
+    
+    [HttpGet]
+    [EnableQuery]
+    public ActionResult<PagedResult<AccountDto>> GetAllAccounts([FromQuery] AccountQuery query)
+    {
+        var accounts = _accountService.GetAll(query);
+        return Ok(accounts);
+    }
+
+    [HttpGet]
+    [EnableQuery]
+    [Route("odata")]
+    public ActionResult<IEnumerable<AccountDto>> GetAllOdata()
+    {
+        var result = _accountService.GetAllOdata();
+        return Ok(result);
     }
 
     [HttpPut]
@@ -43,7 +52,7 @@ public class AccountController : ControllerBase
     [Route("{id}")]
     public ActionResult UpdateAccount([FromBody] PutAccountDto dto)
     {
-        _accountService.UpdateAccount(dto);
+        _accountService.Update(dto);
         return NoContent();
     }
 
@@ -52,7 +61,7 @@ public class AccountController : ControllerBase
     [Route("{id}")]
     public ActionResult DeleteAccount([FromRoute] Guid id)
     {
-        _accountService.DeleteAccount(id);
+        _accountService.Delete(id);
         return NoContent();
     }
 
@@ -60,7 +69,7 @@ public class AccountController : ControllerBase
     [Route("register")]
     public ActionResult PostAccount([FromBody] CreateAccountDto dto)
     {
-        var accountId = _userAccountService.CreateAccount(dto);
+        var accountId = _userAccountService.Create(dto);
         return Created($"api/accounts/{accountId}", null);
     }
         

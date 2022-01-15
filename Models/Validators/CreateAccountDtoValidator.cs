@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using FluentValidation;
 using PicturesAPI.Entities;
+using PicturesAPI.Models.Dtos;
 
 namespace PicturesAPI.Models.Validators;
 

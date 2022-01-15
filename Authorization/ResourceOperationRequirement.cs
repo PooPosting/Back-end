@@ -1,14 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using PicturesAPI.Enums;
 
 namespace PicturesAPI.Authorization;
 
-public enum ResourceOperation
-{
-    Create,
-    Read,
-    Update,
-    Delete
-}
+
 
 public class ResourceOperationRequirement : IAuthorizationRequirement
 {

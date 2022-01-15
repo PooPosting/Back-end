@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using PicturesAPI.Models.Dtos;
 
 namespace PicturesAPI.Models.Validators;
 

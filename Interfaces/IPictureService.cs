@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Claims;
 using PicturesAPI.Models;
+using PicturesAPI.Models.Dtos;
 
 namespace PicturesAPI.Interfaces;
 
 public interface IPictureService
 {
-    IEnumerable<PictureDto> GetAllPictures();
-    PictureDto GetSinglePictureById(Guid id);
-    Guid CreatePicture(CreatePictureDto dto);
-    void PutPicture(Guid id, PutPictureDto dto);
-    void DeletePicture(Guid id);
+    PagedResult<PictureDto> GetAll(PictureQuery query);
+    IEnumerable<PictureDto> GetAllOdata();
+    PictureDto GetById(Guid id);
+    Guid Create(CreatePictureDto dto);
+    void Put(Guid id, PutPictureDto dto);
+    void Delete(Guid id);
 }
