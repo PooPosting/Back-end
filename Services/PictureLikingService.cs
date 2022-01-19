@@ -10,6 +10,7 @@ using PicturesAPI.Interfaces;
 
 namespace PicturesAPI.Services;
 
+// use separate folders for these
 public enum LikeOperationResult
 {
     Liked,
@@ -17,6 +18,8 @@ public enum LikeOperationResult
     Disliked,
     DislikeRemoved
 }
+
+// change this whole bitch to factory
 public class PictureLikingService : IPictureLikingService
 {
     private readonly PictureDbContext _dbContext;
@@ -44,7 +47,7 @@ public class PictureLikingService : IPictureLikingService
         var account = _dbContext.Accounts.SingleOrDefault(a => a.Id.ToString() == accountId);
         if (account is null) throw new InvalidAuthTokenException();
         
-        if (_dbContext.Likes.Any(l => l.Liker == account && l.Liked == picture))
+        if (_dbContext.Likes.Any(l => l.Liker == account && l.Liked == picture && l.IsLike))
         {
             var result = RemoveLike(picture, account);
             return result;
@@ -70,7 +73,8 @@ public class PictureLikingService : IPictureLikingService
         var account = _dbContext.Accounts.SingleOrDefault(a => a.Id.ToString() == accountId);
         if (account is null) throw new InvalidAuthTokenException();
 
-        if (_dbContext.Dislikes.Any(l => l.DisLiker == account && l.DisLiked == picture))
+        // if dislike exists
+        if (_dbContext.Likes.Any(l => l.Liker == account && l.Liked == picture && !l.IsLike))
         {
             var result = RemoveDisLike(picture, account);
             return result;
@@ -106,8 +110,8 @@ public class PictureLikingService : IPictureLikingService
 
     private LikeOperationResult AddLike(Picture picture, Account account)
     {
-        var disLikeToRemove = _dbContext.Dislikes.SingleOrDefault(l => l.DisLiked == picture && l.DisLiker == account);
-        if (disLikeToRemove is not null) _dbContext.Dislikes.Remove(disLikeToRemove!);
+        var disLikeToRemove = _dbContext.Likes.SingleOrDefault(l => l.Liked == picture && l.Liker == account);
+        if (disLikeToRemove is not null) _dbContext.Likes.Remove(disLikeToRemove!);
         
         var pictureTags = picture.Tags.ToLower().Split(' ').ToList();
         account.LikedTags ??= " ";
@@ -132,6 +136,7 @@ public class PictureLikingService : IPictureLikingService
         _dbContext.Likes.Add(
             new Like()
             {
+                IsLike = true,
                 Liked = picture,
                 Liker = account
             });
@@ -141,8 +146,8 @@ public class PictureLikingService : IPictureLikingService
 
     private LikeOperationResult RemoveDisLike(Picture picture, Account account)
     {
-        var disLikeToRemove = _dbContext.Dislikes.SingleOrDefault(l => l.DisLiked == picture && l.DisLiker == account);
-        _dbContext.Dislikes.Remove(disLikeToRemove!);
+        var disLikeToRemove = _dbContext.Likes.SingleOrDefault(l => l.Liked == picture && l.Liker == account);
+        _dbContext.Likes.Remove(disLikeToRemove!);
         _dbContext.SaveChanges();
         return LikeOperationResult.DislikeRemoved;
     }
@@ -151,11 +156,12 @@ public class PictureLikingService : IPictureLikingService
     {
         var likeToRemove = _dbContext.Likes.SingleOrDefault(l => l.Liked == picture && l.Liker == account);
         if (likeToRemove is not null) _dbContext.Likes.Remove(likeToRemove);
-        _dbContext.Dislikes.Add(
-            new Dislike()
+        _dbContext.Likes.Add(
+            new Like()
             {
-                DisLiked = picture,
-                DisLiker = account
+                IsLike = false,
+                Liked = picture,
+                Liker = account,
             });
         _dbContext.SaveChanges();
         return LikeOperationResult.Disliked;

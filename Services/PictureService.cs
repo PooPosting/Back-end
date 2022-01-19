@@ -16,6 +16,8 @@ using PicturesAPI.Models.Dtos;
 
 namespace PicturesAPI.Services;
 
+
+// use factory to get dbcontext data
 public class PictureService : IPictureService
 {
     private readonly ILogger<PictureService> _logger;
@@ -39,7 +41,6 @@ public class PictureService : IPictureService
         var baseQuery = _dbContext.Pictures
             .Include(p => p.Account)
             .Include(p => p.Likes)
-            .Include(p => p.Dislikes)
             .Where(p => query.SearchPhrase == null ||
                         (p.Name.ToLower().Contains(query.SearchPhrase.ToLower()) ||
                          p.Tags.ToLower().Contains(query.SearchPhrase.ToLower())));
@@ -136,10 +137,8 @@ public class PictureService : IPictureService
         if (!authorizationResult.Succeeded) throw new ForbidException("You can't delete picture you didn't added");
 
         var likesToRemove = _dbContext.Likes.Where(l => l.Liked == picture);
-        var disLikesToRemove = _dbContext.Dislikes.Where(d => d.DisLiked == picture);
         
         _dbContext.Likes.RemoveRange(likesToRemove);
-        _dbContext.Dislikes.RemoveRange(disLikesToRemove);
         _dbContext.Pictures.Remove(picture);
         _dbContext.SaveChanges();
         _logger.LogWarning($"Picture with id: {id} DELETE action success");

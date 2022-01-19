@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Microsoft.OData.Edm;
 
 namespace PicturesAPI.Entities;
 
@@ -28,7 +29,7 @@ public class Account
     [AllowNull]
     public string LikedTags { get; set; }
     
-    public DateTime AccountCreated { get; set; }
+    public DateTime AccountCreated { get; set; } = DateTime.Now;
         
     [DefaultValue(1)]
     public int RoleId { get; set; }

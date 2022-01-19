@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.OData;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -23,6 +24,20 @@ namespace PicturesAPI;
 
 public class Startup
 {
+    
+    // public Startup(IHostEnvironment env)
+    // {
+    //     var builder = new ConfigurationBuilder()
+    //         .SetBasePath(env.ContentRootPath)
+    //         .AddJsonFile("appsettings.json")
+    //         .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
+    //         .AddEnvironmentVariables();
+    //     
+    //     Console.WriteLine(env.EnvironmentName);
+    //
+    //     Configuration = builder.Build();
+    // }
+    
     public Startup(IConfiguration configuration)
     {
         Configuration = configuration;
@@ -33,9 +48,13 @@ public class Startup
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
+        
+        services.AddControllers().AddFluentValidation()
+            .AddOData(options => options.Select().Filter().OrderBy());
+
+        // Auth
         var authenticationSettings = new AuthenticationSettings();
         Configuration.GetSection("Authentication").Bind(authenticationSettings);
-
         services.AddSingleton(authenticationSettings);
         services
             .AddAuthentication(option =>
@@ -55,29 +74,37 @@ public class Startup
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authenticationSettings.JwtKey))
                 };
             });
-
         services.AddAuthorization();
-
-        services.AddControllers().AddFluentValidation()
-            .AddOData(options => options.Select().Expand().Filter().Count().OrderBy().SkipToken());
-
         services.AddScoped<IAuthorizationHandler, ResourceOperationRequirementHandler>();
-        services.AddDbContext<PictureDbContext>();
-        services.AddScoped<PictureSeeder>();
+
+
+        // DbContext
+        services.AddDbContext<PictureDbContext>(options =>
+        {
+            options.UseSqlServer(Configuration.GetConnectionString("PictureDbConnection"));
+        });
+
+        // Validators
+        services.AddScoped<IValidator<AccountQuery>, AccountQueryValidator>();
+        services.AddScoped<IValidator<PictureQuery>, PictureQueryValidator>();
+        services.AddScoped<IValidator<PutAccountDto>, PutAccountDtoValidator>();
+        services.AddScoped<IValidator<CreateAccountDto>, CreateAccountDtoValidator>();
+
+        // Middleware
+        services.AddScoped<ErrorHandlingMiddleware>();
+        services.AddScoped<RequestTimeMiddleware>();
+        
+        // Services
         services.AddScoped<IAccountContextService, AccountContextService>();
         services.AddScoped<IPictureLikingService, PictureLikingService>();
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IPictureService, PictureService>();
         services.AddScoped<IUserAccountService, UserAccountService>();
-        services.AddScoped<ErrorHandlingMiddleware>();
-        services.AddScoped<RequestTimeMiddleware>();
+        
+        // Other stuff
         services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
-        services.AddScoped<IValidator<AccountQuery>, AccountQueryValidator>();
-        services.AddScoped<IValidator<PictureQuery>, PictureQueryValidator>();
-        services.AddScoped<IValidator<PutAccountDto>, PutAccountDtoValidator>();
-        services.AddScoped<IValidator<CreateAccountDto>, CreateAccountDtoValidator>();
+        services.AddScoped<PictureSeeder>();
         services.AddAutoMapper(this.GetType().Assembly);
-        services.AddControllers();
         services.AddHttpContextAccessor();
         services.AddSwaggerGen();
     }

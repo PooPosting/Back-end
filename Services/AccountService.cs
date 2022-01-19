@@ -24,6 +24,10 @@ public class AccountService : IAccountService
     private readonly ILogger<AccountService> _logger;
     private readonly IAccountContextService _accountContextService;
 
+    // DONT USE DBCONTEXT IN ANY SERVICE
+    // USE FACTORY
+    // DUMBASS
+
     public AccountService(
         IMapper mapper,
         PictureDbContext dbContext, 
@@ -115,10 +119,8 @@ public class AccountService : IAccountService
             throw new NotFoundException("There's not such an account with that ID");
         }
         var likes = _dbContext.Likes.Where(l => l.Liker == account);
-        var disLikes = _dbContext.Dislikes.Where(d => d.DisLiker == account);
             
         _dbContext.Likes.RemoveRange(likes);
-        _dbContext.Dislikes.RemoveRange(disLikes);
         _dbContext.Accounts.Remove(account);
         _dbContext.SaveChanges();
         _logger.LogWarning($"Account with id: {id} DELETE action success");

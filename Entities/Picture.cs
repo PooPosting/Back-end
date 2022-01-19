@@ -29,7 +29,7 @@ public class Picture
     [Comment("Picture web URL")]
     [Required] [MaxLength(500)]
     public string Url { get; set; }
-    public DateTime PictureAdded { get; set; }
+    public DateTime PictureAdded { get; set; } = DateTime.Now;
         
     public virtual List<Like> Likes { get; set; }
         

@@ -9,4 +9,6 @@ public class Like
     public int Id { get; set; }
     public Account Liker { get; set; }
     public Picture Liked { get; set; }
+
+    [Required] public bool IsLike { get; set; } = true;
 }

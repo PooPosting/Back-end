@@ -10,6 +10,7 @@ using PicturesAPI.Models.Dtos;
 namespace PicturesAPI.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/account")]
 public class AccountController : ControllerBase
 {
@@ -48,7 +49,6 @@ public class AccountController : ControllerBase
     }
 
     [HttpPut]
-    [Authorize]
     [Route("{id}")]
     public ActionResult UpdateAccount([FromBody] PutAccountDto dto)
     {
@@ -57,7 +57,6 @@ public class AccountController : ControllerBase
     }
 
     [HttpDelete] 
-    [Authorize]
     [Route("{id}")]
     public ActionResult DeleteAccount([FromRoute] Guid id)
     {
@@ -74,6 +73,7 @@ public class AccountController : ControllerBase
     }
         
     [HttpPost]
+    [AllowAnonymous]
     [Route("login")]
     public ActionResult Login([FromBody] LoginDto dto)
     {
