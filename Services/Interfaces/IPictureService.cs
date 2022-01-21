@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
 
-namespace PicturesAPI.Interfaces;
+namespace PicturesAPI.Services.Interfaces;
 
 public interface IPictureService
 {
@@ -11,6 +11,6 @@ public interface IPictureService
     IEnumerable<PictureDto> GetAllOdata();
     PictureDto GetById(Guid id);
     Guid Create(CreatePictureDto dto);
-    void Put(Guid id, PutPictureDto dto);
-    void Delete(Guid id);
+    bool Put(Guid id, PutPictureDto dto);
+    bool Delete(Guid id);
 }

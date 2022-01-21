@@ -1,67 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using PicturesAPI.Entities;
 using PicturesAPI.Exceptions;
-using PicturesAPI.Interfaces;
-using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
+using PicturesAPI.Repos.Interfaces;
+using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Services;
 
 public class UserAccountService : IUserAccountService
 {
-    private readonly IMapper _mapper;
-    private readonly PictureDbContext _dbContext;
     private readonly IPasswordHasher<Account> _passwordHasher;
-    private readonly ILogger<UserAccountService> _logger;
     private readonly AuthenticationSettings _authenticationSettings;
+    private readonly IAccountRepo _accountRepo;
 
     public UserAccountService(
-        IMapper mapper,
-        PictureDbContext dbContext, 
         IPasswordHasher<Account> passwordHasher, 
-        ILogger<UserAccountService> logger, 
-        AuthenticationSettings authenticationSettings)
+        AuthenticationSettings authenticationSettings,
+        IAccountRepo accountRepo)
     {
-        _mapper = mapper;
-        _dbContext = dbContext;
         _passwordHasher = passwordHasher;
-        _logger = logger;
         _authenticationSettings = authenticationSettings;
+        _accountRepo = accountRepo;
     }
         
     public Guid Create(CreateAccountDto dto)
     {
-        var newAccount = new Account()
-        {
-            Nickname = dto.Nickname,
-            Email = dto.Email,
-            AccountCreated = DateTime.Now,
-            Pictures = new List<Picture>(),
-            RoleId = dto.RoleId
-        };
-
-        var hashedPassword = _passwordHasher.HashPassword(newAccount, dto.Password);
-        newAccount.PasswordHash = hashedPassword;
-        _dbContext.Accounts.Add(newAccount);
-        _dbContext.SaveChanges();
-            
-        return newAccount.Id;
+        var newAccountId = _accountRepo.CreateAccount(dto);
+        return newAccountId;
     }
 
     public string GenerateJwt(LoginDto dto)
     {
-        var account = _dbContext.Accounts
-            .FirstOrDefault(a => a.Nickname == dto.Nickname);
+        var account = _accountRepo.GetAccountByNick(dto.Nickname);
         if (account is null)
             throw new BadRequestException("Invalid nickname or password");
 

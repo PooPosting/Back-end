@@ -1,169 +1,127 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Claims;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Microsoft.VisualBasic;
 using PicturesAPI.Entities;
+using PicturesAPI.Enums;
 using PicturesAPI.Exceptions;
-using PicturesAPI.Interfaces;
+using PicturesAPI.Repos.Interfaces;
+using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Services;
 
 // use separate folders for these
-public enum LikeOperationResult
-{
-    Liked,
-    LikeRemoved,
-    Disliked,
-    DislikeRemoved
-}
+
 
 // change this whole bitch to factory
 public class PictureLikingService : IPictureLikingService
 {
-    private readonly PictureDbContext _dbContext;
-    private readonly ILogger<PictureLikingService> _logger;
+    private readonly IPictureRepo _pictureRepo;
+    private readonly ILikeRepo _likeRepo;
+    private readonly IAccountRepo _accountRepo;
     private readonly IAccountContextService _accountContextService;
 
-    public PictureLikingService(PictureDbContext dbContext, ILogger<PictureLikingService> logger, IAccountContextService accountContextService)
+    public PictureLikingService(
+        ILikeRepo likeRepo,
+        IAccountRepo accountRepo,
+        IPictureRepo pictureRepo,
+        IAccountContextService accountContextService)
     {
-        _dbContext = dbContext;
-        _logger = logger;
+        _pictureRepo = pictureRepo;
+        _likeRepo = likeRepo;
+        _accountRepo = accountRepo;
         _accountContextService = accountContextService;
     }
     
     public LikeOperationResult Like(Guid id)
     {
         var user = _accountContextService.User;
-        var picture = _dbContext.Pictures
-            .Include(p => p.Likes)
-            .Include(p => p.Dislikes)
-            .SingleOrDefault(p => p.Id == id);
+        var picture = _pictureRepo.GetPictureById(id);
         
-        if (picture is null) throw new NotFoundException("Picture not found");
+        if (picture is null) throw new NotFoundException("picture not found");
         
         var accountId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
-        var account = _dbContext.Accounts.SingleOrDefault(a => a.Id.ToString() == accountId);
+        var account = _accountRepo.GetAccountById(Guid.Parse(accountId));
+        
         if (account is null) throw new InvalidAuthTokenException();
         
-        if (_dbContext.Likes.Any(l => l.Liker == account && l.Liked == picture && l.IsLike))
+        var like = _likeRepo.GetLikeByLikerAndLiked(account, picture);
+        
+        // If we call like
+        if (like is not null)
         {
-            var result = RemoveLike(picture, account);
-            return result;
+            // like exists
+            if (like.IsLike)
+            {
+                // is like
+                _likeRepo.RemoveLike(like);
+                return LikeOperationResult.LikeRemoved;
+            }
+            else
+            {
+                // is dislike
+                _likeRepo.ChangeLike(like);
+                return LikeOperationResult.Liked;
+            }
         }
         else
         {
-            var result = AddLike(picture, account);
-            return result;
+            // like does not exist
+            _likeRepo.AddLike(
+                new Like()
+                {
+                    Liked = picture,
+                    Liker = account,
+                    IsLike = true
+                });
+            return LikeOperationResult.Liked;
         }
     }
 
     public LikeOperationResult DisLike(Guid id)
     {
         var user = _accountContextService.User;
-        var picture = _dbContext.Pictures
-            .Include(p => p.Likes)
-            .Include(p => p.Dislikes)
-            .SingleOrDefault(p => p.Id == id);
+        var picture = _pictureRepo.GetPictureById(id);
         
-        if (picture is null) throw new NotFoundException("Picture not found");
+        if (picture is null) throw new NotFoundException("picture not found");
         
         var accountId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
-        var account = _dbContext.Accounts.SingleOrDefault(a => a.Id.ToString() == accountId);
+        var account = _accountRepo.GetAccountById(Guid.Parse(accountId));
+        
         if (account is null) throw new InvalidAuthTokenException();
+        
+        var like = _likeRepo.GetLikeByLikerAndLiked(account, picture);
 
-        // if dislike exists
-        if (_dbContext.Likes.Any(l => l.Liker == account && l.Liked == picture && !l.IsLike))
+        // If we call dislike
+        if (like is not null)
         {
-            var result = RemoveDisLike(picture, account);
-            return result;
+            // dislike exists
+            if (like.IsLike == false)
+            {
+                // is dislike
+                _likeRepo.RemoveLike(like);
+                return LikeOperationResult.DislikeRemoved;
+            }
+            else
+            {
+                // is like
+                _likeRepo.ChangeLike(like);
+                return LikeOperationResult.Disliked;
+            }
         }
         else
         {
-            var result = AddDisLike(picture, account);
-            return result;
+            // dislike does not exist
+            _likeRepo.AddLike(
+                new Like()
+                {
+                    Liked = picture,
+                    Liker = account,
+                    IsLike = false
+                });
+            return LikeOperationResult.Disliked;
+            
         }
         
     }
 
-    // PRIVATE METHODS | PRIVATE METHODS | PRIVATE METHODS | PRIVATE METHODS | PRIVATE METHODS | PRIVATE METHODS 
-    
-    private LikeOperationResult RemoveLike(Picture picture, Account account)
-    {
-        var likeToRemove = _dbContext.Likes.SingleOrDefault(l => l.Liked == picture && l.Liker == account);
-        account.LikedTags ??= " ";
-        var pictureTags = picture.Tags.Split(' ').ToList();
-        var likedTags = account.LikedTags.Split(' ').ToList();
-        
-        for (int i = 0; i < 3; i++) 
-        {
-            likedTags.Remove(pictureTags[i]);
-        }
-
-        account.LikedTags = string.Join(' ', likedTags);
-
-        _dbContext.Likes.Remove(likeToRemove!);
-        _dbContext.SaveChanges();
-        return LikeOperationResult.Liked;
-    }
-
-    private LikeOperationResult AddLike(Picture picture, Account account)
-    {
-        var disLikeToRemove = _dbContext.Likes.SingleOrDefault(l => l.Liked == picture && l.Liker == account);
-        if (disLikeToRemove is not null) _dbContext.Likes.Remove(disLikeToRemove!);
-        
-        var pictureTags = picture.Tags.ToLower().Split(' ').ToList();
-        account.LikedTags ??= " ";
-        var likedTags = account.LikedTags.ToLower().Split(' ').ToList();
-        likedTags = likedTags.Distinct().ToList();
-        
-        foreach (var tag in likedTags)
-        {
-            if (pictureTags.Any(t => t == tag))
-            {
-                pictureTags.Remove(tag);
-            }
-        }
-        likedTags.AddRange(pictureTags.Take(3));
-        
-        if (likedTags.Count > 30)
-        {
-            likedTags.RemoveRange(30, likedTags.Count - 30);
-        }
-        
-        account.LikedTags = string.Join(' ', likedTags);
-        _dbContext.Likes.Add(
-            new Like()
-            {
-                IsLike = true,
-                Liked = picture,
-                Liker = account
-            });
-        _dbContext.SaveChanges();
-        return LikeOperationResult.LikeRemoved;
-    }
-
-    private LikeOperationResult RemoveDisLike(Picture picture, Account account)
-    {
-        var disLikeToRemove = _dbContext.Likes.SingleOrDefault(l => l.Liked == picture && l.Liker == account);
-        _dbContext.Likes.Remove(disLikeToRemove!);
-        _dbContext.SaveChanges();
-        return LikeOperationResult.DislikeRemoved;
-    }
-
-    private LikeOperationResult AddDisLike(Picture picture, Account account)
-    {
-        var likeToRemove = _dbContext.Likes.SingleOrDefault(l => l.Liked == picture && l.Liker == account);
-        if (likeToRemove is not null) _dbContext.Likes.Remove(likeToRemove);
-        _dbContext.Likes.Add(
-            new Like()
-            {
-                IsLike = false,
-                Liked = picture,
-                Liker = account,
-            });
-        _dbContext.SaveChanges();
-        return LikeOperationResult.Disliked;
-    }
 }

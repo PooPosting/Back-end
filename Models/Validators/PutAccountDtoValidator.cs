@@ -8,8 +8,13 @@ public class PutAccountDtoValidator : AbstractValidator<PutAccountDto>
     public PutAccountDtoValidator()
     {
         RuleFor(x => x.Email)
-            .EmailAddress();
-            
+            .EmailAddress()
+            .MaximumLength(40);
+
+        RuleFor(x => x.Password)
+            .MinimumLength(8)
+            .MaximumLength(128);
+        
         RuleFor(x => x.ConfirmPassword)
             .Equal(e => e.Password);
     }

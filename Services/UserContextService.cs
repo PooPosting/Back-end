@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
-using PicturesAPI.Interfaces;
+using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Services;
 
@@ -14,6 +14,6 @@ public class AccountContextService : IAccountContextService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public ClaimsPrincipal User => _httpContextAccessor.HttpContext?.User;
-    public string? GetAccountId => User is null ? null : User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value;
+    public ClaimsPrincipal User => _httpContextAccessor.HttpContext!.User;
+    public string? GetAccountId => User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 }

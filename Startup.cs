@@ -13,12 +13,14 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using PicturesAPI.Authorization;
 using PicturesAPI.Entities;
-using PicturesAPI.Interfaces;
 using PicturesAPI.Middleware;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Models.Validators;
+using PicturesAPI.Repos;
+using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services;
+using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI;
 
@@ -76,6 +78,7 @@ public class Startup
             });
         services.AddAuthorization();
         services.AddScoped<IAuthorizationHandler, ResourceOperationRequirementHandler>();
+        services.AddScoped<IAuthorizationHandler, AccountOperationRequirementHandler>();
 
 
         // DbContext
@@ -100,6 +103,11 @@ public class Startup
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IPictureService, PictureService>();
         services.AddScoped<IUserAccountService, UserAccountService>();
+        
+        // Repos
+        services.AddScoped<IAccountRepo, AccountRepo>();
+        services.AddScoped<ILikeRepo, LikeRepo>();
+        services.AddScoped<IPictureRepo, PictureRepo>();
         
         // Other stuff
         services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();

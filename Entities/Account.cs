@@ -36,5 +36,4 @@ public class Account
 
     public virtual List<Like> Likes { get; set; }
 
-    public virtual List<Dislike> Dislikes { get; set; }
 }

@@ -3,8 +3,6 @@ using PicturesAPI.Enums;
 
 namespace PicturesAPI.Authorization;
 
-
-
 public class ResourceOperationRequirement : IAuthorizationRequirement
 {
     public ResourceOperation ResourceOperation { get; }

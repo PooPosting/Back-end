@@ -1,77 +1,69 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Claims;
 using AutoMapper;
-using AutoMapper.Internal;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
-using PicturesAPI.Entities;
+using PicturesAPI.Authorization;
+using PicturesAPI.Enums;
 using PicturesAPI.Exceptions;
-using PicturesAPI.Interfaces;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
+using PicturesAPI.Repos.Interfaces;
+using PicturesAPI.Services.Interfaces;
+// ReSharper disable TemplateIsNotCompileTimeConstantProblem
 
 namespace PicturesAPI.Services;
 
 public class AccountService : IAccountService
 {
-    private readonly PictureDbContext _dbContext;
     private readonly IMapper _mapper;
-    private readonly IPasswordHasher<Account> _passwordHasher;
     private readonly ILogger<AccountService> _logger;
     private readonly IAccountContextService _accountContextService;
-
-    // DONT USE DBCONTEXT IN ANY SERVICE
-    // USE FACTORY
-    // DUMBASS
+    private readonly IAccountRepo _accountRepo;
+    private readonly ILikeRepo _likeRepo;
+    private readonly IPictureRepo _pictureRepo;
+    private readonly IAuthorizationService _authorizationService;
 
     public AccountService(
         IMapper mapper,
-        PictureDbContext dbContext, 
-        IPasswordHasher<Account> passwordHasher, 
         ILogger<AccountService> logger,
-        IAccountContextService accountContextService)
-            
-    {
-        _dbContext = dbContext;
+        IAccountContextService accountContextService,
+        IAccountRepo accountRepo,
+        ILikeRepo likeRepo,
+        IPictureRepo pictureRepo,
+        IAuthorizationService authorizationService)
+    {        
         _mapper = mapper;
-        _passwordHasher = passwordHasher;
         _logger = logger;
         _accountContextService = accountContextService;
+        _accountRepo = accountRepo;
+        _likeRepo = likeRepo;
+        _pictureRepo = pictureRepo;
+        _authorizationService = authorizationService;
     }
         
     public AccountDto GetById(Guid id)
     {
-        var account = _dbContext.Accounts
-            .Include(a => a.Pictures)
-            .Include(a => a.Likes)
-            .Include(a => a.Dislikes)
-            .SingleOrDefault(a => a.Id == id);
-
-        if (account == null) throw new NotFoundException("account not found");
-            
+        var account = _accountRepo.GetAccountById(id);
         var result = _mapper.Map<AccountDto>(account);
+        
         return result;
     }
 
     public PagedResult<AccountDto> GetAll(AccountQuery query)
     {
-        var baseQuery = _dbContext.Accounts
-            .Include(p => p.Pictures)
-            .Include(p => p.Likes)
-            .Include(p => p.Dislikes)
-            .Where(p => query.SearchPhrase == null || p.Nickname.ToLower().Contains(query.SearchPhrase.ToLower()));
-        
+        var baseQuery = _accountRepo.GetAccounts()
+            .Where(p => query.SearchPhrase == null || p.Nickname.ToLower().Contains(query.SearchPhrase.ToLower()))
+            .ToList();
+
         var accounts = baseQuery
             .Skip(query.PageSize * (query.PageNumber - 1))
             .Take(query.PageSize)
             .ToList();
-
         
-        if (accounts.Count == 0) throw new NotFoundException("pictures not found");
+        if (accounts.Count == 0) throw new NotFoundException("accounts not found");
         
         var resultCount = baseQuery.Count();
 
@@ -83,11 +75,7 @@ public class AccountService : IAccountService
 
     public IEnumerable<AccountDto> GetAllOdata()
     {
-        var accounts = _dbContext.Accounts
-            .Include(a => a.Pictures)
-            .Include(a => a.Likes)
-            .Include(a => a.Dislikes)
-            .ToList();
+        var accounts = _accountRepo.GetAccounts().ToList();
             
         if (accounts.Count == 0) throw new NotFoundException("accounts not found");
             
@@ -95,35 +83,33 @@ public class AccountService : IAccountService
         return result;
     }
         
-    public void Update(PutAccountDto dto)
+    public bool Update(PutAccountDto dto)
     {
         var user = _accountContextService.User;
         var id = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
-        var account = _dbContext.Accounts.SingleOrDefault(a => a.Id.ToString() == id);
-        if (account is null) throw new NotFoundException("There's not such an account with that ID");
-            
-        var passwordHashed = _passwordHasher.HashPassword(account, dto.Password);
-            
-        if (dto.Email != null) account!.Email = dto.Email;
-        if (dto.Password != null) account!.PasswordHash = passwordHashed;
-        _dbContext.SaveChanges();
+
+        var isUpdated = _accountRepo.UpdateAccount(dto, id);
+        return isUpdated;
     }
 
-    public void Delete(Guid id)
+    public bool Delete(Guid id)
     {
-        _logger.LogWarning($"Account with id: {id} DELETE action invoked");
-        var account = _dbContext.Accounts.SingleOrDefault(a => a.Id == id);
-        if (account is null)
-        {
-            _logger.LogWarning($"Account with id: {id} DELETE action failed (not found)");
-            throw new NotFoundException("There's not such an account with that ID");
-        }
-        var likes = _dbContext.Likes.Where(l => l.Liker == account);
-            
-        _dbContext.Likes.RemoveRange(likes);
-        _dbContext.Accounts.Remove(account);
-        _dbContext.SaveChanges();
-        _logger.LogWarning($"Account with id: {id} DELETE action success");
+        var account = _accountRepo.GetAccountById(id);
+        var user = _accountContextService.User;
+
+        _logger.LogWarning($"Account with Nickname: {account.Nickname} DELETE action invoked");
+        var authorizationResult = _authorizationService.AuthorizeAsync(user, account, new AccountOperationRequirement(AccountOperation.Delete)).Result;
+        if (!authorizationResult.Succeeded) throw new ForbidException("You have no rights to delete this account");
+        
+        var accountDeleteResult = _accountRepo.DeleteAccount(account);
+
+        _logger.LogWarning(
+            "Account with " +
+            $"Nickname: {account.Nickname}, " +
+            $"Id: {account.Id} " +
+            $"DELETE action result: {accountDeleteResult}");
+        
+        return accountDeleteResult;
     }
 
 }

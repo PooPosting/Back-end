@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
-using PicturesAPI.Interfaces;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
+using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Controllers;
 
@@ -64,8 +64,8 @@ public class PictureController : ControllerBase
     [Route("{id}")]
     public ActionResult PutPictureUpdate([FromRoute] Guid id, [FromBody] PutPictureDto dto)
     {
-        _pictureService.Put(id, dto);
-        return NoContent();
+        var result = _pictureService.Put(id, dto);
+        return Ok(result);
     }
 
     [HttpPatch]
@@ -88,8 +88,8 @@ public class PictureController : ControllerBase
     [Route("{id}")]
     public ActionResult DeletePicture([FromRoute] Guid id)
     {
-        _pictureService.Delete(id);
-        return NoContent();
+        var result = _pictureService.Delete(id);
+        return Ok(result);
     }
 
 }

@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System.Security.Claims;
 
-namespace PicturesAPI.Interfaces;
+namespace PicturesAPI.Services.Interfaces;
 
 public interface IAccountContextService
 {

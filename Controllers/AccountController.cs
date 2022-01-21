@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
-using PicturesAPI.Interfaces;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
+using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Controllers;
 
@@ -52,19 +52,20 @@ public class AccountController : ControllerBase
     [Route("{id}")]
     public ActionResult UpdateAccount([FromBody] PutAccountDto dto)
     {
-        _accountService.Update(dto);
-        return NoContent();
+        var result = _accountService.Update(dto);
+        return Ok(result);
     }
 
     [HttpDelete] 
     [Route("{id}")]
     public ActionResult DeleteAccount([FromRoute] Guid id)
     {
-        _accountService.Delete(id);
-        return NoContent();
+        var result = _accountService.Delete(id);
+        return Ok(result);
     }
 
     [HttpPost]
+    [AllowAnonymous]
     [Route("register")]
     public ActionResult PostAccount([FromBody] CreateAccountDto dto)
     {
@@ -77,7 +78,7 @@ public class AccountController : ControllerBase
     [Route("login")]
     public ActionResult Login([FromBody] LoginDto dto)
     {
-        string token = _userAccountService.GenerateJwt(dto);
+        var token = _userAccountService.GenerateJwt(dto);
         return Ok(token);
     }
         

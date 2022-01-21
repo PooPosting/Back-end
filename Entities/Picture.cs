@@ -32,7 +32,5 @@ public class Picture
     public DateTime PictureAdded { get; set; } = DateTime.Now;
         
     public virtual List<Like> Likes { get; set; }
-        
-    public virtual List<Dislike> Dislikes { get; set; }
-
+    
 }

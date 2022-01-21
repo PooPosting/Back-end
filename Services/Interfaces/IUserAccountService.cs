@@ -2,7 +2,7 @@
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
 
-namespace PicturesAPI.Interfaces;
+namespace PicturesAPI.Services.Interfaces;
 
 public interface IUserAccountService
 {
