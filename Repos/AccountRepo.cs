@@ -41,7 +41,6 @@ public class AccountRepo : IAccountRepo
     public Account GetAccountByNick(string nickname)
     {
         var account = _dbContext.Accounts.SingleOrDefault(a => a.Nickname == nickname);
-        if (account == null) throw new NotFoundException("account not found");
         return account;
     }
     
@@ -80,12 +79,14 @@ public class AccountRepo : IAccountRepo
         var account = _dbContext.Accounts.SingleOrDefault(a => a.Id.ToString() == id);
         if (account is null) throw new InvalidAuthTokenException();
         
-        var passwordHashed = _passwordHasher.HashPassword(account, dto.Password);
-
-        if ((dto.Email == null) && (dto.Password == null)) throw new BadRequestException("password or email input cannot be empty");;
+        if (dto.Password != null)
+        {
+            var passwordHashed = _passwordHasher.HashPassword(account, dto.Password);
+            account!.PasswordHash = passwordHashed;
+        }
         
         if (dto.Email != null) account!.Email = dto.Email;
-        if (dto.Password != null) account!.PasswordHash = passwordHashed;
+        
         return true;
     }
 

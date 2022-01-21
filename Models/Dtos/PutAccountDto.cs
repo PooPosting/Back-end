@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace PicturesAPI.Models.Dtos;
+﻿namespace PicturesAPI.Models.Dtos;
 
 public class PutAccountDto
 {

@@ -35,7 +35,8 @@ public class PictureRepo : IPictureRepo
     {
         var pictures = _dbContext.Pictures
             .Include(p => p.Account)
-            .Include(p => p.Likes);
+            .Include(p => p.Likes)
+            .Where(p => p.Account == account);
         
         return pictures;
     }

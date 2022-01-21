@@ -7,6 +7,12 @@ public class PutAccountDtoValidator : AbstractValidator<PutAccountDto>
 {
     public PutAccountDtoValidator()
     {
+        RuleFor(x => x)
+            .Must(value =>
+                !string.IsNullOrEmpty(value.Email) ||
+                !string.IsNullOrEmpty(value.Password))
+            .WithMessage("Email or password cannot be empty");
+        
         RuleFor(x => x.Email)
             .EmailAddress()
             .MaximumLength(40);
