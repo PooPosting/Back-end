@@ -13,4 +13,8 @@ public interface IAccountRepo
     Guid CreateAccount(CreateAccountDto dto);
     bool UpdateAccount(PutAccountDto dto, string id);
     bool DeleteAccount(Account account);
+    string GetLikedTags(Guid accId);
+    void AddLikedTags(Account acc, Picture picture);
+    void RemoveLikedTags(Account acc, Picture picture);
+
 }

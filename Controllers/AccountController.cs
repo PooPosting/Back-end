@@ -32,6 +32,14 @@ public class AccountController : ControllerBase
     }
     
     [HttpGet]
+    [Route("getTags")]
+    public ActionResult<string> GetTags ()
+    {
+        var tags = _accountService.GetLikedTags();
+        return Ok(tags);
+    }
+    
+    [HttpGet]
     [EnableQuery]
     public ActionResult<PagedResult<AccountDto>> GetAllAccounts([FromQuery] AccountQuery query)
     {

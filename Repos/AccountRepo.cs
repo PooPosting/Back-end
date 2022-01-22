@@ -1,10 +1,12 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PicturesAPI.Entities;
 using PicturesAPI.Exceptions;
+using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Repos.Interfaces;
 
@@ -103,6 +105,62 @@ public class AccountRepo : IAccountRepo
         _dbContext.Accounts.Remove(accountToRemove);
         _dbContext.SaveChanges();
         return true;
+    }
+
+    public string GetLikedTags(Guid accId)
+    {
+        var account = _dbContext.Accounts.SingleOrDefault(a => a.Id == accId);
+        var tags = "";
+
+        if (account != null)
+        {
+            tags = account.LikedTags;
+        }
+
+        return tags;
+
+    }
+
+    public void AddLikedTags(Account acc, Picture picture)
+    {
+        var account = _dbContext.Accounts.SingleOrDefault(a => a == acc);
+        if (account is null) throw new InvalidAuthTokenException(); 
+        
+        var tagsToAdd = picture.Tags.Split(' ').Take(3).ToList();
+        
+        var accountTags = account.LikedTags is null 
+            ? new List<string>() 
+            : account.LikedTags.Split(' ').ToList();
+        
+        accountTags.AddRange(tagsToAdd);
+        accountTags = accountTags.Distinct().ToList();
+
+        if (accountTags.Count > 20)
+        {
+            accountTags = accountTags.Take(20).ToList();
+        }
+        account.LikedTags = string.Join(' ', accountTags);
+        _dbContext.SaveChanges();
+    }
+
+    public void RemoveLikedTags(Account acc, Picture picture)
+    {
+        var account = _dbContext.Accounts.SingleOrDefault(a => a == acc);
+        if (account is null) throw new InvalidAuthTokenException(); 
+
+        var tagsToRemove = picture.Tags.Split(' ').Take(3).ToList();
+        
+        var accountTags = account.LikedTags is null 
+            ? new List<string>() 
+            : account.LikedTags.Split(' ').ToList();
+
+        foreach (var tag in tagsToRemove)
+        {
+            accountTags.Remove(tag);
+        }
+        accountTags = accountTags.Distinct().ToList();
+        account.LikedTags = string.Join(' ', accountTags);
+        _dbContext.SaveChanges();
     }
 
 }

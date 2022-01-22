@@ -53,12 +53,14 @@ public class PictureLikingService : IPictureLikingService
             if (like.IsLike)
             {
                 // is like
+                _accountRepo.RemoveLikedTags(account, picture);
                 _likeRepo.RemoveLike(like);
                 return LikeOperationResult.LikeRemoved;
             }
             else
             {
                 // is dislike
+                _accountRepo.AddLikedTags(account, picture);
                 _likeRepo.ChangeLike(like);
                 return LikeOperationResult.Liked;
             }
@@ -66,6 +68,7 @@ public class PictureLikingService : IPictureLikingService
         else
         {
             // like does not exist
+            _accountRepo.AddLikedTags(account, picture);
             _likeRepo.AddLike(
                 new Like()
                 {

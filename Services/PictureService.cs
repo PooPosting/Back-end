@@ -23,14 +23,12 @@ public class PictureService : IPictureService
     private readonly IAuthorizationService _authorizationService;
     private readonly IAccountContextService _accountContextService;
     private readonly IPictureRepo _pictureRepo;
-    private readonly ILikeRepo _likeRepo;
 
     public PictureService(
         ILogger<PictureService> logger, 
         IAuthorizationService authorizationService, 
         IAccountContextService accountContextService,
         IPictureRepo pictureRepo,
-        ILikeRepo likeRepo,
         IMapper mapper)
     {
         _logger = logger;
@@ -38,7 +36,6 @@ public class PictureService : IPictureService
         _authorizationService = authorizationService;
         _accountContextService = accountContextService;
         _pictureRepo = pictureRepo;
-        _likeRepo = likeRepo;
     }
     
     public PagedResult<PictureDto> GetAll(PictureQuery query)
@@ -47,8 +44,11 @@ public class PictureService : IPictureService
             .Where(p => query.SearchPhrase == null || 
                         p.Name.ToLower().Contains(query.SearchPhrase.ToLower()) || 
                         p.Tags.ToLower().Contains(query.SearchPhrase.ToLower()))
+            .Where(p => p.PictureAdded.AddDays(query.DaysSincePictureAdded) > DateTime.Now)
+            .OrderByDescending(p => p.Tags.Split(' ').Intersect(query.LikedTags.Split(' ')).Count())
+            .ThenByDescending(p => p.Likes.Count)
             .ToList();
-        
+
         var pictures = baseQuery
             .Skip(query.PageSize * (query.PageNumber - 1))
             .Take(query.PageSize)
@@ -124,5 +124,6 @@ public class PictureService : IPictureService
 
         return pictureDeleteResult;
     }
-
+    
+    
 }

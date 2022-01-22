@@ -1,33 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
 using PicturesAPI.Entities;
 using PicturesAPI.Repos.Interfaces;
-using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Repos;
 
 public class LikeRepo : ILikeRepo
 {
     private readonly PictureDbContext _dbContext;
-    private readonly ILogger<LikeRepo> _logger;
-    private readonly IPasswordHasher<Account> _passwordHasher;
-    private readonly AuthenticationSettings _authenticationSettings;
-    private readonly IAccountContextService _accountContextService;
 
     public LikeRepo(
-        PictureDbContext dbContext, 
-        ILogger<LikeRepo> logger, 
-        IPasswordHasher<Account> passwordHasher,
-        AuthenticationSettings authenticationSettings,
-        IAccountContextService accountContextService)
+        PictureDbContext dbContext)
     {
         _dbContext = dbContext;
-        _logger = logger;
-        _passwordHasher = passwordHasher;
-        _authenticationSettings = authenticationSettings;
-        _accountContextService = accountContextService;
     }
 
     public List<Like> GetLikesByLiker(Account liker)
@@ -70,7 +55,7 @@ public class LikeRepo : ILikeRepo
     public bool ChangeLike(Like like)
     {
         var likeToChange = _dbContext.Likes.SingleOrDefault(l => l == like);
-
+        
         if (likeToChange is not null)
         {
             likeToChange.IsLike = !likeToChange.IsLike;
@@ -88,6 +73,7 @@ public class LikeRepo : ILikeRepo
         
         return likes.Count;
     }
+    
     
     
 }

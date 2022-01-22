@@ -12,4 +12,5 @@ public interface IAccountService
     IEnumerable<AccountDto> GetAllOdata();
     bool Update(PutAccountDto dto);
     bool Delete(Guid id);
+    public string GetLikedTags();
 }

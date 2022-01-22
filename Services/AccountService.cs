@@ -6,6 +6,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using PicturesAPI.Authorization;
+using PicturesAPI.Entities;
 using PicturesAPI.Enums;
 using PicturesAPI.Exceptions;
 using PicturesAPI.Models;
@@ -55,7 +56,9 @@ public class AccountService : IAccountService
     public PagedResult<AccountDto> GetAll(AccountQuery query)
     {
         var baseQuery = _accountRepo.GetAccounts()
-            .Where(p => query.SearchPhrase == null || p.Nickname.ToLower().Contains(query.SearchPhrase.ToLower()))
+            .Where(a => query.SearchPhrase == null || a.Nickname.ToLower().Contains(query.SearchPhrase.ToLower()))
+            .OrderByDescending(a => _pictureRepo.GetPicturesByOwner(a).Count())
+            .ThenByDescending(a => _pictureRepo.GetPicturesByOwner(a).Sum(picture => picture.Likes.Count))
             .ToList();
 
         var accounts = baseQuery
@@ -65,14 +68,14 @@ public class AccountService : IAccountService
         
         if (accounts.Count == 0) throw new NotFoundException("accounts not found");
         
-        var resultCount = baseQuery.Count();
+        var resultCount = baseQuery.Count;
 
         var accountDtos = _mapper.Map<List<AccountDto>>(accounts).ToList();
         var result = new PagedResult<AccountDto>(accountDtos, resultCount, query.PageSize, query.PageNumber);
         
         return result;
     }
-
+    
     public IEnumerable<AccountDto> GetAllOdata()
     {
         var accounts = _accountRepo.GetAccounts().ToList();
@@ -82,7 +85,15 @@ public class AccountService : IAccountService
         var result = _mapper.Map<List<AccountDto>>(accounts);
         return result;
     }
-        
+
+    public string GetLikedTags()
+    {
+        var id = _accountContextService.GetAccountId;
+        var tags = _accountRepo.GetLikedTags(Guid.Parse(id));
+
+        return tags;
+    }
+    
     public bool Update(PutAccountDto dto)
     {
         var user = _accountContextService.User;
@@ -111,5 +122,8 @@ public class AccountService : IAccountService
         
         return accountDeleteResult;
     }
+    
+    
+
 
 }
