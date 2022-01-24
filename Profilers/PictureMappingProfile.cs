@@ -28,7 +28,11 @@ public class PictureMappingProfile : Profile
             .ForMember(
                 d => d.AccountNickname,
                 m => m.MapFrom(
-                    p => p.Account.Nickname));
+                    p => p.Account.IsDeleted ? "Unknown" : p.Account.Nickname))
+            .ForMember(
+                d => d.AccountId,
+                m => m.MapFrom(
+                    p => p.Account.IsDeleted ? Guid.Empty : p.Account.Id));
 
         CreateMap<Account, AccountDto>()
             .ForMember(d => d.Email,
