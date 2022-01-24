@@ -23,12 +23,14 @@ public class PictureService : IPictureService
     private readonly IAuthorizationService _authorizationService;
     private readonly IAccountContextService _accountContextService;
     private readonly IPictureRepo _pictureRepo;
+    private readonly IAccountRepo _accountRepo;
 
     public PictureService(
         ILogger<PictureService> logger, 
         IAuthorizationService authorizationService, 
         IAccountContextService accountContextService,
         IPictureRepo pictureRepo,
+        IAccountRepo accountRepo,
         IMapper mapper)
     {
         _logger = logger;
@@ -36,6 +38,7 @@ public class PictureService : IPictureService
         _authorizationService = authorizationService;
         _accountContextService = accountContextService;
         _pictureRepo = pictureRepo;
+        _accountRepo = accountRepo;
     }
     
     public PagedResult<PictureDto> GetAll(PictureQuery query)
@@ -81,12 +84,13 @@ public class PictureService : IPictureService
 
     public Guid Create(CreatePictureDto dto)
     {
-        var id = _accountContextService.GetAccountId;
-        if (id is null) throw new InvalidAuthTokenException();
+        var id = _accountContextService.GetAccountId!;
+        var account = _accountRepo.GetAccountById(Guid.Parse(id));
+        if (account is null || account.IsDeleted) throw new InvalidAuthTokenException();
         
         dto.Tags = dto.Tags.Distinct().ToList();
         var picture = _mapper.Map<Picture>(dto);
-        picture.AccountId = Guid.Parse(id);
+        picture.Account = account;
         
         var result = _pictureRepo.CreatePicture(picture);
         return result;

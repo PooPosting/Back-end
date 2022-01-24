@@ -10,7 +10,9 @@ public class PagedResult<T>
         Items = items;
         TotalItemsCount = totalItemsCount;
         ItemsFrom = pageSize * (pageNumber - 1) + 1;
-        ItemsTo = ItemsFrom + pageSize - 1;
+        ItemsTo = (ItemsFrom + pageSize - 1 > totalItemsCount) 
+            ? totalItemsCount 
+            : ItemsFrom + pageSize - 1;
         TotalPages = (int)Math.Ceiling(totalItemsCount /(double) pageSize);
     }
     
@@ -19,4 +21,5 @@ public class PagedResult<T>
     public int ItemsFrom { get; set; }
     public int ItemsTo { get; set; }
     public int TotalItemsCount { get; set; }
+    
 }

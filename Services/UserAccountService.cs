@@ -48,7 +48,7 @@ public class UserAccountService : IUserAccountService
     public string GenerateJwt(LoginDto dto)
     {
         var account = _accountRepo.GetAccountByNick(dto.Nickname);
-        if (account is null)
+        if (account is null || account.IsDeleted)
             throw new BadRequestException("Invalid nickname or password");
 
         var result = _passwordHasher.VerifyHashedPassword(account, account.PasswordHash, dto.Password);

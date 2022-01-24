@@ -24,7 +24,11 @@ public class PictureMappingProfile : Profile
             .ForMember(
                 p => p.Dislikes,
                 m => m
-                    .MapFrom(p => p.Likes.Count(l => l.IsLike == false)));
+                    .MapFrom(p => p.Likes.Count(l => l.IsLike == false)))
+            .ForMember(
+                d => d.AccountNickname,
+                m => m.MapFrom(
+                    p => p.Account.Nickname));
 
         CreateMap<Account, AccountDto>()
             .ForMember(d => d.Email,

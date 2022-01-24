@@ -84,8 +84,9 @@ public class AccountService : IAccountService
 
     public string GetLikedTags()
     {
-        var id = _accountContextService.GetAccountId;
-        if (id == null) throw new InvalidAuthTokenException();
+        var id = _accountContextService.GetAccountId!;
+        var account = _accountRepo.GetAccountById(Guid.Parse(id));
+        if (account == null || account.IsDeleted) throw new InvalidAuthTokenException();
         var tags = _accountRepo.GetLikedTags(Guid.Parse(id));
 
         return tags;
@@ -93,8 +94,9 @@ public class AccountService : IAccountService
     
     public bool Update(PutAccountDto dto)
     {
-        var id = _accountContextService.GetAccountId;
-        if (id == null) throw new InvalidAuthTokenException();
+        var id = _accountContextService.GetAccountId!;
+        var account = _accountRepo.GetAccountById(Guid.Parse(id));
+        if (account == null || account.IsDeleted) throw new InvalidAuthTokenException();
         _accountRepo.UpdateAccount(dto, id);
         return true;
     }
