@@ -55,6 +55,7 @@ public class AccountService : IAccountService
     {
         var baseQuery = _accountRepo.GetAccounts()
             .Where(a => query.SearchPhrase == null || a.Nickname.ToLower().Contains(query.SearchPhrase.ToLower()))
+            .Where(a => !a.IsDeleted)
             .OrderByDescending(a => _pictureRepo.GetPicturesByOwner(a).Count())
             .ThenByDescending(a => _pictureRepo.GetPicturesByOwner(a).Sum(picture => picture.Likes.Count))
             .ToList();
@@ -76,7 +77,7 @@ public class AccountService : IAccountService
     
     public IEnumerable<AccountDto> GetAllOdata()
     {
-        var accounts = _accountRepo.GetAccounts().ToList();
+        var accounts = _accountRepo.GetAccounts().Where(a => !a.IsDeleted).ToList();
         if (accounts.Count == 0) throw new NotFoundException("accounts not found");
         var result = _mapper.Map<List<AccountDto>>(accounts);
         return result;
