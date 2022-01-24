@@ -31,17 +31,6 @@ public class PictureController : ControllerBase
         return Ok(pictures);
     }
 
-    // only for testing
-    [HttpGet]
-    [EnableQuery]
-    [AllowAnonymous]
-    [Route("odata")]
-    public IActionResult GetAllOData()
-    {
-        var pictures = _pictureService.GetAllOdata();
-        return Ok(pictures);
-    }
-
     [HttpGet]
     [AllowAnonymous]
     [Route("{id}")]

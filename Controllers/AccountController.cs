@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -45,15 +44,6 @@ public class AccountController : ControllerBase
     {
         var accounts = _accountService.GetAll(query);
         return Ok(accounts);
-    }
-
-    [HttpGet]
-    [EnableQuery]
-    [Route("odata")]
-    public IActionResult GetAllOdata()
-    {
-        var result = _accountService.GetAllOdata();
-        return Ok(result);
     }
 
     [HttpPut]
