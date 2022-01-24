@@ -9,10 +9,6 @@ using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Services;
 
-// use separate folders for these
-
-
-// change this whole bitch to factory
 public class PictureLikingService : IPictureLikingService
 {
     private readonly IPictureRepo _pictureRepo;
@@ -42,7 +38,7 @@ public class PictureLikingService : IPictureLikingService
         var accountId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
         var account = _accountRepo.GetAccountById(Guid.Parse(accountId));
         
-        if (account is null) throw new InvalidAuthTokenException();
+        if (account is null || account.IsDeleted) throw new InvalidAuthTokenException();
         
         var like = _likeRepo.GetLikeByLikerAndLiked(account, picture);
         
@@ -90,10 +86,11 @@ public class PictureLikingService : IPictureLikingService
         var accountId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
         var account = _accountRepo.GetAccountById(Guid.Parse(accountId));
         
-        if (account is null) throw new InvalidAuthTokenException();
+        if (account is null || account.IsDeleted) throw new InvalidAuthTokenException();
         
         var like = _likeRepo.GetLikeByLikerAndLiked(account, picture);
-
+        
+        
         // If we call dislike
         if (like is not null)
         {
@@ -104,7 +101,8 @@ public class PictureLikingService : IPictureLikingService
                 _likeRepo.RemoveLike(like);
                 return LikeOperationResult.DislikeRemoved;
             }
-            else
+            else 
+            // (like.IsLike == true)
             {
                 // is like
                 _likeRepo.ChangeLike(like);

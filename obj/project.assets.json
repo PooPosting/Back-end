@@ -6119,11 +6119,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\mrgra\\Desktop\\PicturesAPI\\PicturesAPI\\PicturesAPI\\PicturesAPI.csproj",
+      "projectUniqueName": "C:\\Users\\mrgra\\Desktop\\Projects\\PicturesAPI\\PicturesAPI\\PicturesAPI.csproj",
       "projectName": "PicturesAPI",
-      "projectPath": "C:\\Users\\mrgra\\Desktop\\PicturesAPI\\PicturesAPI\\PicturesAPI\\PicturesAPI.csproj",
+      "projectPath": "C:\\Users\\mrgra\\Desktop\\Projects\\PicturesAPI\\PicturesAPI\\PicturesAPI.csproj",
       "packagesPath": "C:\\Users\\mrgra\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\mrgra\\Desktop\\PicturesAPI\\PicturesAPI\\PicturesAPI\\obj\\",
+      "outputPath": "C:\\Users\\mrgra\\Desktop\\Projects\\PicturesAPI\\PicturesAPI\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\mrgra\\AppData\\Roaming\\NuGet\\NuGet.Config"

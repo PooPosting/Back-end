@@ -53,7 +53,6 @@ public class PictureService : IPictureService
             .Skip(query.PageSize * (query.PageNumber - 1))
             .Take(query.PageSize)
             .ToList();
-
         
         if (pictures.Count == 0) throw new NotFoundException("pictures not found");
         
@@ -65,9 +64,7 @@ public class PictureService : IPictureService
     
     public IEnumerable<PictureDto> GetAllOdata()
     {
-        var pictures = _pictureRepo.GetPictures()
-            .ToList();
-        
+        var pictures = _pictureRepo.GetPictures().ToList();
         if (pictures.Count == 0) throw new NotFoundException("pictures not found");
         var result = _mapper.Map<List<PictureDto>>(pictures);
         
@@ -77,7 +74,6 @@ public class PictureService : IPictureService
     public PictureDto GetById(Guid id)
     {
         var picture = _pictureRepo.GetPictureById(id);
-
         if (picture == null) throw new NotFoundException("picture not found");
         var result = _mapper.Map<PictureDto>(picture);
         return result;
@@ -99,7 +95,7 @@ public class PictureService : IPictureService
     public bool Put(Guid id, PutPictureDto dto)
     {
         var picture = _pictureRepo.GetPictureById(id);
-        if (picture is null) throw new NotFoundException("There's not such a picture with that ID");
+        if (picture is null) throw new NotFoundException("picture not found");
         var user = _accountContextService.User;
 
         var authorizationResult = _authorizationService.AuthorizeAsync(user, picture, new ResourceOperationRequirement(ResourceOperation.Update)).Result;
@@ -112,6 +108,7 @@ public class PictureService : IPictureService
     public bool Delete(Guid id)
     {
         var picture = _pictureRepo.GetPictureById(id);
+        if (picture is null) throw new NotFoundException("picture not found");
         var user = _accountContextService.User;
 
         _logger.LogWarning($"Picture with id: {id} DELETE action invoked");

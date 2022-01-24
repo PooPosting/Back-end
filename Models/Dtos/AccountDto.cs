@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using PicturesAPI.Entities;
 
 namespace PicturesAPI.Models.Dtos;
 

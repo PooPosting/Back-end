@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "4KHHVJgCzftzf++Ulb9X6MVDZ9FEB//GtLUV/wMmJJsZcThDHc3gi2bj8QKuk75xc94HMpoYn1Q2w94zO4u4XQ==",
+  "dgSpecHash": "9TIHdWI06UIAJREtoZK5LwOQfA/NmNnLa5pg0Cf8ftUvB5zA776qWLpo+05uVYnq6jLQAJ4L3bJCMk5YlRYU/A==",
   "success": true,
-  "projectFilePath": "C:\\Users\\mrgra\\Desktop\\PicturesAPI\\PicturesAPI\\PicturesAPI\\PicturesAPI.csproj",
+  "projectFilePath": "C:\\Users\\mrgra\\Desktop\\Projects\\PicturesAPI\\PicturesAPI\\PicturesAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\mrgra\\.nuget\\packages\\automapper\\10.1.1\\automapper.10.1.1.nupkg.sha512",
     "C:\\Users\\mrgra\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\8.1.1\\automapper.extensions.microsoft.dependencyinjection.8.1.1.nupkg.sha512",

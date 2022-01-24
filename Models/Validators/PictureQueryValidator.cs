@@ -1,5 +1,4 @@
-﻿using System.Data;
-using System.Linq;
+﻿using System.Linq;
 using FluentValidation;
 
 namespace PicturesAPI.Models.Validators;

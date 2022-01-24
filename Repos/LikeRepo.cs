@@ -34,36 +34,24 @@ public class LikeRepo : ILikeRepo
         return like;
     }
 
-    public bool AddLike(Like like)
+    public void AddLike(Like like)
     {
         _dbContext.Add(like);
         _dbContext.SaveChanges();
-        return true;
     }
 
-    public bool RemoveLike(Like like)
+    public void RemoveLike(Like like)
     {
-        if (_dbContext.Likes.Any(l => l == like))
-        {
-            _dbContext.Remove(like);
-            _dbContext.SaveChanges();
-            return true;
-        }
-        return false;
+        _dbContext.Remove(like);
+        _dbContext.SaveChanges();
     }
 
-    public bool ChangeLike(Like like)
+    public void ChangeLike(Like like)
     {
         var likeToChange = _dbContext.Likes.SingleOrDefault(l => l == like);
         
-        if (likeToChange is not null)
-        {
-            likeToChange.IsLike = !likeToChange.IsLike;
-            _dbContext.SaveChanges();
-            return true;
-        }
-
-        return false;
+        likeToChange!.IsLike = !likeToChange.IsLike;
+        _dbContext.SaveChanges();
     }
     
     public int RemoveLikes(List<Like> likes)

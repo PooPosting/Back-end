@@ -9,8 +9,8 @@ public interface ILikeRepo
     List<Like> GetLikesByLiked(Picture picture);
     int RemoveLikes(List<Like> likes);
     public Like GetLikeByLikerAndLiked(Account account, Picture picture);
-    bool AddLike(Like like);
-    bool RemoveLike(Like like);
-    bool ChangeLike(Like like);
+    void AddLike(Like like);
+    void RemoveLike(Like like);
+    void ChangeLike(Like like);
 
 }

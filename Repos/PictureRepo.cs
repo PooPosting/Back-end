@@ -26,8 +26,6 @@ public class PictureRepo : IPictureRepo
             .Include(p => p.Account)
             .Include(p => p.Likes);
 
-        if (pictures.ToList().Count == 0) throw new NotFoundException("pictures not found");
-
         return pictures;
     }
 
@@ -47,8 +45,6 @@ public class PictureRepo : IPictureRepo
             .Include(p => p.Likes)
             .SingleOrDefault(p => p.Id == id);
 
-        if (picture is null) throw new NotFoundException("picture not found");
-
         return picture;
     }
 
@@ -63,8 +59,6 @@ public class PictureRepo : IPictureRepo
     public bool UpdatePicture(Picture picture, PutPictureDto dto)
     {
         var pictureToUpdate = _dbContext.Pictures.SingleOrDefault(p => p == picture);
-        if (pictureToUpdate is null) throw new NotFoundException("picture not found");
-
         
         dto.Tags = dto.Tags.Distinct().ToList();
         if (dto.Description != null) pictureToUpdate!.Description = dto.Description;
@@ -81,8 +75,8 @@ public class PictureRepo : IPictureRepo
         var likesToRemove = _likeRepo.GetLikesByLiked(picture);
         if (likesToRemove is not null) _dbContext.Likes.RemoveRange(likesToRemove);
         
-        var pictureToRemove = _dbContext.Pictures.SingleOrDefault(p => p == picture);
-        if (pictureToRemove is null) throw new NotFoundException("picture not found");
+        var pictureToRemove = _dbContext.Pictures.SingleOrDefault(p => p == picture)!;
+        
         _dbContext.Pictures.Remove(pictureToRemove);
         _dbContext.SaveChanges();
         return true;

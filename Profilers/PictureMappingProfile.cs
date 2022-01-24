@@ -16,7 +16,7 @@ public class PictureMappingProfile : Profile
             .ForMember(
                 p => p.Tags,
                 c => c
-                    .MapFrom(s => GetTags(s.Tags) ))
+                    .MapFrom(s => SerializeTags(s.Tags) ))
             .ForMember(
                 p => p.Likes,
                 m => m
@@ -26,7 +26,16 @@ public class PictureMappingProfile : Profile
                 m => m
                     .MapFrom(p => p.Likes.Count(l => l.IsLike == false)));
 
-        CreateMap<Account, AccountDto>();
+        CreateMap<Account, AccountDto>()
+            .ForMember(d => d.Email,
+                m => m.MapFrom(
+                    a => a.IsDeleted ? string.Empty : a.Email))
+            .ForMember(d => d.Nickname,
+                m => m.MapFrom(
+                    a => a.IsDeleted ? "Unknown" : a.Nickname))
+            .ForMember(d => d.Id,
+                m => m.MapFrom(
+                    a => a.IsDeleted ? Guid.Empty : a.Id));
 
         CreateMap<CreateAccountDto, Account>()
             .ForMember(
@@ -41,7 +50,7 @@ public class PictureMappingProfile : Profile
                     .MapFrom(c => string.Join(" ", c.Tags).ToLower()));
     }
 
-    private static List<string> GetTags(string tags)
+    private static List<string> SerializeTags(string tags)
     {
         var tagList = tags.Split(' ').ToList();
         return tagList;

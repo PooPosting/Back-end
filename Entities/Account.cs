@@ -22,18 +22,19 @@ public class Account
         
     [Required] [MinLength(8)]
     public string PasswordHash { get; set; }
-        
-    [AllowNull]
+
+    [AllowNull] 
     public virtual List<Picture> Pictures { get; set; }
     
     [AllowNull]
     public string LikedTags { get; set; }
     
     public DateTime AccountCreated { get; set; } = DateTime.Now;
-        
-    [DefaultValue(1)]
-    public int RoleId { get; set; }
+
+    public int RoleId { get; set; } = 1;
 
     public virtual List<Like> Likes { get; set; }
+
+    public bool IsDeleted { get; set; } = false;
 
 }

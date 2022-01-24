@@ -28,117 +28,85 @@ public class AccountRepo : IAccountRepo
         _pictureRepo = pictureRepo;
     }
 
-    public Account GetAccountById(Guid id)
+    public Account? GetAccountById(Guid id)
     {
         var account = _dbContext.Accounts
             .Include(a => a.Pictures)
             .Include(a => a.Likes)
             .SingleOrDefault(a => a.Id == id);
 
-        if (account == null) throw new NotFoundException("account not found");
-        
         return account;
     }
 
-    public Account GetAccountByNick(string nickname)
+    public Account? GetAccountByNick(string nickname)
     {
         var account = _dbContext.Accounts.SingleOrDefault(a => a.Nickname == nickname);
         return account;
     }
     
-    public IEnumerable<Account> GetAccounts()
+    public IEnumerable<Account>? GetAccounts()
     {
         var accounts = _dbContext.Accounts
             .Include(p => p.Pictures)
             .Include(p => p.Likes);
         
-        if (accounts.ToList().Count == 0) throw new NotFoundException("account not found");
-        
         return accounts;
     }
     
-    public Guid CreateAccount(CreateAccountDto dto)
+    public string GetLikedTags(Guid accId)
     {
-        var newAccount = new Account()
-        {
-            Nickname = dto.Nickname,
-            Email = dto.Email,
-            AccountCreated = DateTime.Now,
-            Pictures = new List<Picture>(),
-            RoleId = dto.RoleId
-        };
-
-        var hashedPassword = _passwordHasher.HashPassword(newAccount, dto.Password);
-        newAccount.PasswordHash = hashedPassword;
+        var account = _dbContext.Accounts.SingleOrDefault(a => a.Id == accId);
+        return account!.LikedTags ?? string.Empty;
+    }
+    
+    public Guid CreateAccount(Account newAccount)
+    {
         _dbContext.Accounts.Add(newAccount);
         _dbContext.SaveChanges();
         
         return newAccount.Id;
     }
 
-    public bool UpdateAccount(PutAccountDto dto, string id)
+    
+    //  is updating things like that in a repo a good practice?
+    //  |
+    //  V
+    public void UpdateAccount(PutAccountDto dto, string id)
     {
-        var account = _dbContext.Accounts.SingleOrDefault(a => a.Id.ToString() == id);
-        if (account is null) throw new InvalidAuthTokenException();
+        var account = _dbContext.Accounts.SingleOrDefault(a => a.Id.ToString() == id)!;
         
-        if (dto.Password != null)
+        if (dto.Password is not null)
         {
-            var passwordHashed = _passwordHasher.HashPassword(account, dto.Password);
+            var passwordHashed = _passwordHasher.HashPassword(account!, dto.Password);
             account!.PasswordHash = passwordHashed;
         }
+
+        if (dto.Email is not null) account.Email = dto.Email;
         
-        if (dto.Email != null) account!.Email = dto.Email;
-        
-        return true;
     }
 
-    public bool DeleteAccount(Account account)
+    public void DeleteAccount(Guid id)
     {
-        var accountToRemove = _dbContext.Accounts.SingleOrDefault(a => a == account);
-        if (accountToRemove is null) throw new NotFoundException("Account not found");
-
-        var picturesToRemove = _pictureRepo.GetPicturesByOwner(account).ToList();
-        
-        if(picturesToRemove.ToList().Count != 0) 
-            _dbContext.Pictures.RemoveRange(picturesToRemove);
-        
-        _dbContext.Accounts.Remove(accountToRemove);
+        var accountToRemove = _dbContext.Accounts.SingleOrDefault(a => a.Id == id);
+        accountToRemove!.IsDeleted = true;
         _dbContext.SaveChanges();
-        return true;
     }
-
-    public string GetLikedTags(Guid accId)
-    {
-        var account = _dbContext.Accounts.SingleOrDefault(a => a.Id == accId);
-        var tags = "";
-
-        if (account != null)
-        {
-            tags = account.LikedTags;
-        }
-
-        return tags;
-
-    }
-
+    
     public void AddLikedTags(Account acc, Picture picture)
     {
         var account = _dbContext.Accounts.SingleOrDefault(a => a == acc);
-        if (account is null) throw new InvalidAuthTokenException(); 
         
         var tagsToAdd = picture.Tags.Split(' ').Take(3).ToList();
         
-        var accountTags = account.LikedTags is null 
+        var accountTags = account!.LikedTags is null 
             ? new List<string>() 
             : account.LikedTags.Split(' ').ToList();
         
         accountTags.AddRange(tagsToAdd);
         accountTags = accountTags.Distinct().ToList();
 
-        if (accountTags.Count > 20)
-        {
-            accountTags = accountTags.Take(20).ToList();
-        }
+        if (accountTags.Count > 20) accountTags = accountTags.Take(20).ToList();
+        
         account.LikedTags = string.Join(' ', accountTags);
         _dbContext.SaveChanges();
     }
@@ -146,11 +114,10 @@ public class AccountRepo : IAccountRepo
     public void RemoveLikedTags(Account acc, Picture picture)
     {
         var account = _dbContext.Accounts.SingleOrDefault(a => a == acc);
-        if (account is null) throw new InvalidAuthTokenException(); 
 
         var tagsToRemove = picture.Tags.Split(' ').Take(3).ToList();
         
-        var accountTags = account.LikedTags is null 
+        var accountTags = account!.LikedTags is null 
             ? new List<string>() 
             : account.LikedTags.Split(' ').ToList();
 

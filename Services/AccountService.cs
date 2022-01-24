@@ -23,7 +23,6 @@ public class AccountService : IAccountService
     private readonly ILogger<AccountService> _logger;
     private readonly IAccountContextService _accountContextService;
     private readonly IAccountRepo _accountRepo;
-    private readonly ILikeRepo _likeRepo;
     private readonly IPictureRepo _pictureRepo;
     private readonly IAuthorizationService _authorizationService;
 
@@ -32,7 +31,6 @@ public class AccountService : IAccountService
         ILogger<AccountService> logger,
         IAccountContextService accountContextService,
         IAccountRepo accountRepo,
-        ILikeRepo likeRepo,
         IPictureRepo pictureRepo,
         IAuthorizationService authorizationService)
     {        
@@ -40,7 +38,6 @@ public class AccountService : IAccountService
         _logger = logger;
         _accountContextService = accountContextService;
         _accountRepo = accountRepo;
-        _likeRepo = likeRepo;
         _pictureRepo = pictureRepo;
         _authorizationService = authorizationService;
     }
@@ -48,6 +45,7 @@ public class AccountService : IAccountService
     public AccountDto GetById(Guid id)
     {
         var account = _accountRepo.GetAccountById(id);
+        if (account is null || account.IsDeleted) throw new NotFoundException("account not found");
         var result = _mapper.Map<AccountDto>(account);
         
         return result;
@@ -79,9 +77,7 @@ public class AccountService : IAccountService
     public IEnumerable<AccountDto> GetAllOdata()
     {
         var accounts = _accountRepo.GetAccounts().ToList();
-            
         if (accounts.Count == 0) throw new NotFoundException("accounts not found");
-            
         var result = _mapper.Map<List<AccountDto>>(accounts);
         return result;
     }
@@ -89,6 +85,7 @@ public class AccountService : IAccountService
     public string GetLikedTags()
     {
         var id = _accountContextService.GetAccountId;
+        if (id == null) throw new InvalidAuthTokenException();
         var tags = _accountRepo.GetLikedTags(Guid.Parse(id));
 
         return tags;
@@ -96,34 +93,31 @@ public class AccountService : IAccountService
     
     public bool Update(PutAccountDto dto)
     {
-        var user = _accountContextService.User;
-        var id = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
-
-        var isUpdated = _accountRepo.UpdateAccount(dto, id);
-        return isUpdated;
+        var id = _accountContextService.GetAccountId;
+        if (id == null) throw new InvalidAuthTokenException();
+        _accountRepo.UpdateAccount(dto, id);
+        return true;
     }
 
     public bool Delete(Guid id)
     {
         var account = _accountRepo.GetAccountById(id);
+        if (account is null || account.IsDeleted) throw new NotFoundException("account not found");
         var user = _accountContextService.User;
 
         _logger.LogWarning($"Account with Nickname: {account.Nickname} DELETE action invoked");
         var authorizationResult = _authorizationService.AuthorizeAsync(user, account, new AccountOperationRequirement(AccountOperation.Delete)).Result;
         if (!authorizationResult.Succeeded) throw new ForbidException("You have no rights to delete this account");
         
-        var accountDeleteResult = _accountRepo.DeleteAccount(account);
+        _accountRepo.DeleteAccount(id);
 
         _logger.LogWarning(
             "Account with " +
             $"Nickname: {account.Nickname}, " +
             $"Id: {account.Id} " +
-            $"DELETE action result: {accountDeleteResult}");
+            "DELETE action succeed");
         
-        return accountDeleteResult;
+        return true;
     }
-    
-    
-
 
 }

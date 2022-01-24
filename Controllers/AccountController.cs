@@ -25,15 +25,15 @@ public class AccountController : ControllerBase
      
     [HttpGet]
     [Route("{id}")]
-    public ActionResult<AccountDto> GetAccountById([FromRoute] Guid id)
+    public IActionResult GetAccountById([FromRoute] Guid id)
     {
         var account = _accountService.GetById(id);
         return Ok(account);
     }
     
     [HttpGet]
-    [Route("getTags")]
-    public ActionResult<string> GetTags ()
+    [Route("likedTags")]
+    public IActionResult GetTags ()
     {
         var tags = _accountService.GetLikedTags();
         return Ok(tags);
@@ -41,7 +41,7 @@ public class AccountController : ControllerBase
     
     [HttpGet]
     [EnableQuery]
-    public ActionResult<PagedResult<AccountDto>> GetAllAccounts([FromQuery] AccountQuery query)
+    public IActionResult GetAllAccounts([FromQuery] AccountQuery query)
     {
         var accounts = _accountService.GetAll(query);
         return Ok(accounts);
@@ -50,7 +50,7 @@ public class AccountController : ControllerBase
     [HttpGet]
     [EnableQuery]
     [Route("odata")]
-    public ActionResult<IEnumerable<AccountDto>> GetAllOdata()
+    public IActionResult GetAllOdata()
     {
         var result = _accountService.GetAllOdata();
         return Ok(result);
@@ -58,7 +58,7 @@ public class AccountController : ControllerBase
 
     [HttpPut]
     [Route("{id}")]
-    public ActionResult UpdateAccount([FromBody] PutAccountDto dto)
+    public IActionResult UpdateAccount([FromBody] PutAccountDto dto)
     {
         var result = _accountService.Update(dto);
         return Ok(result);
@@ -66,7 +66,7 @@ public class AccountController : ControllerBase
 
     [HttpDelete] 
     [Route("{id}")]
-    public ActionResult DeleteAccount([FromRoute] Guid id)
+    public IActionResult DeleteAccount([FromRoute] Guid id)
     {
         var result = _accountService.Delete(id);
         return Ok(result);
@@ -75,7 +75,7 @@ public class AccountController : ControllerBase
     [HttpPost]
     [AllowAnonymous]
     [Route("register")]
-    public ActionResult PostAccount([FromBody] CreateAccountDto dto)
+    public IActionResult PostAccount([FromBody] CreateAccountDto dto)
     {
         var accountId = _userAccountService.Create(dto);
         return Created($"api/accounts/{accountId}", null);
@@ -84,7 +84,7 @@ public class AccountController : ControllerBase
     [HttpPost]
     [AllowAnonymous]
     [Route("login")]
-    public ActionResult Login([FromBody] LoginDto dto)
+    public IActionResult Login([FromBody] LoginDto dto)
     {
         var token = _userAccountService.GenerateJwt(dto);
         return Ok(token);

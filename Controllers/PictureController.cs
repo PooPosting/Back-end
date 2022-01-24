@@ -36,7 +36,7 @@ public class PictureController : ControllerBase
     [EnableQuery]
     [AllowAnonymous]
     [Route("odata")]
-    public ActionResult<PagedResult<PictureDto>> GetAllOData()
+    public IActionResult GetAllOData()
     {
         var pictures = _pictureService.GetAllOdata();
         return Ok(pictures);
@@ -45,7 +45,7 @@ public class PictureController : ControllerBase
     [HttpGet]
     [AllowAnonymous]
     [Route("{id}")]
-    public ActionResult<PictureDto> GetSinglePictureById([FromRoute] Guid id)
+    public IActionResult GetSinglePictureById([FromRoute] Guid id)
     {
         var picture = _pictureService.GetById(id);
         return Ok(picture);
@@ -53,7 +53,7 @@ public class PictureController : ControllerBase
 
     [HttpPost]
     [Route("create")]
-    public ActionResult PostPicture([FromBody] CreatePictureDto dto)
+    public IActionResult PostPicture([FromBody] CreatePictureDto dto)
     {
         var pictureId = _pictureService.Create(dto);
         
@@ -62,7 +62,7 @@ public class PictureController : ControllerBase
 
     [HttpPut]
     [Route("{id}")]
-    public ActionResult PutPictureUpdate([FromRoute] Guid id, [FromBody] PutPictureDto dto)
+    public IActionResult PutPictureUpdate([FromRoute] Guid id, [FromBody] PutPictureDto dto)
     {
         var result = _pictureService.Put(id, dto);
         return Ok(result);
@@ -70,7 +70,7 @@ public class PictureController : ControllerBase
 
     [HttpPatch]
     [Route("{id}/voteup")]
-    public ActionResult PatchPictureVoteUp([FromRoute] Guid id)
+    public IActionResult PatchPictureVoteUp([FromRoute] Guid id)
     {
         var likeOperationResult = _pictureLikingService.Like(id);
         return Ok(likeOperationResult);
@@ -78,7 +78,7 @@ public class PictureController : ControllerBase
         
     [HttpPatch]
     [Route("{id}/votedown")]
-    public ActionResult PatchPictureVoteDown([FromRoute] Guid id)
+    public IActionResult PatchPictureVoteDown([FromRoute] Guid id)
     {
         var likeOperationResult = _pictureLikingService.DisLike(id);
         return Ok(likeOperationResult);
@@ -86,7 +86,7 @@ public class PictureController : ControllerBase
 
     [HttpDelete]
     [Route("{id}")]
-    public ActionResult DeletePicture([FromRoute] Guid id)
+    public IActionResult DeletePicture([FromRoute] Guid id)
     {
         var result = _pictureService.Delete(id);
         return Ok(result);

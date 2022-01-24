@@ -31,7 +31,17 @@ public class UserAccountService : IUserAccountService
         
     public Guid Create(CreateAccountDto dto)
     {
-        var newAccountId = _accountRepo.CreateAccount(dto);
+        var newAccount = new Account()
+        {
+            Nickname = dto.Nickname,
+            Email = dto.Email,
+            RoleId = dto.RoleId
+        };
+
+        var hashedPassword = _passwordHasher.HashPassword(newAccount, dto.Password);
+        newAccount.PasswordHash = hashedPassword;
+        
+        var newAccountId = _accountRepo.CreateAccount(newAccount);
         return newAccountId;
     }
 
