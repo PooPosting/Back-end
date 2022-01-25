@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using FluentValidation;
+﻿using FluentValidation;
 using PicturesAPI.Entities;
 using PicturesAPI.Models.Dtos;
 

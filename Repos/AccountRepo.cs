@@ -1,12 +1,7 @@
 ﻿#nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PicturesAPI.Entities;
-using PicturesAPI.Exceptions;
-using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Repos.Interfaces;
 

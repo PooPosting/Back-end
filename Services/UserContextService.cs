@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
 using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Services;

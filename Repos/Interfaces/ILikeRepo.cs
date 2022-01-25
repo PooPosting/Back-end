@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using PicturesAPI.Entities;
+﻿using PicturesAPI.Entities;
 
 namespace PicturesAPI.Repos.Interfaces;
 

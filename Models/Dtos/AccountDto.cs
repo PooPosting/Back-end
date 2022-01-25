@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace PicturesAPI.Models.Dtos;
+﻿namespace PicturesAPI.Models.Dtos;
 
 public class AccountDto
 {

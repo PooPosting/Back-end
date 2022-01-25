@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using PicturesAPI.Entities;
+﻿using PicturesAPI.Entities;
 using PicturesAPI.Repos.Interfaces;
 
 namespace PicturesAPI.Repos;

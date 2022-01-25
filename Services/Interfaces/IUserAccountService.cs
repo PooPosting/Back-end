@@ -1,6 +1,4 @@
-﻿using System;
-using PicturesAPI.Models;
-using PicturesAPI.Models.Dtos;
+﻿using PicturesAPI.Models.Dtos;
 
 namespace PicturesAPI.Services.Interfaces;
 

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Security.Claims;
-using PicturesAPI.Enums;
-using PicturesAPI.Services;
+﻿using PicturesAPI.Enums;
 
 namespace PicturesAPI.Services.Interfaces;
 

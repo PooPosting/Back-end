@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Logging;
 using PicturesAPI.Authorization;
 using PicturesAPI.Entities;
 using PicturesAPI.Enums;

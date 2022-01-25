@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using PicturesAPI.Entities;
+﻿using PicturesAPI.Entities;
 using PicturesAPI.Models.Dtos;
 
 namespace PicturesAPI.Repos.Interfaces;

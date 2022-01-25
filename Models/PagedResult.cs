@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace PicturesAPI.Models;
+﻿namespace PicturesAPI.Models;
 
 public class PagedResult<T>
 {

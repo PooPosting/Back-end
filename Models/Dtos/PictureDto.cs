@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-
-namespace PicturesAPI.Models.Dtos;
+﻿namespace PicturesAPI.Models.Dtos;
 
 public class PictureDto
 {
