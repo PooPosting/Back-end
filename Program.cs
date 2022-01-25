@@ -22,10 +22,14 @@ using PicturesAPI.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder();
 
-// NLog: Setup NLog fo Dependency injection
-builder.Logging.ClearProviders();
-builder.Logging.SetMinimumLevel(LogLevel.Trace);
-builder.Host.UseNLog();
+// NLog: Setup NLog to Dependency injection
+
+    if (!builder.Environment.IsDevelopment())
+    {
+        builder.Logging.ClearProviders();
+    }
+    builder.Logging.SetMinimumLevel(LogLevel.Trace);
+    builder.Host.UseNLog();
 
 // Configure builder.Services
      
@@ -103,11 +107,11 @@ builder.Host.UseNLog();
         );
     });
 
-
-// Configure
 var app = builder.Build();
 
-    app.UseCors("FrontEndClient");
+// Configure
+
+app.UseCors("FrontEndClient");
 
     var scope = app.Services.CreateScope();
     var seeder = scope.ServiceProvider.GetRequiredService<PictureSeeder>();
