@@ -43,6 +43,7 @@ public class PictureRepo : IPictureRepo
     {
         var picture = _dbContext.Pictures
             .Include(p => p.Likes)
+            .Include(p => p.Account)
             .SingleOrDefault(p => p.Id == id);
 
         return picture;
