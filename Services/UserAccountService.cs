@@ -1,10 +1,12 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using PicturesAPI.Entities;
 using PicturesAPI.Exceptions;
+using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services.Interfaces;
@@ -16,15 +18,18 @@ public class UserAccountService : IUserAccountService
     private readonly IPasswordHasher<Account> _passwordHasher;
     private readonly AuthenticationSettings _authenticationSettings;
     private readonly IAccountRepo _accountRepo;
+    private readonly IMapper _mapper;
 
     public UserAccountService(
         IPasswordHasher<Account> passwordHasher, 
         AuthenticationSettings authenticationSettings,
-        IAccountRepo accountRepo)
+        IAccountRepo accountRepo,
+        IMapper mapper)
     {
         _passwordHasher = passwordHasher;
         _authenticationSettings = authenticationSettings;
         _accountRepo = accountRepo;
+        _mapper = mapper;
     }
         
     public Guid Create(CreateAccountDto dto)
@@ -43,7 +48,7 @@ public class UserAccountService : IUserAccountService
         return newAccountId;
     }
 
-    public string GenerateJwt(LoginDto dto)
+    public LoginSuccessResult GenerateJwt(LoginDto dto)
     {
         var account = _accountRepo.GetAccountByNick(dto.Nickname);
         if (account is null || account.IsDeleted)
@@ -72,7 +77,14 @@ public class UserAccountService : IUserAccountService
             signingCredentials: cred);
 
         var tokenHandler = new JwtSecurityTokenHandler();
-        return tokenHandler.WriteToken(token);
+
+        var loginSuccessResult = new LoginSuccessResult()
+        {
+            AccountDto = _mapper.Map<Account, AccountDto>(account),
+            AuthToken = tokenHandler.WriteToken(token)
+        };
+        
+        return loginSuccessResult;
 
     }
 }

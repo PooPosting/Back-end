@@ -75,8 +75,10 @@ public class AccountController : ControllerBase
     [Route("login")]
     public IActionResult Login([FromBody] LoginDto dto)
     {
-        var token = _userAccountService.GenerateJwt(dto);
-        return Ok(token);
+        var result = _userAccountService.GenerateJwt(dto);
+        return Ok(result);
+        
+        // return token as a cookie?
     }
         
 

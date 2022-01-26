@@ -104,6 +104,7 @@ var builder = WebApplication.CreateBuilder();
             policyBuilder.AllowAnyMethod()
                 .AllowAnyHeader()
                 .WithOrigins(builder.Configuration["AllowedOrigins"])
+                .AllowCredentials()
         );
     });
 

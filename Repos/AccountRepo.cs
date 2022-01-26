@@ -35,7 +35,11 @@ public class AccountRepo : IAccountRepo
 
     public Account? GetAccountByNick(string nickname)
     {
-        var account = _dbContext.Accounts.SingleOrDefault(a => a.Nickname == nickname);
+        var account = _dbContext.Accounts
+                .Include(p => p.Pictures)
+                .Include(p => p.Likes)
+                .SingleOrDefault(a => a.Nickname == nickname);
+        
         return account;
     }
     
@@ -62,7 +66,6 @@ public class AccountRepo : IAccountRepo
         return newAccount.Id;
     }
 
-    
     //  is updating things like that in a repo a good practice?
     //  |
     //  V
