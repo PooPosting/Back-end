@@ -1,0 +1,37 @@
+{
+  "Version": 1,
+  "Hash": "Lvce9Ma5S1D3fvyj+JelvQw4yjc6SDitPruqkrgczD8=",
+  "Source": "PicturesAPI",
+  "BasePath": "_content/PicturesAPI",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "PicturesAPI\\wwwroot",
+      "Source": "PicturesAPI",
+      "ContentRoot": "C:\\Users\\mrgra\\Desktop\\Projects\\PicturesAPI\\PicturesAPI\\wwwroot\\",
+      "BasePath": "_content/PicturesAPI",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "C:\\Users\\mrgra\\Desktop\\Projects\\PicturesAPI\\PicturesAPI\\wwwroot\\pictures\\cdbd3fdb-0bd4-4ffc-b4e0-9853598286b0.webp",
+      "SourceId": "PicturesAPI",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\mrgra\\Desktop\\Projects\\PicturesAPI\\PicturesAPI\\wwwroot\\",
+      "BasePath": "_content/PicturesAPI",
+      "RelativePath": "pictures/cdbd3fdb-0bd4-4ffc-b4e0-9853598286b0.webp",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\pictures\\cdbd3fdb-0bd4-4ffc-b4e0-9853598286b0.webp"
+    }
+  ]
+}
