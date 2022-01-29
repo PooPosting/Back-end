@@ -5,7 +5,7 @@ namespace PicturesAPI.Entities;
 
 public class Account
 {
-    [Key]
+    [Key] 
     public Guid Id { get; set; }
         
     [Required] [MinLength(4)] [MaxLength(25)]

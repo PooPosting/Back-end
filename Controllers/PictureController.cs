@@ -41,9 +41,20 @@ public class PictureController : ControllerBase
 
     [HttpPost]
     [Route("create")]
-    public IActionResult PostPicture([FromBody] CreatePictureDto dto)
+    public IActionResult PostPicture(
+        [FromForm] IFormFile file, 
+        [FromForm] string name, 
+        [FromForm] string description, 
+        [FromForm] string[] tags)
     {
-        var pictureId = _pictureService.Create(dto);
+        var dto = new CreatePictureDto()
+        {
+            Name = name,
+            Description = description,
+            Tags = tags.ToList()
+        };
+        
+        var pictureId = _pictureService.Create(file, dto);
         
         return Created($"api/picture/{pictureId}", null);
     }

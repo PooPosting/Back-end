@@ -13,7 +13,5 @@ public class CreatePictureDto
         
     [MaxLength(20)]
     public List<string> Tags { get; set; }
-        
-    [Required] [MinLength(16)] [MaxLength(500)]
-    public string Url { get; set; }
+    
 }

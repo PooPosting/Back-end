@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using NLog.Web;
 using PicturesAPI;
@@ -113,6 +114,13 @@ var app = builder.Build();
 // Configure
 
 app.UseCors("FrontEndClient");
+app.UseFileServer(new FileServerOptions  
+{  
+    FileProvider = new PhysicalFileProvider(  
+        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
+    RequestPath = "/wwwroot",  
+    EnableDefaultFiles = true  
+}) ;  
 
     var scope = app.Services.CreateScope();
     var seeder = scope.ServiceProvider.GetRequiredService<PictureSeeder>();

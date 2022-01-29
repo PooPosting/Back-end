@@ -78,7 +78,7 @@ public class PictureService : IPictureService
         return result;
     }
 
-    public Guid Create(CreatePictureDto dto)
+    public Guid Create(IFormFile file, CreatePictureDto dto)
     {
         var id = _accountContextService.GetAccountId!;
         var account = _accountRepo.GetAccountById(Guid.Parse(id));
@@ -87,9 +87,26 @@ public class PictureService : IPictureService
         dto.Tags = dto.Tags.Distinct().ToList();
         var picture = _mapper.Map<Picture>(dto);
         picture.Account = account;
-        
-        var result = _pictureRepo.CreatePicture(picture);
-        return result;
+
+        if (file is { Length: > 0 })
+        {
+            var rootPath = Directory.GetCurrentDirectory();
+            var fileGuid = Guid.NewGuid();
+            var fullPath = $"{rootPath}/wwwroot/pictures/{fileGuid}.webp";
+            picture.Id = fileGuid;
+            picture.Url = $"wwwroot/pictures/{fileGuid}.webp";
+            
+            var result = _pictureRepo.CreatePicture(picture);
+            
+            using (var stream = new FileStream(fullPath, FileMode.Create))
+            {
+                file.CopyTo(stream);
+            }
+            return result;
+        }
+
+        throw new BadRequestException("invalid picture");
+
     }
 
     public bool Put(Guid id, PutPictureDto dto)

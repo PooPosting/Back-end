@@ -74,3 +74,4 @@ C:\Users\mrgra\Desktop\Projects\PicturesAPI\PicturesAPI\obj\Debug\net6.0\Picture
 C:\Users\mrgra\Desktop\Projects\PicturesAPI\PicturesAPI\obj\Debug\net6.0\ref\PicturesAPI.dll
 C:\Users\mrgra\Desktop\Projects\PicturesAPI\PicturesAPI\obj\Debug\net6.0\PicturesAPI.pdb
 C:\Users\mrgra\Desktop\Projects\PicturesAPI\PicturesAPI\obj\Debug\net6.0\PicturesAPI.genruntimeconfig.cache
+C:\Users\mrgra\Desktop\Projects\PicturesAPI\PicturesAPI\bin\Debug\net6.0\PicturesAPI.staticwebassets.runtime.json
