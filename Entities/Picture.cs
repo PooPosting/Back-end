@@ -16,13 +16,13 @@ public class Picture
     [Required] [MinLength(4)] [MaxLength(25)]
     public string Name { get; set; }
         
-    [MaxLength(400)]
+    [MaxLength(500)]
     public string Description { get; set; }
         
-    [MaxLength(400)]
+    [MaxLength(500)]
     public string Tags { get; set; }
         
-    [Comment("Picture web URL")]
+    [Comment("Picture URL")]
     [Required] [MaxLength(500)]
     public string Url { get; set; }
     public DateTime PictureAdded { get; set; } = DateTime.Now;
