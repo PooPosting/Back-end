@@ -18,17 +18,20 @@ public class UserAccountService : IUserAccountService
     private readonly IPasswordHasher<Account> _passwordHasher;
     private readonly AuthenticationSettings _authenticationSettings;
     private readonly IAccountRepo _accountRepo;
+    private readonly ILikeRepo _likeRepo;
     private readonly IMapper _mapper;
 
     public UserAccountService(
         IPasswordHasher<Account> passwordHasher, 
         AuthenticationSettings authenticationSettings,
         IAccountRepo accountRepo,
+        ILikeRepo likeRepo,
         IMapper mapper)
     {
         _passwordHasher = passwordHasher;
         _authenticationSettings = authenticationSettings;
         _accountRepo = accountRepo;
+        _likeRepo = likeRepo;
         _mapper = mapper;
     }
         
@@ -81,7 +84,9 @@ public class UserAccountService : IUserAccountService
         var loginSuccessResult = new LoginSuccessResult()
         {
             AccountDto = _mapper.Map<Account, AccountDto>(account),
-            AuthToken = tokenHandler.WriteToken(token)
+            LikedTags = account.LikedTags,
+            AuthToken = tokenHandler.WriteToken(token),
+            Likes = _mapper.Map<List<LikeDto>>(_likeRepo.GetLikesByLiker(account))
         };
         
         return loginSuccessResult;

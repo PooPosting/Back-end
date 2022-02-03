@@ -1,4 +1,5 @@
-﻿using PicturesAPI.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using PicturesAPI.Entities;
 using PicturesAPI.Repos.Interfaces;
 
 namespace PicturesAPI.Repos;
@@ -15,13 +16,19 @@ public class LikeRepo : ILikeRepo
 
     public List<Like> GetLikesByLiker(Account liker)
     {
-        var likes = _dbContext.Likes.Where(l => l.Liker == liker).ToList();
+        var likes = _dbContext.Likes.Where(l => l.Liker == liker)
+            .Include(l => l.Liked)
+            .ToList();
+        
         return likes;
     }
 
     public List<Like> GetLikesByLiked(Picture picture)
     {
-        var likes = _dbContext.Likes.Where(l => l.Liked == picture).ToList();
+        var likes = _dbContext.Likes.Where(l => l.Liked == picture)
+            .Include(l => l.Liker)
+            .ToList();
+        
         return likes;
     }
 

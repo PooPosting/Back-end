@@ -36,9 +36,8 @@ public class AccountRepo : IAccountRepo
     public Account? GetAccountByNick(string nickname)
     {
         var account = _dbContext.Accounts
-                .Include(p => p.Pictures)
-                .Include(p => p.Likes)
-                .SingleOrDefault(a => a.Nickname == nickname);
+            .Include(a => a.Pictures)
+            .SingleOrDefault(a => a.Nickname == nickname);
         
         return account;
     }
@@ -72,15 +71,12 @@ public class AccountRepo : IAccountRepo
     public void UpdateAccount(PutAccountDto dto, string id)
     {
         var account = _dbContext.Accounts.SingleOrDefault(a => a.Id.ToString() == id)!;
-        
         if (dto.Password is not null)
         {
             var passwordHashed = _passwordHasher.HashPassword(account!, dto.Password);
             account!.PasswordHash = passwordHashed;
         }
-
         if (dto.Email is not null) account.Email = dto.Email;
-        
     }
 
     public void DeleteAccount(Guid id)

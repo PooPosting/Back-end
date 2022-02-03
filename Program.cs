@@ -67,7 +67,8 @@ var builder = WebApplication.CreateBuilder();
     // DbContext
     builder.Services.AddDbContext<PictureDbContext>(options =>
     {
-        options.UseSqlServer(builder.Configuration.GetConnectionString("PictureDbConnection"));
+        var connString = builder.Configuration.GetConnectionString("PictureDbConnection");
+        options.UseSqlServer(connString);
     });
 
     // Validators

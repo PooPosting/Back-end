@@ -53,6 +53,14 @@ public class PictureMappingProfile : Profile
                 p => p.Tags,
                 p => p
                     .MapFrom(c => string.Join(" ", c.Tags).ToLower()));
+
+        CreateMap<Like, LikeDto>()
+            .ForMember(l => l.AccountId,
+                l => l.MapFrom(
+                    c => c.Liker.Id))
+            .ForMember(l => l.PictureId,
+                l => l.MapFrom(
+                    c => c.Liked.Id));
     }
 
     private static List<string> SerializeTags(string tags)

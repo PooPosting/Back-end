@@ -12,10 +12,10 @@ public class PictureQueryValidator : AbstractValidator<PictureQuery>
         RuleFor(p => p.PageNumber)
             .GreaterThanOrEqualTo(1);
 
-        RuleFor(p => p.LikedTags)
-            .NotNull();
-        
         RuleFor(p => p.DaysSincePictureAdded)
+            .NotNull();
+            
+        RuleFor(p => p.LikedTags)
             .NotNull();
         
         RuleFor(p => p.PageSize).Custom((value, context) =>

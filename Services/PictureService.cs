@@ -39,7 +39,7 @@ public class PictureService : IPictureService
     
     public PagedResult<PictureDto> GetAll(PictureQuery query)
     {
-        var baseQuery = _pictureRepo.GetPictures()
+        var baseQuery = _pictureRepo.GetPictures() // how to make this less painful for the database?
             .Where(p => query.SearchPhrase == null || 
                         p.Name.ToLower().Contains(query.SearchPhrase.ToLower()) || 
                         p.Tags.ToLower().Contains(query.SearchPhrase.ToLower()))
