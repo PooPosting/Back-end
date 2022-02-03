@@ -30,9 +30,9 @@ public class Account
     
 
     [AllowNull] 
-    public virtual List<Picture> Pictures { get; set; }
+    public virtual ICollection<Picture> Pictures { get; set; }
     [AllowNull]
-    public virtual List<Like> Likes { get; set; }
+    public virtual ICollection<Like> Likes { get; set; }
 
     public bool IsDeleted { get; set; } = false;
     
