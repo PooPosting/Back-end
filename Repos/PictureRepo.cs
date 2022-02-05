@@ -10,7 +10,9 @@ public class PictureRepo : IPictureRepo
     private readonly PictureDbContext _dbContext;
     private readonly ILikeRepo _likeRepo;
 
-    public PictureRepo(PictureDbContext dbContext, ILikeRepo likeRepo)
+    public PictureRepo(
+        PictureDbContext dbContext, 
+        ILikeRepo likeRepo)
     {
         _dbContext = dbContext;
         _likeRepo = likeRepo;
@@ -19,7 +21,6 @@ public class PictureRepo : IPictureRepo
     public IEnumerable<Picture> GetPictures()
     {
         var pictures = _dbContext.Pictures
-            .Include(p => p.Account)
             .Include(p => p.Likes);
 
         return pictures;
@@ -31,17 +32,15 @@ public class PictureRepo : IPictureRepo
             .Include(p => p.Account)
             .Include(p => p.Likes)
             .Where(p => p.Account == account);
-        
         return pictures;
     }
-
+    
     public Picture GetPictureById(Guid id)
     {
         var picture = _dbContext.Pictures
             .Include(p => p.Likes)
             .Include(p => p.Account)
             .SingleOrDefault(p => p.Id == id);
-
         return picture;
     }
 
@@ -49,7 +48,6 @@ public class PictureRepo : IPictureRepo
     {
         _dbContext.Pictures.Add(picture);
         _dbContext.SaveChanges();
-
         return picture.Id;
     }
 

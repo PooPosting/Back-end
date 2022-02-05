@@ -1,13 +1,14 @@
 ﻿using PicturesAPI.Entities;
+using PicturesAPI.Enums;
 using PicturesAPI.Models.Dtos;
 
 namespace PicturesAPI.Repos.Interfaces;
 
 public interface IAccountRepo
 {
-    Account GetAccountById(Guid id);
-    Account GetAccountByNick(string nickname);
-    IEnumerable<Account> GetAccounts();
+    Account GetAccountById(Guid id, DbInclude option);
+    Account GetAccountByNick(string nickname, DbInclude option);
+    IEnumerable<Account> GetAccounts(DbInclude option);
     Guid CreateAccount(Account newAccount);
     void UpdateAccount(PutAccountDto dto, string id);
     void DeleteAccount(Guid id);

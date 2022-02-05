@@ -12,8 +12,8 @@ public class AccountOperationRequirementHandler : AuthorizationHandler<AccountOp
         AccountOperationRequirement requirement,
         Account account)
     {
-        if (requirement.AccountOperation == AccountOperation.Create ||
-            requirement.AccountOperation == AccountOperation.Read)
+        if (requirement.AccountOperation == ResourceOperation.Create ||
+            requirement.AccountOperation == ResourceOperation.Read)
         {
             context.Succeed(requirement);
         }

@@ -5,6 +5,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using PicturesAPI.Entities;
+using PicturesAPI.Enums;
 using PicturesAPI.Exceptions;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
@@ -53,7 +54,7 @@ public class UserAccountService : IUserAccountService
 
     public LoginSuccessResult GenerateJwt(LoginDto dto)
     {
-        var account = _accountRepo.GetAccountByNick(dto.Nickname);
+        var account = _accountRepo.GetAccountByNick(dto.Nickname, DbInclude.Raw);
         if (account is null || account.IsDeleted)
             throw new BadRequestException("Invalid nickname or password");
 
@@ -83,7 +84,7 @@ public class UserAccountService : IUserAccountService
 
         var loginSuccessResult = new LoginSuccessResult()
         {
-            AccountDto = _mapper.Map<Account, AccountDto>(account),
+            AccountDto = _mapper.Map<AccountDto>(account),
             LikedTags = account.LikedTags,
             AuthToken = tokenHandler.WriteToken(token),
             Likes = _mapper.Map<List<LikeDto>>(_likeRepo.GetLikesByLiker(account))

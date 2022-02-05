@@ -39,20 +39,22 @@ public class PictureService : IPictureService
     
     public PagedResult<PictureDto> GetAll(PictureQuery query)
     {
-        var baseQuery = _pictureRepo.GetPictures() // how to make this less painful for the database?
+        var baseQuery = _pictureRepo.GetPictures().ToList();
+        
+        
+        var sortedQuery = baseQuery
             .Where(p => query.SearchPhrase == null || 
                         p.Name.ToLower().Contains(query.SearchPhrase.ToLower()) || 
                         p.Tags.ToLower().Contains(query.SearchPhrase.ToLower()))
             .Where(p => p.PictureAdded.AddDays(query.DaysSincePictureAdded) > DateTime.Now)
             .OrderByDescending(p => p.Tags.Split(' ').Intersect(query.LikedTags.Split(' ')).Count())
             .ThenByDescending(p => p.Likes.Count)
-            .ToList();
-
-        var pictures = baseQuery
             .Skip(query.PageSize * (query.PageNumber - 1))
             .Take(query.PageSize)
             .ToList();
-        
+
+        var pictures = sortedQuery.Select(picture => _pictureRepo.GetPictureById(picture.Id)).ToList();
+
         if (pictures.Count == 0) throw new NotFoundException("pictures not found");
         
         var resultCount = baseQuery.Count;
@@ -77,11 +79,11 @@ public class PictureService : IPictureService
         var result = _mapper.Map<PictureDto>(picture);
         return result;
     }
-
+    
     public Guid Create(IFormFile file, CreatePictureDto dto)
     {
         var id = _accountContextService.GetAccountId!;
-        var account = _accountRepo.GetAccountById(Guid.Parse(id));
+        var account = _accountRepo.GetAccountById(Guid.Parse(id), DbInclude.Raw);
         if (account is null || account.IsDeleted) throw new InvalidAuthTokenException();
         
         dto.Tags = dto.Tags.Distinct().ToList();

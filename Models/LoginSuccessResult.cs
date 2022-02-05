@@ -7,7 +7,6 @@ namespace PicturesAPI.Models;
 public class LoginSuccessResult
 {
     public AccountDto AccountDto { get; set; }
-    
     public string LikedTags { get; set; }
     public string AuthToken { get; set; }
     

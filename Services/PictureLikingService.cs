@@ -34,7 +34,7 @@ public class PictureLikingService : IPictureLikingService
         if (picture is null) throw new NotFoundException("picture not found");
         
         var accountId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
-        var account = _accountRepo.GetAccountById(Guid.Parse(accountId));
+        var account = _accountRepo.GetAccountById(Guid.Parse(accountId), DbInclude.Raw);
         
         if (account is null || account.IsDeleted) throw new InvalidAuthTokenException();
         
@@ -82,7 +82,7 @@ public class PictureLikingService : IPictureLikingService
         if (picture is null) throw new NotFoundException("picture not found");
         
         var accountId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
-        var account = _accountRepo.GetAccountById(Guid.Parse(accountId));
+        var account = _accountRepo.GetAccountById(Guid.Parse(accountId), DbInclude.Raw);
         
         if (account is null || account.IsDeleted) throw new InvalidAuthTokenException();
         

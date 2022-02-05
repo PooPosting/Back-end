@@ -38,6 +38,15 @@ public class PictureController : ControllerBase
         var picture = _pictureService.GetById(id);
         return Ok(picture);
     }
+    
+    [HttpGet]
+    [AllowAnonymous]
+    [Route("{id}/likes")]
+    public IActionResult GetPictureLikes([FromRoute] Guid id)
+    {
+        var picture = _pictureService.GetById(id);
+        return Ok();
+    }
 
     [HttpPost]
     [Route("create")]

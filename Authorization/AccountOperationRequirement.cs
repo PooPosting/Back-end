@@ -5,9 +5,9 @@ namespace PicturesAPI.Authorization;
 
 public class AccountOperationRequirement : IAuthorizationRequirement
 {
-    public AccountOperation AccountOperation { get; }
+    public ResourceOperation AccountOperation { get; }
 
-    public AccountOperationRequirement(AccountOperation accountOperation)
+    public AccountOperationRequirement(ResourceOperation accountOperation)
     {
         AccountOperation = accountOperation;
     }

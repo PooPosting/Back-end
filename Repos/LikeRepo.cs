@@ -26,9 +26,14 @@ public class LikeRepo : ILikeRepo
     public List<Like> GetLikesByLiked(Picture picture)
     {
         var likes = _dbContext.Likes.Where(l => l.Liked == picture)
-            .Include(l => l.Liker)
             .ToList();
-        
+        return likes;
+    }
+    
+    public List<Like> GetLikesByLiked(Guid id)
+    {
+        var likes = _dbContext.Likes.Where(l => l.Liked.Id == id)
+            .ToList();
         return likes;
     }
 

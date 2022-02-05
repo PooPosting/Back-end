@@ -38,7 +38,7 @@ public class AccountService : IAccountService
         
     public AccountDto GetById(Guid id)
     {
-        var account = _accountRepo.GetAccountById(id);
+        var account = _accountRepo.GetAccountById(id, DbInclude.Include);
         if (account is null || account.IsDeleted) throw new NotFoundException("account not found");
         var result = _mapper.Map<AccountDto>(account);
         
@@ -47,7 +47,7 @@ public class AccountService : IAccountService
 
     public PagedResult<AccountDto> GetAll(AccountQuery query)
     {
-        var baseQuery = _accountRepo.GetAccounts()
+        var baseQuery = _accountRepo.GetAccounts(DbInclude.Raw)
             .Where(a => query.SearchPhrase == null || a.Nickname.ToLower().Contains(query.SearchPhrase.ToLower()))
             .Where(a => !a.IsDeleted)
             .OrderByDescending(a => _pictureRepo.GetPicturesByOwner(a).Count())
@@ -71,7 +71,7 @@ public class AccountService : IAccountService
     
     public IEnumerable<AccountDto> GetAllOdata()
     {
-        var accounts = _accountRepo.GetAccounts().Where(a => !a.IsDeleted).ToList();
+        var accounts = _accountRepo.GetAccounts(DbInclude.Include).Where(a => !a.IsDeleted).ToList();
         if (accounts.Count == 0) throw new NotFoundException("accounts not found");
         var result = _mapper.Map<List<AccountDto>>(accounts);
         return result;
@@ -80,7 +80,7 @@ public class AccountService : IAccountService
     public string GetLikedTags()
     {
         var id = _accountContextService.GetAccountId!;
-        var account = _accountRepo.GetAccountById(Guid.Parse(id));
+        var account = _accountRepo.GetAccountById(Guid.Parse(id), DbInclude.Include);
         if (account == null || account.IsDeleted) throw new InvalidAuthTokenException();
         var tags = _accountRepo.GetLikedTags(Guid.Parse(id));
 
@@ -90,7 +90,7 @@ public class AccountService : IAccountService
     public bool Update(PutAccountDto dto)
     {
         var id = _accountContextService.GetAccountId!;
-        var account = _accountRepo.GetAccountById(Guid.Parse(id));
+        var account = _accountRepo.GetAccountById(Guid.Parse(id), DbInclude.Raw);
         if (account == null || account.IsDeleted) throw new InvalidAuthTokenException();
         _accountRepo.UpdateAccount(dto, id);
         return true;
@@ -98,12 +98,12 @@ public class AccountService : IAccountService
 
     public bool Delete(Guid id)
     {
-        var account = _accountRepo.GetAccountById(id);
+        var account = _accountRepo.GetAccountById(id, DbInclude.Raw);
         if (account is null || account.IsDeleted) throw new NotFoundException("account not found");
         var user = _accountContextService.User;
 
         _logger.LogWarning($"Account with Nickname: {account.Nickname} DELETE action invoked");
-        var authorizationResult = _authorizationService.AuthorizeAsync(user, account, new AccountOperationRequirement(AccountOperation.Delete)).Result;
+        var authorizationResult = _authorizationService.AuthorizeAsync(user, account, new AccountOperationRequirement(ResourceOperation.Delete)).Result;
         if (!authorizationResult.Succeeded) throw new ForbidException("You have no rights to delete this account");
         
         _accountRepo.DeleteAccount(id);

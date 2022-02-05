@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PicturesAPI.Entities;
+using PicturesAPI.Enums;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Repos.Interfaces;
 
@@ -11,43 +12,65 @@ public class AccountRepo : IAccountRepo
 {
     private readonly PictureDbContext _dbContext;
     private readonly IPasswordHasher<Account> _passwordHasher;
-    private readonly IPictureRepo _pictureRepo;
 
     public AccountRepo(
         PictureDbContext dbContext, 
-        IPasswordHasher<Account> passwordHasher,
-        IPictureRepo pictureRepo)
+        IPasswordHasher<Account> passwordHasher)
     {
         _dbContext = dbContext;
         _passwordHasher = passwordHasher;
-        _pictureRepo = pictureRepo;
     }
 
-    public Account? GetAccountById(Guid id)
+    public Account? GetAccountById(Guid id, DbInclude option)
     {
-        var account = _dbContext.Accounts
-            .Include(a => a.Pictures)
-            .Include(a => a.Likes)
-            .SingleOrDefault(a => a.Id == id);
+        Account? account;
+        if (option == DbInclude.Include)
+        {
+            account = _dbContext.Accounts
+                .Include(a => a.Pictures)
+                .Include(a => a.Likes)
+                .SingleOrDefault(a => a.Id == id);
+        } else
+        {
+            account = _dbContext.Accounts
+                .SingleOrDefault(a => a.Id == id);
+        }
 
         return account;
     }
 
-    public Account? GetAccountByNick(string nickname)
+    public Account? GetAccountByNick(string nickname, DbInclude option)
     {
-        var account = _dbContext.Accounts
-            .Include(a => a.Pictures)
-            .SingleOrDefault(a => a.Nickname == nickname);
+        Account? account;
+        if (option == DbInclude.Include)
+        {
+            account = _dbContext.Accounts
+                .Include(a => a.Pictures)
+                .Include(a => a.Likes)
+                .SingleOrDefault(a => a.Nickname == nickname);
+        } else
+        {
+            account = _dbContext.Accounts
+                .SingleOrDefault(a => a.Nickname == nickname);
+        }
         
         return account;
     }
     
-    public IEnumerable<Account>? GetAccounts()
+    public IEnumerable<Account>? GetAccounts(DbInclude option)
     {
-        var accounts = _dbContext.Accounts
-            .Include(p => p.Pictures)
-            .Include(p => p.Likes);
-        
+        IEnumerable<Account>? accounts;
+
+        if (option == DbInclude.Include)
+        {
+            accounts = _dbContext.Accounts
+                .Include(p => p.Pictures)
+                .Include(p => p.Likes);
+        } else
+        {
+            accounts = _dbContext.Accounts;
+        }
+
         return accounts;
     }
     
