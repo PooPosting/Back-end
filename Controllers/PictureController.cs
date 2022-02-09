@@ -44,8 +44,8 @@ public class PictureController : ControllerBase
     [Route("{id}/likes")]
     public IActionResult GetPictureLikes([FromRoute] Guid id)
     {
-        var picture = _pictureService.GetById(id);
-        return Ok();
+        var likes = _pictureService.GetPicLikes(id);
+        return Ok(likes);
     }
 
     [HttpPost]

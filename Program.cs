@@ -20,6 +20,7 @@ using PicturesAPI.Repos;
 using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services;
 using PicturesAPI.Services.Interfaces;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 var builder = WebApplication.CreateBuilder();
 
@@ -68,7 +69,7 @@ var builder = WebApplication.CreateBuilder();
     builder.Services.AddDbContext<PictureDbContext>(options =>
     {
         var connString = builder.Configuration.GetConnectionString("PictureDbConnection");
-        options.UseSqlServer(connString);
+        options.UseMySql(connString, ServerVersion.Create(1, 0, 0,ServerType.MariaDb));
     });
 
     // Validators

@@ -17,7 +17,10 @@ public class LikeRepo : ILikeRepo
     public List<Like> GetLikesByLiker(Account liker)
     {
         var likes = _dbContext.Likes.Where(l => l.Liker == liker)
-            .Include(l => l.Liked)
+            .Include(a => a.Liked)
+            .ThenInclude(l => l.Id)
+            .Include(a => a.Liker)
+            .ThenInclude(a => a.Id)
             .ToList();
         
         return likes;
@@ -26,6 +29,8 @@ public class LikeRepo : ILikeRepo
     public List<Like> GetLikesByLiked(Picture picture)
     {
         var likes = _dbContext.Likes.Where(l => l.Liked == picture)
+            .Include(a => a.Liked)
+            .Include(a => a.Liker)
             .ToList();
         return likes;
     }
@@ -33,6 +38,8 @@ public class LikeRepo : ILikeRepo
     public List<Like> GetLikesByLiked(Guid id)
     {
         var likes = _dbContext.Likes.Where(l => l.Liked.Id == id)
+            .Include(a => a.Liked)
+            .Include(a => a.Liker)
             .ToList();
         return likes;
     }

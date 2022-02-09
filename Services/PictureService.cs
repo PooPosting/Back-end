@@ -20,6 +20,7 @@ public class PictureService : IPictureService
     private readonly IAccountContextService _accountContextService;
     private readonly IPictureRepo _pictureRepo;
     private readonly IAccountRepo _accountRepo;
+    private readonly ILikeRepo _likeRepo;
 
     public PictureService(
         ILogger<PictureService> logger, 
@@ -27,6 +28,7 @@ public class PictureService : IPictureService
         IAccountContextService accountContextService,
         IPictureRepo pictureRepo,
         IAccountRepo accountRepo,
+        ILikeRepo likeRepo,
         IMapper mapper)
     {
         _logger = logger;
@@ -35,12 +37,12 @@ public class PictureService : IPictureService
         _accountContextService = accountContextService;
         _pictureRepo = pictureRepo;
         _accountRepo = accountRepo;
+        _likeRepo = likeRepo;
     }
     
     public PagedResult<PictureDto> GetAll(PictureQuery query)
     {
         var baseQuery = _pictureRepo.GetPictures().ToList();
-        
         
         var sortedQuery = baseQuery
             .Where(p => query.SearchPhrase == null || 
@@ -71,7 +73,15 @@ public class PictureService : IPictureService
         
         return result;
     }
-    
+
+    public List<LikeDto> GetPicLikes(Guid id)
+    {
+        var likes = _likeRepo.GetLikesByLiked(id);
+        var likeDtos = _mapper.Map<List<LikeDto>>(likes);
+
+        return likeDtos;
+    }
+
     public PictureDto GetById(Guid id)
     {
         var picture = _pictureRepo.GetPictureById(id);
