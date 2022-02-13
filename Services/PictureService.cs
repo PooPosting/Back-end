@@ -145,6 +145,16 @@ public class PictureService : IPictureService
         if (!authorizationResult.Succeeded) throw new ForbidException("You have no rights to delete this picture");
 
         var pictureDeleteResult = _pictureRepo.DeletePicture(picture);
+
+        if (pictureDeleteResult)
+        {
+            var rootPath = Directory.GetCurrentDirectory();
+            var fullPath = $"{rootPath}/wwwroot/pictures/{picture.Id}.webp";
+            if(File.Exists(fullPath))
+            {
+                File.Delete(fullPath);
+            }
+        }
         
         _logger.LogWarning($"Picture with id: {id} DELETE action success");
 

@@ -18,6 +18,7 @@ public class AccountService : IAccountService
     private readonly IAccountContextService _accountContextService;
     private readonly IAccountRepo _accountRepo;
     private readonly IPictureRepo _pictureRepo;
+    private readonly ILikeRepo _likeRepo;
     private readonly IAuthorizationService _authorizationService;
 
     public AccountService(
@@ -26,6 +27,7 @@ public class AccountService : IAccountService
         IAccountContextService accountContextService,
         IAccountRepo accountRepo,
         IPictureRepo pictureRepo,
+        ILikeRepo likeRepo,
         IAuthorizationService authorizationService)
     {        
         _mapper = mapper;
@@ -33,6 +35,7 @@ public class AccountService : IAccountService
         _accountContextService = accountContextService;
         _accountRepo = accountRepo;
         _pictureRepo = pictureRepo;
+        _likeRepo = likeRepo;
         _authorizationService = authorizationService;
     }
         
@@ -68,7 +71,14 @@ public class AccountService : IAccountService
         
         return result;
     }
-    
+
+    public List<LikeDto> GetAccLikes(Guid id)
+    {
+        var likes = this._likeRepo.GetLikesByLiker(id);
+        var likeDtos = _mapper.Map<List<LikeDto>>(likes);
+        return likeDtos;
+    }
+
     public IEnumerable<AccountDto> GetAllOdata()
     {
         var accounts = _accountRepo.GetAccounts(DbInclude.Include).Where(a => !a.IsDeleted).ToList();

@@ -52,6 +52,15 @@ public class AccountController : ControllerBase
         var result = _accountService.Update(dto);
         return Ok(result);
     }
+    
+    [HttpGet]
+    [AllowAnonymous]
+    [Route("{id}/likes")]
+    public IActionResult GetPictureLikes([FromRoute] Guid id)
+    {
+        var likes = _accountService.GetAccLikes(id);
+        return Ok(likes);
+    }
 
     [HttpDelete] 
     [Route("{id}")]

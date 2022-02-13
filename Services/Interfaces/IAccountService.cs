@@ -6,6 +6,7 @@ namespace PicturesAPI.Services.Interfaces;
 public interface IAccountService
 {
     AccountDto GetById(Guid id);
+    List<LikeDto> GetAccLikes(Guid id);
     PagedResult<AccountDto> GetAll(AccountQuery query);
     IEnumerable<AccountDto> GetAllOdata();
     bool Update(PutAccountDto dto);

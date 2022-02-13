@@ -29,6 +29,7 @@ public class AccountRepo : IAccountRepo
             account = _dbContext.Accounts
                 .Include(a => a.Pictures)
                 .Include(a => a.Likes)
+                .AsSplitQuery()
                 .SingleOrDefault(a => a.Id == id);
         } else
         {

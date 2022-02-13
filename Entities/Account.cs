@@ -28,7 +28,6 @@ public class Account
     [MaxLength(2)]
     public int RoleId { get; set; } = 1;
     
-
     [AllowNull] 
     public virtual ICollection<Picture> Pictures { get; set; }
     [AllowNull]
