@@ -44,10 +44,11 @@ public class PictureService : IPictureService
     {
         var baseQuery = _pictureRepo.GetPictures().ToList();
         
+        //change default sorting algorithm
         var sortedQuery = baseQuery
-            .Where(p => query.SearchPhrase == null || 
-                        p.Name.ToLower().Contains(query.SearchPhrase.ToLower()) || 
-                        p.Tags.ToLower().Contains(query.SearchPhrase.ToLower()))
+            // .Where(p => query.SearchPhrase == null || 
+            //             p.Name.ToLower().Contains(query.SearchPhrase.ToLower()) || 
+            //             p.Tags.ToLower().Contains(query.SearchPhrase.ToLower()))
             .Where(p => p.PictureAdded.AddDays(query.DaysSincePictureAdded) > DateTime.Now)
             .OrderByDescending(p => p.Tags.Split(' ').Intersect(query.LikedTags.Split(' ')).Count())
             .ThenByDescending(p => p.Likes.Count)
@@ -55,7 +56,9 @@ public class PictureService : IPictureService
             .Take(query.PageSize)
             .ToList();
 
-        var pictures = sortedQuery.Select(picture => _pictureRepo.GetPictureById(picture.Id)).ToList();
+        var pictures = sortedQuery
+            .Select(picture => _pictureRepo.GetPictureById(picture.Id))
+            .ToList();
 
         if (pictures.Count == 0) throw new NotFoundException("pictures not found");
         
@@ -64,7 +67,49 @@ public class PictureService : IPictureService
         var result = new PagedResult<PictureDto>(pictureDtos, resultCount, query.PageSize, query.PageNumber);
         return result;
     }
-    
+
+    public PagedResult<PictureDto> SearchAll(SearchQuery query)
+    {
+        var baseQuery = _pictureRepo.GetPictures().ToList();
+
+        List<Picture> sortedQuery;
+
+        switch (query.SearchBy)
+        {
+            case SortSearchBy.MostPopular:
+                sortedQuery = baseQuery
+                    .OrderByDescending(p => p.Likes.Count)
+                    .ToList();
+                break;
+            case SortSearchBy.Newest:
+                sortedQuery = baseQuery
+                    .OrderByDescending(p => p.PictureAdded)
+                    .ToList();
+                break;
+            case SortSearchBy.MostLikes:
+                sortedQuery = baseQuery
+                    .OrderByDescending(p => p.Likes.Count(l => l.IsLike))
+                    .ToList();
+                break;
+            default:
+                throw new BadRequestException("Invalid 'search by' option");
+        }
+
+        var pictures = sortedQuery
+            .Where(p => query.SearchPhrase == null ||
+                        p.Name.ToLower().Contains(query.SearchPhrase.ToLower()) ||
+                        p.Tags.ToLower().Contains(query.SearchPhrase.ToLower()))
+            .Select(picture => _pictureRepo.GetPictureById(picture.Id))
+            .ToList();
+
+        if (pictures.Count == 0) throw new NotFoundException("pictures not found");
+        
+        var resultCount = pictures.Count;
+        var pictureDtos = _mapper.Map<List<PictureDto>>(pictures).ToList();
+        var result = new PagedResult<PictureDto>(pictureDtos, resultCount, query.PageSize, query.PageNumber);
+        return result;
+    }
+
     public IEnumerable<PictureDto> GetAllOdata()
     {
         var pictures = _pictureRepo.GetPictures().ToList();

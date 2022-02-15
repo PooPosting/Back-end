@@ -29,6 +29,16 @@ public class PictureController : ControllerBase
         var pictures = _pictureService.GetAll(query);
         return Ok(pictures);
     }
+    
+    [HttpGet]
+    [EnableQuery]
+    [AllowAnonymous]
+    [Route("search")]
+    public ActionResult<PagedResult<PictureDto>> SearchAllPictures([FromQuery] SearchQuery query)
+    {
+        var pictures = _pictureService.SearchAll(query);
+        return Ok(pictures);
+    }
 
     [HttpGet]
     [AllowAnonymous]
