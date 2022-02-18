@@ -105,7 +105,11 @@ public class PictureService : IPictureService
         if (pictures.Count == 0) throw new NotFoundException("pictures not found");
         
         var resultCount = pictures.Count;
-        var pictureDtos = _mapper.Map<List<PictureDto>>(pictures).ToList();
+        var pictureDtos = _mapper
+            .Map<List<PictureDto>>(pictures)
+            .Skip(query.PageSize * (query.PageNumber - 1))
+            .Take(query.PageSize)
+            .ToList();
         var result = new PagedResult<PictureDto>(pictureDtos, resultCount, query.PageSize, query.PageNumber);
         return result;
     }

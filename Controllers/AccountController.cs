@@ -22,6 +22,7 @@ public class AccountController : ControllerBase
     }
      
     [HttpGet]
+    [AllowAnonymous]
     [Route("{id}")]
     public IActionResult GetAccountById([FromRoute] Guid id)
     {
@@ -38,6 +39,7 @@ public class AccountController : ControllerBase
     }
     
     [HttpGet]
+    [AllowAnonymous]
     [EnableQuery]
     public IActionResult GetAllAccounts([FromQuery] AccountQuery query)
     {

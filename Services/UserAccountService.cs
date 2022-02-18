@@ -54,7 +54,7 @@ public class UserAccountService : IUserAccountService
 
     public LoginSuccessResult GenerateJwt(LoginDto dto)
     {
-        var account = _accountRepo.GetAccountByNick(dto.Nickname, DbInclude.Raw);
+        var account = _accountRepo.GetAccountByNick(dto.Nickname, DbInclude.Include);
         if (account is null || account.IsDeleted)
             throw new BadRequestException("Invalid nickname or password");
 

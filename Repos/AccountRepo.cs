@@ -28,6 +28,7 @@ public class AccountRepo : IAccountRepo
         {
             account = _dbContext.Accounts
                 .Include(a => a.Pictures)
+                .ThenInclude(p => p.Likes)
                 .Include(a => a.Likes)
                 .AsSplitQuery()
                 .SingleOrDefault(a => a.Id == id);
@@ -47,7 +48,9 @@ public class AccountRepo : IAccountRepo
         {
             account = _dbContext.Accounts
                 .Include(a => a.Pictures)
+                .ThenInclude(p => p.Likes)
                 .Include(a => a.Likes)
+                .AsSplitQuery()
                 .SingleOrDefault(a => a.Nickname == nickname);
         } else
         {
@@ -66,6 +69,7 @@ public class AccountRepo : IAccountRepo
         {
             accounts = _dbContext.Accounts
                 .Include(p => p.Pictures)
+                .ThenInclude(p => p.Likes)
                 .Include(p => p.Likes);
         } else
         {
