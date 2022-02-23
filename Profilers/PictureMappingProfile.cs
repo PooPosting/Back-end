@@ -8,20 +8,11 @@ public class PictureMappingProfile : Profile
 {
     public PictureMappingProfile()
     {
-
         CreateMap<Picture, PictureDto>()
             .ForMember(
                 p => p.Tags,
                 c => c
-                    .MapFrom(s => SerializeTags(s.Tags) ))
-            .ForMember(
-                p => p.Likes,
-                m => m
-                    .MapFrom(p => p.Likes.Count(l => l.IsLike == true)))
-            .ForMember(
-                p => p.Dislikes,
-                m => m
-                    .MapFrom(p => p.Likes.Count(l => l.IsLike == false)))
+                    .MapFrom(s => SerializeTags(s.Tags)))
             .ForMember(
                 d => d.AccountNickname,
                 m => m.MapFrom(

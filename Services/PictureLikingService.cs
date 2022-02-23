@@ -1,7 +1,9 @@
 ﻿using System.Security.Claims;
+using AutoMapper;
 using PicturesAPI.Entities;
 using PicturesAPI.Enums;
 using PicturesAPI.Exceptions;
+using PicturesAPI.Models.Dtos;
 using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services.Interfaces;
 
@@ -10,6 +12,7 @@ namespace PicturesAPI.Services;
 public class PictureLikingService : IPictureLikingService
 {
     private readonly IPictureRepo _pictureRepo;
+    private readonly IMapper _mapper;
     private readonly ILikeRepo _likeRepo;
     private readonly IAccountRepo _accountRepo;
     private readonly IAccountContextService _accountContextService;
@@ -18,15 +21,17 @@ public class PictureLikingService : IPictureLikingService
         ILikeRepo likeRepo,
         IAccountRepo accountRepo,
         IPictureRepo pictureRepo,
+        IMapper mapper,
         IAccountContextService accountContextService)
     {
         _pictureRepo = pictureRepo;
+        _mapper = mapper;
         _likeRepo = likeRepo;
         _accountRepo = accountRepo;
         _accountContextService = accountContextService;
     }
     
-    public LikeOperationResult Like(Guid id)
+    public PictureDto Like(Guid id)
     {
         var user = _accountContextService.User;
         var picture = _pictureRepo.GetPictureById(id);
@@ -49,32 +54,27 @@ public class PictureLikingService : IPictureLikingService
                 // is like
                 _accountRepo.RemoveLikedTags(account, picture);
                 _likeRepo.RemoveLike(like);
-                return LikeOperationResult.LikeRemoved;
+                return _mapper.Map<PictureDto>(picture);
             }
-            else
-            {
-                // is dislike
-                _accountRepo.AddLikedTags(account, picture);
-                _likeRepo.ChangeLike(like);
-                return LikeOperationResult.Liked;
-            }
-        }
-        else
-        {
-            // like does not exist
+            // is dislike
             _accountRepo.AddLikedTags(account, picture);
-            _likeRepo.AddLike(
-                new Like()
-                {
-                    Liked = picture,
-                    Liker = account,
-                    IsLike = true
-                });
-            return LikeOperationResult.Liked;
+            _likeRepo.ChangeLike(like);
+            return _mapper.Map<PictureDto>(picture);
         }
+        // like does not exist
+        _accountRepo.AddLikedTags(account, picture);
+        _likeRepo.AddLike(
+            new Like()
+            {
+                Liked = picture,
+                Liker = account,
+                IsLike = true
+            });
+        return _mapper.Map<PictureDto>(picture);
+
     }
 
-    public LikeOperationResult DisLike(Guid id)
+    public PictureDto DisLike(Guid id)
     {
         var user = _accountContextService.User;
         var picture = _pictureRepo.GetPictureById(id);
@@ -97,30 +97,21 @@ public class PictureLikingService : IPictureLikingService
             {
                 // is dislike
                 _likeRepo.RemoveLike(like);
-                return LikeOperationResult.DislikeRemoved;
+                return _mapper.Map<PictureDto>(picture);
             }
-            else 
-            // (like.IsLike == true)
+            // is like
+            _likeRepo.ChangeLike(like);
+            return _mapper.Map<PictureDto>(picture);
+        } 
+        // dislike does not exist
+        _likeRepo.AddLike(
+            new Like()
             {
-                // is like
-                _likeRepo.ChangeLike(like);
-                return LikeOperationResult.Disliked;
-            }
-        }
-        else
-        {
-            // dislike does not exist
-            _likeRepo.AddLike(
-                new Like()
-                {
-                    Liked = picture,
-                    Liker = account,
-                    IsLike = false
-                });
-            return LikeOperationResult.Disliked;
-            
-        }
-        
+                Liked = picture,
+                Liker = account,
+                IsLike = false
+            });
+        return _mapper.Map<PictureDto>(picture);
     }
 
 }

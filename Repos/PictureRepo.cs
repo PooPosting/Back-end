@@ -29,8 +29,9 @@ public class PictureRepo : IPictureRepo
     public IEnumerable<Picture> GetPicturesByOwner(Account account)
     {
         var pictures = _dbContext.Pictures
-            .Include(p => p.Account)
             .Include(p => p.Likes)
+            .ThenInclude(l => l.Liker)
+            .Include(p => p.Account)
             .Where(p => p.Account == account);
         return pictures;
     }
@@ -39,6 +40,7 @@ public class PictureRepo : IPictureRepo
     {
         var picture = _dbContext.Pictures
             .Include(p => p.Likes)
+            .ThenInclude(l => l.Liker)
             .Include(p => p.Account)
             .SingleOrDefault(p => p.Id == id);
         return picture;

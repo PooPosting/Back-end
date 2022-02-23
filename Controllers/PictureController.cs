@@ -90,16 +90,16 @@ public class PictureController : ControllerBase
     [Route("{id}/voteup")]
     public IActionResult PatchPictureVoteUp([FromRoute] Guid id)
     {
-        var likeOperationResult = _pictureLikingService.Like(id);
-        return Ok(likeOperationResult);
+        var result = _pictureLikingService.Like(id);
+        return Ok(result);
     }
         
     [HttpPatch]
     [Route("{id}/votedown")]
     public IActionResult PatchPictureVoteDown([FromRoute] Guid id)
     {
-        var likeOperationResult = _pictureLikingService.DisLike(id);
-        return Ok(likeOperationResult);
+        var result = _pictureLikingService.DisLike(id);
+        return Ok(result);
     }
 
     [HttpDelete]

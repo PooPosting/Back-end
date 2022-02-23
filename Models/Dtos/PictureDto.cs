@@ -12,7 +12,6 @@ public class PictureDto
         
     public string Url { get; set; }
     public DateTime PictureAdded { get; set; }
-        
-    public int Likes { get; set; }
-    public int Dislikes { get; set; }
+    
+    public List<LikeDto> Likes { get; set; }
 }
