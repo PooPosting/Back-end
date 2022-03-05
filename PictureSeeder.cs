@@ -18,6 +18,7 @@ public class PictureSeeder
     {
         if (!_dbContext.Roles.Any())
         {
+            Console.WriteLine("Seeding the database...");
             var roles = GetRoles();
             _dbContext.Roles.AddRange(roles);
             _dbContext.SaveChanges();

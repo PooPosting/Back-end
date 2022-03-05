@@ -60,7 +60,6 @@ public class PictureRepo : IPictureRepo
         dto.Tags = dto.Tags.Distinct().ToList();
         if (dto.Description != null) pictureToUpdate!.Description = dto.Description;
         if (dto.Name != null) pictureToUpdate!.Name = dto.Name;
-        if (dto.Url != null) pictureToUpdate!.Url = dto.Url;
         if (dto.Tags != null) pictureToUpdate!.Tags = string.Join(" ", dto.Tags).ToLower();
         _dbContext.SaveChanges();
         

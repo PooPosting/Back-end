@@ -69,7 +69,7 @@ var builder = WebApplication.CreateBuilder();
     builder.Services.AddDbContext<PictureDbContext>(options =>
     {
         var connString = builder.Configuration.GetConnectionString("PictureDbConnection");
-        options.UseMySql(connString, ServerVersion.Create(1, 0, 0,ServerType.MariaDb));
+        options.UseMySql(connString, ServerVersion.Create(1, 0, 0, ServerType.MariaDb));
     });
 
     // Validators
@@ -112,17 +112,18 @@ var builder = WebApplication.CreateBuilder();
     });
 
 var app = builder.Build();
+DbManagementService.MigrationInit(app);
 
 // Configure
 
-app.UseCors("FrontEndClient");
-app.UseFileServer(new FileServerOptions  
-{  
-    FileProvider = new PhysicalFileProvider(  
-        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
-    RequestPath = "/wwwroot",  
-    EnableDefaultFiles = true  
-}) ;  
+    app.UseCors("FrontEndClient");
+    app.UseFileServer(new FileServerOptions  
+    {  
+        FileProvider = new PhysicalFileProvider(  
+            Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
+        RequestPath = "/wwwroot",  
+        EnableDefaultFiles = true  
+    }) ;  
 
     var scope = app.Services.CreateScope();
     var seeder = scope.ServiceProvider.GetRequiredService<PictureSeeder>();
@@ -132,14 +133,15 @@ app.UseFileServer(new FileServerOptions
         app.UseDeveloperExceptionPage();
     }
 
-    app.UseMiddleware<ErrorHandlingMiddleware>();
+app.UseMiddleware<ErrorHandlingMiddleware>();
     app.UseMiddleware<RequestTimeMiddleware>();
     app.UseAuthentication();
     app.UseHttpsRedirection();
     app.UseSwagger();
+
     app.UseSwaggerUI(c => 
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "PicturesAPI v1"));
-                
+
     app.UseRouting();
     app.UseAuthorization();
     app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
