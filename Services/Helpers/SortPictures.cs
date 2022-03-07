@@ -35,11 +35,11 @@ public static class SortPictures
         }
         for (int i = 0; i < picture.Likes.Count(l => l.IsLike); i++)
         {
-            result *= 1.025;
+            result *= 1.075;
         }
         for (int i = 0; i < picture.Likes.Count(l => l.IsLike == false); i++)
         {
-            result *= 1.005;
+            result *= 1.02;
         }
         
         return intersectedTags.Aggregate(result, (current, tag) => current * 1.15);
