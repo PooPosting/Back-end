@@ -21,7 +21,10 @@ public class PictureRepo : IPictureRepo
     public IEnumerable<Picture> GetPictures()
     {
         var pictures = _dbContext.Pictures
-            .Include(p => p.Likes);
+            .Include(p => p.Likes)
+            .ThenInclude(l => l.Liker)
+            .Include(p => p.Account)
+            .AsSplitQuery();
 
         return pictures;
     }

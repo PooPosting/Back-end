@@ -7,6 +7,7 @@ using PicturesAPI.Exceptions;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Repos.Interfaces;
+using PicturesAPI.Services.Helpers;
 using PicturesAPI.Services.Interfaces;
 // ReSharper disable TemplateIsNotCompileTimeConstantProblem
 
@@ -42,20 +43,15 @@ public class PictureService : IPictureService
     
     public PagedResult<PictureDto> GetAll(PictureQuery query)
     {
-        var baseQuery = _pictureRepo.GetPictures().ToList();
-        
-        //change default sorting algorithm
-        var sortedQuery = baseQuery
-            // .Where(p => query.SearchPhrase == null || 
-            //             p.Name.ToLower().Contains(query.SearchPhrase.ToLower()) || 
-            //             p.Tags.ToLower().Contains(query.SearchPhrase.ToLower()))
-            .Where(p => p.PictureAdded.AddDays(query.DaysSincePictureAdded) > DateTime.Now)
-            .OrderByDescending(p => p.Tags.Split(' ').Intersect(query.LikedTags.Split(' ')).Count())
-            .ThenByDescending(p => p.Likes.Count)
-            .Skip(query.PageSize * (query.PageNumber - 1))
-            .Take(query.PageSize)
+        var baseQuery = _pictureRepo
+            .GetPictures()
             .ToList();
-
+        
+        var sortedQuery = SortPictures
+            .SortPics(baseQuery, query)
+            .Skip(query.PageSize * (query.PageNumber - 1))
+            .Take(query.PageSize);
+        
         var pictures = sortedQuery
             .Select(picture => _pictureRepo.GetPictureById(picture.Id))
             .ToList();

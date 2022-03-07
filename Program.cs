@@ -26,10 +26,6 @@ var builder = WebApplication.CreateBuilder();
 
 // NLog: Setup NLog to Dependency injection
 
-    if (!builder.Environment.IsDevelopment())
-    {
-        builder.Logging.ClearProviders();
-    }
     builder.Logging.SetMinimumLevel(LogLevel.Trace);
     builder.Host.UseNLog();
 
@@ -103,11 +99,17 @@ var builder = WebApplication.CreateBuilder();
     builder.Services.AddCors(options =>
     {
         options.AddPolicy("FrontEndClient", policyBuilder =>
-            
-            policyBuilder.AllowAnyMethod()
-                .AllowAnyHeader()
-                .WithOrigins(builder.Configuration["AllowedOrigins"])
-                .AllowCredentials()
+            {
+                foreach (var origin in builder.Configuration["AllowedOrigins"].Split(','))
+                {
+                    policyBuilder.WithOrigins(origin);
+                    Console.WriteLine($"Built with CORS origin: {origin}");
+                }
+                policyBuilder
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
+            }
         );
     });
 
