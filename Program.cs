@@ -100,12 +100,15 @@ var builder = WebApplication.CreateBuilder();
     {
         options.AddPolicy("FrontEndClient", policyBuilder =>
             {
+                var originList = new List<string>();
                 foreach (var origin in builder.Configuration["AllowedOrigins"].Split(','))
                 {
-                    policyBuilder.WithOrigins(origin);
+                    originList.Add(origin);
                     Console.WriteLine($"Built with CORS origin: {origin}");
                 }
+
                 policyBuilder
+                    .WithOrigins(originList.ToArray())
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();

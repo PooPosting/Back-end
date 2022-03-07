@@ -17,22 +17,28 @@ public static class SortPictures
 
     private static double CountPicPoints(Picture picture, PictureQuery query)
     {
-        var result = 10.0;
+        var result = 0.0;
         var date = DateTime.Today.AddDays(-1);
 
         var intersectedTags = picture.Tags
             .Split(' ')
             .Intersect(query.LikedTags.Split(' '));
-        
-        if (picture.PictureAdded > date)
+
+        if ((DateTime.Now - picture.PictureAdded).TotalMinutes < 30)
         {
-            result += (((DateTime.Now - date).Days * 1440) + ((DateTime.Now - date).Hours * 60) + (DateTime.Now - date).Minutes) * 0.1;
-            result += (((picture.PictureAdded - date).Days * 1440) + ((picture.PictureAdded - date).Hours * 60) + (picture.PictureAdded - date).Minutes) * 0.2;
+            result += (DateTime.Now - date).TotalMinutes * 1;
+            result -= (DateTime.Now - picture.PictureAdded).TotalMinutes * 0.7;
+        }
+        else if (picture.PictureAdded > date)
+        {
+            result += (DateTime.Now - date).TotalMinutes * 0.6;
+            result -= (DateTime.Now - picture.PictureAdded).TotalMinutes * 0.3;
         }
         else
         {
-            result += 750;
+            result += 250;
         }
+        
         for (int i = 0; i < picture.Likes.Count(l => l.IsLike); i++)
         {
             result *= 1.075;
