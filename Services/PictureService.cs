@@ -22,6 +22,7 @@ public class PictureService : IPictureService
     private readonly IPictureRepo _pictureRepo;
     private readonly IAccountRepo _accountRepo;
     private readonly ILikeRepo _likeRepo;
+    private readonly IClassifyNsfw _classifyNsfw;
 
     public PictureService(
         ILogger<PictureService> logger, 
@@ -30,6 +31,7 @@ public class PictureService : IPictureService
         IPictureRepo pictureRepo,
         IAccountRepo accountRepo,
         ILikeRepo likeRepo,
+        IClassifyNsfw classifyNsfw,
         IMapper mapper)
     {
         _logger = logger;
@@ -39,6 +41,7 @@ public class PictureService : IPictureService
         _pictureRepo = pictureRepo;
         _accountRepo = accountRepo;
         _likeRepo = likeRepo;
+        _classifyNsfw = classifyNsfw;
     }
     
     public PagedResult<PictureDto> GetAll(PictureQuery query)
@@ -152,14 +155,23 @@ public class PictureService : IPictureService
             var fullPath = $"{rootPath}/wwwroot/pictures/{fileGuid}.webp";
             picture.Id = fileGuid;
             picture.Url = $"wwwroot/pictures/{fileGuid}.webp";
-            
-            var result = _pictureRepo.CreatePicture(picture);
-            
-            using (var stream = new FileStream(fullPath, FileMode.Create))
+
+
+            using (var stream =
+                   new FileStream(fullPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
             {
                 file.CopyTo(stream);
+                stream.Dispose();
             }
+
+            if (!_classifyNsfw.IsSafeForWork(fileGuid.ToString()))
+            {
+                File.Delete(fullPath);
+                throw new BadRequestException("nsfw picture");
+            }
+            var result = _pictureRepo.CreatePicture(picture);
             return result;
+
         }
 
         throw new BadRequestException("invalid picture");

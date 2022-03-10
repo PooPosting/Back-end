@@ -19,6 +19,7 @@ using PicturesAPI.Models.Validators;
 using PicturesAPI.Repos;
 using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services;
+using PicturesAPI.Services.Helpers;
 using PicturesAPI.Services.Interfaces;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
@@ -92,6 +93,7 @@ var builder = WebApplication.CreateBuilder();
     
     // Other stuff
     builder.Services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
+builder.Services.AddScoped<IClassifyNsfw, ClassifyNsfw>();
     builder.Services.AddScoped<PictureSeeder>();
     builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
     builder.Services.AddHttpContextAccessor();
@@ -106,7 +108,6 @@ var builder = WebApplication.CreateBuilder();
                     originList.Add(origin);
                     Console.WriteLine($"Built with CORS origin: {origin}");
                 }
-
                 policyBuilder
                     .WithOrigins(originList.ToArray())
                     .AllowAnyHeader()
@@ -118,7 +119,6 @@ var builder = WebApplication.CreateBuilder();
 
 var app = builder.Build();
 DbManagementService.MigrationInit(app);
-
 // Configure
 
     app.UseCors("FrontEndClient");
