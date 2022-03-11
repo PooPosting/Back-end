@@ -63,6 +63,9 @@ public class PictureService : IPictureService
         
         var resultCount = baseQuery.Count;
         var pictureDtos = _mapper.Map<List<PictureDto>>(pictures).ToList();
+        
+        AllowModify(pictureDtos);
+            
         var result = new PagedResult<PictureDto>(pictureDtos, resultCount, query.PageSize, query.PageNumber);
         return result;
     }
@@ -109,6 +112,9 @@ public class PictureService : IPictureService
             .Skip(query.PageSize * (query.PageNumber - 1))
             .Take(query.PageSize)
             .ToList();
+        
+        AllowModify(pictureDtos);
+
         var result = new PagedResult<PictureDto>(pictureDtos, resultCount, query.PageSize, query.PageNumber);
         return result;
     }
@@ -164,7 +170,8 @@ public class PictureService : IPictureService
                 stream.Dispose();
             }
 
-            if (!_classifyNsfw.IsSafeForWork(fileGuid.ToString()))
+            var isSafe = _classifyNsfw.IsSafeForWork(fileGuid.ToString());
+            if (!isSafe)
             {
                 File.Delete(fullPath);
                 throw new BadRequestException("nsfw picture");
@@ -178,7 +185,7 @@ public class PictureService : IPictureService
 
     }
 
-    public bool Put(Guid id, PutPictureDto dto)
+    public PictureDto Put(Guid id, PutPictureDto dto)
     {
         var picture = _pictureRepo.GetPictureById(id);
         if (picture is null) throw new NotFoundException("picture not found");
@@ -186,8 +193,9 @@ public class PictureService : IPictureService
 
         var authorizationResult = _authorizationService.AuthorizeAsync(user, picture, new ResourceOperationRequirement(ResourceOperation.Update)).Result;
         if (!authorizationResult.Succeeded) throw new ForbidException("You can't modify picture you didn't added");
+        _pictureRepo.UpdatePicture(picture, dto);
 
-        var result = _pictureRepo.UpdatePicture(picture, dto);
+        var result = _mapper.Map<PictureDto>(picture);
         return result;
     }
         
@@ -218,5 +226,23 @@ public class PictureService : IPictureService
         return pictureDeleteResult;
     }
     
+    private void AllowModify(List<PictureDto> pictureDtos)
+    {
+        var role = _accountContextService.GetAccountRole;
+        var accountId = _accountContextService.GetAccountId;
+
+        switch (role)
+        {
+            case ("3"):
+                pictureDtos.ForEach(p => p.IsModifiable = true);
+                break;
+            default:
+                pictureDtos
+                    .Where(p => p.AccountId.ToString() == accountId)
+                    .ToList()
+                    .ForEach(p => p.IsModifiable = true);
+                break;
+        }
+    }
     
 }

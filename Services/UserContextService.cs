@@ -15,4 +15,5 @@ public class AccountContextService : IAccountContextService
 
     public ClaimsPrincipal User => _httpContextAccessor.HttpContext!.User;
     public string? GetAccountId => User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+    public string? GetAccountRole => User.FindFirst(c => c.Type == ClaimTypes.Role)?.Value;
 }

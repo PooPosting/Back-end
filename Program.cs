@@ -118,7 +118,7 @@ builder.Services.AddScoped<IClassifyNsfw, ClassifyNsfw>();
     });
 
 var app = builder.Build();
-DbManagementService.MigrationInit(app);
+// DbManagementService.MigrationInit(app);
 // Configure
 
     app.UseCors("FrontEndClient");

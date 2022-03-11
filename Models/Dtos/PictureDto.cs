@@ -14,4 +14,5 @@ public class PictureDto
     public DateTime PictureAdded { get; set; }
     
     public List<LikeDto> Likes { get; set; }
+    public bool IsModifiable { get; set; }
 }

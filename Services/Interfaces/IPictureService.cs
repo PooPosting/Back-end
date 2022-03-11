@@ -11,6 +11,6 @@ public interface IPictureService
     public List<LikeDto> GetPicLikes(Guid id);
     PictureDto GetById(Guid id);
     Guid Create(IFormFile file, CreatePictureDto dto);
-    bool Put(Guid id, PutPictureDto dto);
+    PictureDto Put(Guid id, PutPictureDto dto);
     bool Delete(Guid id);
 }

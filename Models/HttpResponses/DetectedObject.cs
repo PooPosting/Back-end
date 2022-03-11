@@ -4,12 +4,12 @@ namespace PicturesAPI.Models.HttpResponses;
 
 public class DetectedObject
 {
-    [JsonPropertyName("confidence")]
-    public string Confidence { get; set; }
+    [JsonPropertyName("box")]
+    public List<int> Box { get; set; }
+    
+    [JsonPropertyName("score")]
+    public float Score { get; set; }
 
-    [JsonPropertyName("bounding_box")]
-    public List<int> BoundingBox { get; set; }
-
-    [JsonPropertyName("name")]
-    public string Name { get; set; }
+    [JsonPropertyName("label")]
+    public string Label { get; set; }
 }

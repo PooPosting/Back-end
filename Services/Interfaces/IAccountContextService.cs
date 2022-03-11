@@ -7,4 +7,5 @@ public interface IAccountContextService
 {
     ClaimsPrincipal User { get; }
     string? GetAccountId { get; }
+    string? GetAccountRole { get; }
 }

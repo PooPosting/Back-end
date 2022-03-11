@@ -2,6 +2,7 @@
 using PicturesAPI.Entities;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
+using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Services.Helpers;
 
@@ -19,6 +20,7 @@ public static class SortPictures
     {
         var result = 0.0;
         var date = DateTime.Today.AddDays(-1);
+        
 
         var intersectedTags = picture.Tags
             .Split(' ')

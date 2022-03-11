@@ -13,7 +13,7 @@ public class Picture
         
     public Guid AccountId { get; set; }
         
-    [Required] [MinLength(4)] [MaxLength(25)]
+    [Required] [MinLength(4)] [MaxLength(40)]
     public string Name { get; set; }
         
     [MaxLength(500)]
