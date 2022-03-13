@@ -28,7 +28,6 @@ public class ClassifyNsfw : IClassifyNsfw
             RequestUri = new Uri(_config.GetValue<string>("AppSecret:x-rapidapi-uri")),
             Headers =
             {
-                
                 { "x-rapidapi-host", _config.GetValue<string>("AppSecret:x-rapidapi-host") },
                 { "x-rapidapi-key", _config.GetValue<string>("AppSecret:x-rapidapi-key") },
             },
