@@ -57,6 +57,15 @@ public class PictureController : ControllerBase
         var likes = _pictureService.GetPicLikes(id);
         return Ok(likes);
     }
+    
+    [HttpGet]
+    [AllowAnonymous]
+    [Route("{id}/likers")]
+    public IActionResult GetPictureLikers([FromRoute] Guid id)
+    {
+        var likes = _pictureService.GetPicLikers(id);
+        return Ok(likes);
+    }
 
     [HttpPost]
     [Route("create")]

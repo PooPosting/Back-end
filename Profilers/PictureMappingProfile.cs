@@ -46,6 +46,9 @@ public class PictureMappingProfile : Profile
                     .MapFrom(c => string.Join(" ", c.Tags).ToLower()));
 
         CreateMap<Like, LikeDto>()
+            .ForMember(l => l.AccountNickname,
+                l => l.MapFrom(
+                    c => c.Liker.Nickname))
             .ForMember(l => l.AccountId,
                 l => l.MapFrom(
                     c => c.Liker.Id))

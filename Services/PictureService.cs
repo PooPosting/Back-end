@@ -135,7 +135,15 @@ public class PictureService : IPictureService
 
         return likeDtos;
     }
-
+    
+    public List<AccountDto> GetPicLikers(Guid id)
+    {
+        var likes = _likeRepo.GetLikesByLiked(id);
+        var accounts = likes.Select(like => like.Liker).ToList();
+        var result = _mapper.Map<List<AccountDto>>(accounts);
+        return result;
+    }
+    
     public PictureDto GetById(Guid id)
     {
         var picture = _pictureRepo.GetPictureById(id);

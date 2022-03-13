@@ -9,6 +9,7 @@ public interface IPictureService
     PagedResult<PictureDto> SearchAll(SearchQuery query);
     IEnumerable<PictureDto> GetAllOdata();
     public List<LikeDto> GetPicLikes(Guid id);
+    public List<AccountDto> GetPicLikers(Guid id);
     PictureDto GetById(Guid id);
     Guid Create(IFormFile file, CreatePictureDto dto);
     PictureDto Put(Guid id, PutPictureDto dto);

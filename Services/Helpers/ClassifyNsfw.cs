@@ -7,24 +7,30 @@ namespace PicturesAPI.Services.Helpers;
 
 public class ClassifyNsfw : IClassifyNsfw
 {
+    private readonly IConfiguration _config;
+    public ClassifyNsfw(IConfiguration config)
+    {
+        _config = config;
+    }
     public bool IsSafeForWork(string picId)
     {
         var isDevelopment = string.Equals(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"), "development",
             StringComparison.InvariantCultureIgnoreCase);
+        
         if (isDevelopment) return true;
         
-        //get root api path from appsettings.json
-        var url = Path.Combine("https://pictures-api.migra.ml/", $"wwwroot/pictures/{picId}.webp");
+        var url = Path.Combine(_config.GetValue<string>("AppSecret:app-url"), $"wwwroot/pictures/{picId}.webp");
         
         var client = new HttpClient();
         var request = new HttpRequestMessage
         {
             Method = HttpMethod.Post,
-            RequestUri = new Uri("https://nsfw-images-detection-and-classification.p.rapidapi.com/adult-content"),
+            RequestUri = new Uri(_config.GetValue<string>("AppSecret:x-rapidapi-uri")),
             Headers =
             {
-                { "x-rapidapi-host", "nsfw-images-detection-and-classification.p.rapidapi.com" },
-                { "x-rapidapi-key", "faf9137d03msh62cdf2d3a847bc1p197d35jsn4f22cd1ac52c" },
+                
+                { "x-rapidapi-host", _config.GetValue<string>("AppSecret:x-rapidapi-host") },
+                { "x-rapidapi-key", _config.GetValue<string>("AppSecret:x-rapidapi-key") },
             },
             Content = new StringContent("{\r\"url\": \"" + url + "\"\r}")
             {

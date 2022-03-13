@@ -60,10 +60,13 @@ public class PictureRepo : IPictureRepo
     {
         var pictureToUpdate = _dbContext.Pictures.SingleOrDefault(p => p == picture);
         
-        dto.Tags = dto.Tags.Distinct().ToList();
         if (dto.Description != null) pictureToUpdate!.Description = dto.Description;
         if (dto.Name != null) pictureToUpdate!.Name = dto.Name;
-        if (dto.Tags != null) pictureToUpdate!.Tags = string.Join(" ", dto.Tags).ToLower();
+        if (dto.Tags != null)
+        {
+            dto.Tags = dto.Tags.Distinct().ToList();
+            pictureToUpdate!.Tags = string.Join(" ", dto.Tags).ToLower();
+        }
         _dbContext.SaveChanges();
         
         return true;
