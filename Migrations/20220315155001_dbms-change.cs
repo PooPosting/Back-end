@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace PicturesAPI.Migrations
 {
-    public partial class dbmschangedtomariadb : Migration
+    public partial class dbmschange : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

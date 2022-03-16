@@ -19,7 +19,7 @@ public class ClassifyNsfw : IClassifyNsfw
         
         if (isDevelopment) return true;
         
-        var url = Path.Combine(_config.GetValue<string>("AppSecret:app-url"), $"wwwroot/pictures/{picId}.webp");
+        var url = Path.Combine(_config.GetValue<string>("AppSecret:app-weburl"), $"wwwroot/pictures/{picId}.webp");
         
         var client = new HttpClient();
         var request = new HttpRequestMessage

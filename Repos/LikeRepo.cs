@@ -86,6 +86,10 @@ public class LikeRepo : ILikeRepo
         return likes.Count;
     }
     
-    
+    public bool Exists(int id)
+    {
+        var like = _dbContext.Likes.SingleOrDefault(l => l.Id == id);
+        return (like is not null);
+    }
     
 }

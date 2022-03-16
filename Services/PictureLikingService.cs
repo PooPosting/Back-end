@@ -33,16 +33,14 @@ public class PictureLikingService : IPictureLikingService
     
     public PictureDto Like(Guid id)
     {
-        var user = _accountContextService.User;
         var picture = _pictureRepo.GetPictureById(id);
-        
+        var accountId = _accountContextService.GetAccountId;
+
         if (picture is null) throw new NotFoundException("picture not found");
+        if (accountId is null) throw new ForbidException("please log in");
+        if (!_accountRepo.Exists(Guid.Parse(accountId))) throw new InvalidAuthTokenException();
         
-        var accountId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
         var account = _accountRepo.GetAccountById(Guid.Parse(accountId), DbInclude.Raw);
-        
-        if (account is null || account.IsDeleted) throw new InvalidAuthTokenException();
-        
         var like = _likeRepo.GetLikeByLikerAndLiked(account, picture);
         
         // If we call like
@@ -76,16 +74,14 @@ public class PictureLikingService : IPictureLikingService
 
     public PictureDto DisLike(Guid id)
     {
-        var user = _accountContextService.User;
         var picture = _pictureRepo.GetPictureById(id);
-        
+        var accountId = _accountContextService.GetAccountId;
+
         if (picture is null) throw new NotFoundException("picture not found");
+        if (accountId is null) throw new ForbidException("please log in");
+        if (!_accountRepo.Exists(Guid.Parse(accountId))) throw new InvalidAuthTokenException();
         
-        var accountId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
         var account = _accountRepo.GetAccountById(Guid.Parse(accountId), DbInclude.Raw);
-        
-        if (account is null || account.IsDeleted) throw new InvalidAuthTokenException();
-        
         var like = _likeRepo.GetLikeByLikerAndLiked(account, picture);
         
         

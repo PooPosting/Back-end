@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
 namespace PicturesAPI.Entities;
@@ -7,10 +8,6 @@ public class Picture
 {
     [Key]
     public Guid Id { get; set; }
-        
-    [Required]
-    public virtual Account Account { get; set; }
-        
     public Guid AccountId { get; set; }
         
     [Required] [MinLength(4)] [MaxLength(40)]
@@ -29,4 +26,8 @@ public class Picture
         
     public virtual List<Like> Likes { get; set; }
     
+    public virtual List<Comment> Comments { get; set; }
+    
+    [Required]
+    public virtual Account Account { get; set; }
 }

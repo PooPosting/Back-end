@@ -24,7 +24,7 @@ public class PictureController : ControllerBase
     [HttpGet]
     [EnableQuery]
     [AllowAnonymous]
-    public ActionResult<PagedResult<PictureDto>> GetAllPictures([FromQuery] PictureQuery query)
+    public IActionResult GetAllPictures([FromQuery] PictureQuery query)
     {
         var pictures = _pictureService.GetAll(query);
         return Ok(pictures);
@@ -34,7 +34,7 @@ public class PictureController : ControllerBase
     [EnableQuery]
     [AllowAnonymous]
     [Route("search")]
-    public ActionResult<PagedResult<PictureDto>> SearchAllPictures([FromQuery] SearchQuery query)
+    public IActionResult SearchAllPictures([FromQuery] SearchQuery query)
     {
         var pictures = _pictureService.SearchAll(query);
         return Ok(pictures);

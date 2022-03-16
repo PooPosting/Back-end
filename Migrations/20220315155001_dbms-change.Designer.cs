@@ -11,8 +11,8 @@ using PicturesAPI.Entities;
 namespace PicturesAPI.Migrations
 {
     [DbContext(typeof(PictureDbContext))]
-    [Migration("20220312153426_dbms-changed-to-mariadb")]
-    partial class dbmschangedtomariadb
+    [Migration("20220315155001_dbms-change")]
+    partial class dbmschange
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

@@ -130,6 +130,7 @@ public class PictureService : IPictureService
 
     public List<LikeDto> GetPicLikes(Guid id)
     {
+        if (_pictureRepo.Exists(id)) throw new NotFoundException("picture not found");
         var likes = _likeRepo.GetLikesByLiked(id);
         var likeDtos = _mapper.Map<List<LikeDto>>(likes);
 
@@ -138,6 +139,7 @@ public class PictureService : IPictureService
     
     public List<AccountDto> GetPicLikers(Guid id)
     {
+        if (_pictureRepo.Exists(id)) throw new NotFoundException("picture not found");
         var likes = _likeRepo.GetLikesByLiked(id);
         var accounts = likes.Select(like => like.Liker).ToList();
         var result = _mapper.Map<List<AccountDto>>(accounts);
@@ -149,6 +151,7 @@ public class PictureService : IPictureService
         var picture = _pictureRepo.GetPictureById(id);
         if (picture == null) throw new NotFoundException("picture not found");
         var result = _mapper.Map<PictureDto>(picture);
+        AllowModify(result);
         return result;
     }
     
@@ -162,34 +165,29 @@ public class PictureService : IPictureService
         var picture = _mapper.Map<Picture>(dto);
         picture.Account = account;
 
-        if (file is { Length: > 0 })
+        if (file is not { Length: > 0 }) throw new BadRequestException("invalid picture");
+        
+        var rootPath = Directory.GetCurrentDirectory();
+        var fileGuid = Guid.NewGuid();
+        var fullPath = $"{rootPath}/wwwroot/pictures/{fileGuid}.webp";
+        picture.Id = fileGuid;
+        picture.Url = $"wwwroot/pictures/{fileGuid}.webp";
+        
+        using (var stream =
+               new FileStream(fullPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
         {
-            var rootPath = Directory.GetCurrentDirectory();
-            var fileGuid = Guid.NewGuid();
-            var fullPath = $"{rootPath}/wwwroot/pictures/{fileGuid}.webp";
-            picture.Id = fileGuid;
-            picture.Url = $"wwwroot/pictures/{fileGuid}.webp";
-
-
-            using (var stream =
-                   new FileStream(fullPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
-            {
-                file.CopyTo(stream);
-                stream.Dispose();
-            }
-
-            var isSafe = _classifyNsfw.IsSafeForWork(fileGuid.ToString());
-            if (!isSafe)
-            {
-                File.Delete(fullPath);
-                throw new BadRequestException("nsfw picture");
-            }
-            var result = _pictureRepo.CreatePicture(picture);
-            return result;
-
+            file.CopyTo(stream);
+            stream.Dispose();
         }
 
-        throw new BadRequestException("invalid picture");
+        var isSafe = _classifyNsfw.IsSafeForWork(fileGuid.ToString());
+        if (!isSafe)
+        {
+            File.Delete(fullPath);
+            throw new BadRequestException("nsfw picture");
+        }
+        var result = _pictureRepo.CreatePicture(picture);
+        return result;
 
     }
 
@@ -197,12 +195,10 @@ public class PictureService : IPictureService
     {
         var picture = _pictureRepo.GetPictureById(id);
         if (picture is null) throw new NotFoundException("picture not found");
-        var user = _accountContextService.User;
-
-        var authorizationResult = _authorizationService.AuthorizeAsync(user, picture, new ResourceOperationRequirement(ResourceOperation.Update)).Result;
-        if (!authorizationResult.Succeeded) throw new ForbidException("You can't modify picture you didn't added");
+        
+        AuthorizePictureOperation(picture, ResourceOperation.Update,"you cant modify picture you didnt added");
+        
         _pictureRepo.UpdatePicture(picture, dto);
-
         var result = _mapper.Map<PictureDto>(picture);
         return result;
     }
@@ -211,11 +207,9 @@ public class PictureService : IPictureService
     {
         var picture = _pictureRepo.GetPictureById(id);
         if (picture is null) throw new NotFoundException("picture not found");
-        var user = _accountContextService.User;
-
         _logger.LogWarning($"Picture with id: {id} DELETE action invoked");
-        var authorizationResult = _authorizationService.AuthorizeAsync(user, picture, new ResourceOperationRequirement(ResourceOperation.Delete)).Result;
-        if (!authorizationResult.Succeeded) throw new ForbidException("You have no rights to delete this picture");
+
+        AuthorizePictureOperation(picture,ResourceOperation.Delete ,"you have no rights to delete this picture");
 
         var pictureDeleteResult = _pictureRepo.DeletePicture(picture);
 
@@ -238,19 +232,62 @@ public class PictureService : IPictureService
     {
         var role = _accountContextService.GetAccountRole;
         var accountId = _accountContextService.GetAccountId;
+        if (accountId is null) return;
 
         switch (role)
         {
             case ("3"):
                 pictureDtos.ForEach(p => p.IsModifiable = true);
+                foreach (var commentList in pictureDtos.Select(c => c.Comments))
+                {
+                    foreach (var comment in commentList)
+                    {
+                        comment.IsModifiable = true;
+                    }
+                }
                 break;
             default:
                 pictureDtos
                     .Where(p => p.AccountId.ToString() == accountId)
                     .ToList()
                     .ForEach(p => p.IsModifiable = true);
+                foreach (var commentList in pictureDtos.Select(c => c.Comments))
+                {
+                    foreach (var comment in commentList.Where(comment => comment.AuthorId == Guid.Parse(accountId)))
+                    {
+                        comment.IsModifiable = true;
+                    }
+                }
                 break;
         }
+    }
+    private void AllowModify(PictureDto pictureDto)
+    {
+        var role = _accountContextService.GetAccountRole;
+        var accountId = _accountContextService.GetAccountId;
+        if (accountId is null) return;
+
+        switch (role)
+        {
+            case ("3"):
+                pictureDto.IsModifiable = true;
+                pictureDto.Comments.ForEach(c => c.IsModifiable = true);
+                break;
+            default:
+                if (pictureDto.AccountId == Guid.Parse(accountId)) 
+                    pictureDto.IsModifiable = true;
+                pictureDto.Comments
+                    .Where(c => c.AuthorId == Guid.Parse(accountId))
+                    .ToList()
+                    .ForEach(c => c.IsModifiable = true);
+                break;
+        }
+    }
+    private void AuthorizePictureOperation(Picture picture, ResourceOperation operation, string message)
+    {
+        var user = _accountContextService.User;
+        var authorizationResult = _authorizationService.AuthorizeAsync(user, picture, new PictureOperationRequirement(operation)).Result;
+        if (!authorizationResult.Succeeded) throw new ForbidException(message);
     }
     
 }

@@ -5,15 +5,15 @@ using PicturesAPI.Enums;
 
 namespace PicturesAPI.Authorization;
 
-public class ResourceOperationRequirementHandler : AuthorizationHandler<ResourceOperationRequirement, Picture>
+public class CommentOperationRequirementHandler : AuthorizationHandler<CommentOperationRequirement, Comment>
 {
     protected override Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
-        ResourceOperationRequirement requirement,
-        Picture resource)
+        CommentOperationRequirement requirement,
+        Comment resource)
     {
-        if (requirement.ResourceOperation == ResourceOperation.Read ||
-            requirement.ResourceOperation == ResourceOperation.Create)
+        if (requirement.CommentOperation == ResourceOperation.Read ||
+            requirement.CommentOperation == ResourceOperation.Create)
         {
             context.Succeed(requirement);
         }
@@ -21,7 +21,7 @@ public class ResourceOperationRequirementHandler : AuthorizationHandler<Resource
         var userId = context.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
         var userRole = context.User.FindFirst(c => c.Type == ClaimTypes.Role)!.Value;
         
-        if (resource.AccountId.ToString() == userId)
+        if (resource.Author.Id.ToString() == userId)
         {
             context.Succeed(requirement);
         }

@@ -10,51 +10,64 @@ public class PictureMappingProfile : Profile
     {
         CreateMap<Picture, PictureDto>()
             .ForMember(
-                p => p.Tags,
-                c => c
-                    .MapFrom(s => SerializeTags(s.Tags)))
+                pto => pto.Tags,
+                opt => opt.MapFrom(
+                    p => SerializeTags(p.Tags)))
             .ForMember(
-                d => d.AccountNickname,
-                m => m.MapFrom(
+                dto => dto.AccountNickname,
+                opt => opt.MapFrom(
                     p => p.Account.IsDeleted ? "Unknown" : p.Account.Nickname))
             .ForMember(
-                d => d.AccountId,
-                m => m.MapFrom(
+                dto => dto.AccountId,
+                opt => opt.MapFrom(
                     p => p.Account.IsDeleted ? Guid.Empty : p.Account.Id));
 
         CreateMap<Account, AccountDto>()
-            .ForMember(d => d.Email,
-                m => m.MapFrom(
+            .ForMember(dto => dto.Email,
+                opt => opt.MapFrom(
                     a => a.IsDeleted ? string.Empty : a.Email))
-            .ForMember(d => d.Nickname,
-                m => m.MapFrom(
+            .ForMember(dto => dto.Nickname,
+                opt => opt.MapFrom(
                     a => a.IsDeleted ? "Unknown" : a.Nickname))
-            .ForMember(d => d.Id,
-                m => m.MapFrom(
+            .ForMember(dto => dto.Id,
+                opt => opt.MapFrom(
                     a => a.IsDeleted ? Guid.Empty : a.Id));
-
+        
+        CreateMap<Comment, CommentDto>()
+            .ForMember(dto => dto.AuthorNickname,
+                opt => opt.MapFrom(
+                    c => c.Author.Nickname))
+            .ForMember(dto => dto.PictureId,
+                opt => opt.MapFrom(
+                    c => c.Picture.Id))
+            .ForMember(dto => dto.AuthorId,
+                opt => opt.MapFrom(
+                    c => c.Author.Id));
+        
         CreateMap<CreateAccountDto, Account>()
             .ForMember(
-                c => c.AccountCreated,
-                a => a.MapFrom(
-                    m => DateTime.Now));
+                acc => acc.AccountCreated,
+                opt => opt.MapFrom(
+                    c => DateTime.Now));
 
         CreateMap<CreatePictureDto, Picture>()
             .ForMember(
-                p => p.Tags,
-                p => p
+                pic => pic.Tags,
+                opt => opt
                     .MapFrom(c => string.Join(" ", c.Tags).ToLower()));
 
         CreateMap<Like, LikeDto>()
-            .ForMember(l => l.AccountNickname,
-                l => l.MapFrom(
-                    c => c.Liker.Nickname))
-            .ForMember(l => l.AccountId,
-                l => l.MapFrom(
-                    c => c.Liker.Id))
-            .ForMember(l => l.PictureId,
-                l => l.MapFrom(
-                    c => c.Liked.Id));
+            .ForMember(dto => dto.AccountNickname,
+                opt => opt.MapFrom(
+                    l => l.Liker.Nickname))
+            .ForMember(dto => dto.AccountId,
+                opt => opt.MapFrom(
+                    l => l.Liker.Id))
+            .ForMember(dto => dto.PictureId,
+                opt => opt.MapFrom(
+                    l => l.Liked.Id));
+
+        
     }
 
     private static List<string> SerializeTags(string tags)

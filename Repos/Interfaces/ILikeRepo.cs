@@ -13,5 +13,6 @@ public interface ILikeRepo
     void AddLike(Like like);
     void RemoveLike(Like like);
     void ChangeLike(Like like);
+    bool Exists(int id);
 
 }

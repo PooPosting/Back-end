@@ -23,6 +23,10 @@ public class PictureRepo : IPictureRepo
         var pictures = _dbContext.Pictures
             .Include(p => p.Likes)
             .ThenInclude(l => l.Liker)
+            .AsSplitQuery()
+            .Include(p => p.Comments)
+            .ThenInclude(c => c.Author)
+            .AsSplitQuery()
             .Include(p => p.Account)
             .AsSplitQuery();
 
@@ -34,7 +38,12 @@ public class PictureRepo : IPictureRepo
         var pictures = _dbContext.Pictures
             .Include(p => p.Likes)
             .ThenInclude(l => l.Liker)
+            .AsSplitQuery()
+            .Include(p => p.Comments)
+            .ThenInclude(c => c.Author)
+            .AsSplitQuery()
             .Include(p => p.Account)
+            .AsSplitQuery()
             .Where(p => p.Account == account);
         return pictures;
     }
@@ -44,7 +53,12 @@ public class PictureRepo : IPictureRepo
         var picture = _dbContext.Pictures
             .Include(p => p.Likes)
             .ThenInclude(l => l.Liker)
+            .AsSplitQuery()
+            .Include(p => p.Comments)
+            .ThenInclude(c => c.Author)
+            .AsSplitQuery()
             .Include(p => p.Account)
+            .AsSplitQuery()
             .SingleOrDefault(p => p.Id == id);
         return picture;
     }
@@ -71,7 +85,7 @@ public class PictureRepo : IPictureRepo
         
         return true;
     }
-
+    
     public bool DeletePicture(Picture picture)
     {
         var likesToRemove = _likeRepo.GetLikesByLiked(picture);
@@ -84,5 +98,9 @@ public class PictureRepo : IPictureRepo
         return true;
     }
     
-    
+    public bool Exists(Guid id)
+    {
+        var picture = _dbContext.Pictures.SingleOrDefault(c => c.Id == id);
+        return (picture is not null);
+    }
 }

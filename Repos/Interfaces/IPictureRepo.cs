@@ -11,4 +11,5 @@ public interface IPictureRepo
     Guid CreatePicture(Picture picture);
     bool UpdatePicture(Picture picture, PutPictureDto dto);
     bool DeletePicture(Picture picture);
+    bool Exists(Guid id);
 }

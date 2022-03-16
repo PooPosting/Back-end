@@ -32,6 +32,8 @@ public class Account
     public virtual ICollection<Picture> Pictures { get; set; }
     [AllowNull]
     public virtual ICollection<Like> Likes { get; set; }
+    [AllowNull] 
+    public virtual ICollection<Comment> Comments { get; set; }
 
     public bool IsDeleted { get; set; } = false;
     

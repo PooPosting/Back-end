@@ -58,9 +58,9 @@ var builder = WebApplication.CreateBuilder();
             };
         });
     builder.Services.AddAuthorization();
-    builder.Services.AddScoped<IAuthorizationHandler, ResourceOperationRequirementHandler>();
+    builder.Services.AddScoped<IAuthorizationHandler, PictureOperationRequirementHandler>();
     builder.Services.AddScoped<IAuthorizationHandler, AccountOperationRequirementHandler>();
-
+    builder.Services.AddScoped<IAuthorizationHandler, CommentOperationRequirementHandler>();
 
     // DbContext
     builder.Services.AddDbContext<PictureDbContext>(options =>
@@ -84,16 +84,19 @@ var builder = WebApplication.CreateBuilder();
     builder.Services.AddScoped<IPictureLikingService, PictureLikingService>();
     builder.Services.AddScoped<IAccountService, AccountService>();
     builder.Services.AddScoped<IPictureService, PictureService>();
+    builder.Services.AddScoped<IPictureCommentService, PictureCommentService>();
     builder.Services.AddScoped<IUserAccountService, UserAccountService>();
     
+
     // Repos
     builder.Services.AddScoped<IAccountRepo, AccountRepo>();
     builder.Services.AddScoped<ILikeRepo, LikeRepo>();
     builder.Services.AddScoped<IPictureRepo, PictureRepo>();
+    builder.Services.AddScoped<ICommentRepo, CommentRepo>();
     
     // Other stuff
     builder.Services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
-builder.Services.AddScoped<IClassifyNsfw, ClassifyNsfw>();
+    builder.Services.AddScoped<IClassifyNsfw, ClassifyNsfw>();
     builder.Services.AddScoped<PictureSeeder>();
     builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
     builder.Services.AddHttpContextAccessor();
@@ -118,7 +121,7 @@ builder.Services.AddScoped<IClassifyNsfw, ClassifyNsfw>();
     });
 
 var app = builder.Build();
-// DbManagementService.MigrationInit(app);
+DbManagementService.UpdateDb(app);
 // Configure
 
     app.UseCors("FrontEndClient");
@@ -138,7 +141,7 @@ var app = builder.Build();
         app.UseDeveloperExceptionPage();
     }
 
-app.UseMiddleware<ErrorHandlingMiddleware>();
+    app.UseMiddleware<ErrorHandlingMiddleware>();
     app.UseMiddleware<RequestTimeMiddleware>();
     app.UseAuthentication();
     app.UseHttpsRedirection();

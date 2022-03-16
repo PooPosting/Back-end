@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using PicturesAPI.Authorization;
+using PicturesAPI.Entities;
 using PicturesAPI.Enums;
 using PicturesAPI.Exceptions;
 using PicturesAPI.Models;
@@ -74,7 +75,9 @@ public class AccountService : IAccountService
 
     public List<LikeDto> GetAccLikes(Guid id)
     {
-        var likes = this._likeRepo.GetLikesByLiker(id);
+        if (!_accountRepo.Exists(id)) throw new NotFoundException("account not found");
+        
+        var likes = _likeRepo.GetLikesByLiker(id);
         var likeDtos = _mapper.Map<List<LikeDto>>(likes);
         return likeDtos;
     }
@@ -89,19 +92,17 @@ public class AccountService : IAccountService
 
     public string GetLikedTags()
     {
-        var id = _accountContextService.GetAccountId!;
-        var account = _accountRepo.GetAccountById(Guid.Parse(id), DbInclude.Include);
-        if (account == null || account.IsDeleted) throw new InvalidAuthTokenException();
-        var tags = _accountRepo.GetLikedTags(Guid.Parse(id));
+        var id = Guid.Parse(_accountContextService.GetAccountId!);
+        if (!_accountRepo.Exists(id)) throw new InvalidAuthTokenException();
+        var tags = _accountRepo.GetLikedTags(id);
 
         return tags;
     }
     
     public bool Update(PutAccountDto dto)
     {
-        var id = _accountContextService.GetAccountId!;
-        var account = _accountRepo.GetAccountById(Guid.Parse(id), DbInclude.Raw);
-        if (account == null || account.IsDeleted) throw new InvalidAuthTokenException();
+        var id = Guid.Parse(_accountContextService.GetAccountId!);
+        if (!_accountRepo.Exists(id)) throw new InvalidAuthTokenException();
         _accountRepo.UpdateAccount(dto, id);
         return true;
     }
@@ -110,11 +111,8 @@ public class AccountService : IAccountService
     {
         var account = _accountRepo.GetAccountById(id, DbInclude.Raw);
         if (account is null || account.IsDeleted) throw new NotFoundException("account not found");
-        var user = _accountContextService.User;
-
         _logger.LogWarning($"Account with Nickname: {account.Nickname} DELETE action invoked");
-        var authorizationResult = _authorizationService.AuthorizeAsync(user, account, new AccountOperationRequirement(ResourceOperation.Delete)).Result;
-        if (!authorizationResult.Succeeded) throw new ForbidException("You have no rights to delete this account");
+        AuthorizeAccountOperation(account, ResourceOperation.Delete ,"You have no rights to delete this account");
         
         _accountRepo.DeleteAccount(id);
 
@@ -123,8 +121,14 @@ public class AccountService : IAccountService
             $"Nickname: {account.Nickname}, " +
             $"Id: {account.Id} " +
             "DELETE action succeed");
-        
         return true;
+    }
+    
+    private void AuthorizeAccountOperation(Account account, ResourceOperation operation, string message)
+    {
+        var user = _accountContextService.User;
+        var authorizationResult = _authorizationService.AuthorizeAsync(user, account, new AccountOperationRequirement(operation)).Result;
+        if (!authorizationResult.Succeeded) throw new ForbidException(message);
     }
 
 }
