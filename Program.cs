@@ -85,6 +85,7 @@ var builder = WebApplication.CreateBuilder();
     builder.Services.AddScoped<IAccountService, AccountService>();
     builder.Services.AddScoped<IPictureService, PictureService>();
     builder.Services.AddScoped<IPictureCommentService, PictureCommentService>();
+    builder.Services.AddScoped<IPopularService, PopularService>();
     builder.Services.AddScoped<IUserAccountService, UserAccountService>();
     
 

@@ -15,5 +15,4 @@ public class PictureDto
 
     public List<LikeDto> Likes { get; set; }
     public List<CommentDto> Comments { get; set; }
-    public bool IsModifiable { get; set; }
 }

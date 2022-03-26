@@ -64,8 +64,6 @@ public class PictureService : IPictureService
         var resultCount = baseQuery.Count;
         var pictureDtos = _mapper.Map<List<PictureDto>>(pictures).ToList();
         
-        AllowModify(pictureDtos);
-            
         var result = new PagedResult<PictureDto>(pictureDtos, resultCount, query.PageSize, query.PageNumber);
         return result;
     }
@@ -112,19 +110,8 @@ public class PictureService : IPictureService
             .Skip(query.PageSize * (query.PageNumber - 1))
             .Take(query.PageSize)
             .ToList();
-        
-        AllowModify(pictureDtos);
 
         var result = new PagedResult<PictureDto>(pictureDtos, resultCount, query.PageSize, query.PageNumber);
-        return result;
-    }
-
-    public IEnumerable<PictureDto> GetAllOdata()
-    {
-        var pictures = _pictureRepo.GetPictures().ToList();
-        if (pictures.Count == 0) throw new NotFoundException("pictures not found");
-        var result = _mapper.Map<List<PictureDto>>(pictures);
-        
         return result;
     }
 
@@ -151,7 +138,6 @@ public class PictureService : IPictureService
         var picture = _pictureRepo.GetPictureById(id);
         if (picture == null) throw new NotFoundException("picture not found");
         var result = _mapper.Map<PictureDto>(picture);
-        AllowModify(result);
         return result;
     }
     
@@ -228,61 +214,6 @@ public class PictureService : IPictureService
         return pictureDeleteResult;
     }
     
-    private void AllowModify(List<PictureDto> pictureDtos)
-    {
-        var role = _accountContextService.GetAccountRole;
-        var accountId = _accountContextService.GetAccountId;
-        if (accountId is null) return;
-
-        switch (role)
-        {
-            case ("3"):
-                pictureDtos.ForEach(p => p.IsModifiable = true);
-                foreach (var commentList in pictureDtos.Select(c => c.Comments))
-                {
-                    foreach (var comment in commentList)
-                    {
-                        comment.IsModifiable = true;
-                    }
-                }
-                break;
-            default:
-                pictureDtos
-                    .Where(p => p.AccountId.ToString() == accountId)
-                    .ToList()
-                    .ForEach(p => p.IsModifiable = true);
-                foreach (var commentList in pictureDtos.Select(c => c.Comments))
-                {
-                    foreach (var comment in commentList.Where(comment => comment.AuthorId == Guid.Parse(accountId)))
-                    {
-                        comment.IsModifiable = true;
-                    }
-                }
-                break;
-        }
-    }
-    private void AllowModify(PictureDto pictureDto)
-    {
-        var role = _accountContextService.GetAccountRole;
-        var accountId = _accountContextService.GetAccountId;
-        if (accountId is null) return;
-
-        switch (role)
-        {
-            case ("3"):
-                pictureDto.IsModifiable = true;
-                pictureDto.Comments.ForEach(c => c.IsModifiable = true);
-                break;
-            default:
-                if (pictureDto.AccountId == Guid.Parse(accountId)) 
-                    pictureDto.IsModifiable = true;
-                pictureDto.Comments
-                    .Where(c => c.AuthorId == Guid.Parse(accountId))
-                    .ToList()
-                    .ForEach(c => c.IsModifiable = true);
-                break;
-        }
-    }
     private void AuthorizePictureOperation(Picture picture, ResourceOperation operation, string message)
     {
         var user = _accountContextService.User;

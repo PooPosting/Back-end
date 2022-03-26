@@ -82,14 +82,6 @@ public class AccountService : IAccountService
         return likeDtos;
     }
 
-    public IEnumerable<AccountDto> GetAllOdata()
-    {
-        var accounts = _accountRepo.GetAccounts(DbInclude.Include).Where(a => !a.IsDeleted).ToList();
-        if (accounts.Count == 0) throw new NotFoundException("accounts not found");
-        var result = _mapper.Map<List<AccountDto>>(accounts);
-        return result;
-    }
-
     public string GetLikedTags()
     {
         var id = Guid.Parse(_accountContextService.GetAccountId!);

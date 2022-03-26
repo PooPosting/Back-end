@@ -8,7 +8,6 @@ public interface IAccountService
     AccountDto GetById(Guid id);
     List<LikeDto> GetAccLikes(Guid id);
     PagedResult<AccountDto> GetAll(AccountQuery query);
-    IEnumerable<AccountDto> GetAllOdata();
     bool Update(PutAccountDto dto);
     bool Delete(Guid id);
     public string GetLikedTags();

@@ -97,7 +97,9 @@ public class AccountRepo : IAccountRepo
                 accounts = _dbContext.Accounts
                     .Include(p => p.Pictures)
                     .ThenInclude(p => p.Likes)
-                    .Include(p => p.Likes);
+                    .AsSplitQuery()
+                    .Include(p => p.Likes)
+                    .AsSplitQuery();
                 break;
             }
             case DbInclude.Raw:

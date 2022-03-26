@@ -19,37 +19,46 @@ public static class SortPictures
     private static double CountPicPoints(Picture picture, PictureQuery query)
     {
         var result = 0.0;
-        var date = DateTime.Today.AddDays(-1);
+        var date = DateTime.Today.AddDays(-7);
+        var time = (date - DateTime.Now).TotalMinutes;
+        var likePoints = 0.0;
+
+        picture.Likes.ForEach(l =>
+        {
+            if (l.IsLike) likePoints += 1;
+            else likePoints += 0.5;
+        });
         
 
         var intersectedTags = picture.Tags
             .Split(' ')
             .Intersect(query.LikedTags.Split(' '));
 
-        if ((DateTime.Now - picture.PictureAdded).TotalMinutes < 30)
+        if ((DateTime.Now - picture.PictureAdded).TotalMinutes < 180)
         {
-            result += (DateTime.Now - date).TotalMinutes * 1;
-            result -= (DateTime.Now - picture.PictureAdded).TotalMinutes * 0.7;
+            result += CalcPicPoints(likePoints, time) * 1.75;
         }
         else if (picture.PictureAdded > date)
         {
-            result += (DateTime.Now - date).TotalMinutes * 0.6;
-            result -= (DateTime.Now - picture.PictureAdded).TotalMinutes * 0.3;
+            result += CalcPicPoints(likePoints, time);
         }
         else
         {
-            result += 250;
-        }
-        
-        for (int i = 0; i < picture.Likes.Count(l => l.IsLike); i++)
-        {
-            result *= 1.075;
-        }
-        for (int i = 0; i < picture.Likes.Count(l => l.IsLike == false); i++)
-        {
-            result *= 1.02;
+            result += Math.Log(likePoints + 10) * 10;
         }
         
         return intersectedTags.Aggregate(result, (current, tag) => current * 1.15);
     }
+    
+    private static double CalcPicPointModifier(double x)
+    {
+        var fx = Math.Log(0.1, 30) * (x + 1);
+        return fx;
+    }
+    private static double CalcPicPoints(double likes, double time)
+    {
+        var gx = CalcPicPointModifier(likes + 10) * (time / 4);
+        return gx;
+    }
+    
 }
