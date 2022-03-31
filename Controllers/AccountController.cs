@@ -88,8 +88,15 @@ public class AccountController : ControllerBase
     {
         var result = _userAccountService.GenerateJwt(dto);
         return Ok(result);
-        
-        // return token as a cookie?
+    }
+    
+    [HttpPost]
+    [AllowAnonymous]
+    [Route("verifyJwt")]
+    public IActionResult VerifyJwt([FromBody] LsLoginDto dto)
+    {
+        var result = _userAccountService.VerifyJwt(dto);
+        return Ok(result);
     }
         
 

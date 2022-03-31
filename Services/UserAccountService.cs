@@ -51,7 +51,6 @@ public class UserAccountService : IUserAccountService
         var newAccountId = _accountRepo.CreateAccount(newAccount);
         return newAccountId;
     }
-
     public LoginSuccessResult GenerateJwt(LoginDto dto)
     {
         var account = _accountRepo.GetAccountByNick(dto.Nickname, DbInclude.Raw);
@@ -92,5 +91,37 @@ public class UserAccountService : IUserAccountService
         
         return loginSuccessResult;
 
+    }
+
+    public LsLoginSuccessResult VerifyJwt(LsLoginDto dto)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        JwtSecurityToken jwtToken;
+        try
+        {
+            jwtToken = handler.ReadToken(dto.JwtToken) as JwtSecurityToken;
+            if (jwtToken is null) throw new InvalidAuthTokenException();
+        }
+        catch (Exception e)
+        {
+            throw new InvalidAuthTokenException();
+        }
+        
+        
+        var guid = jwtToken.Claims.First(c => c.Type == ClaimTypes.NameIdentifier);
+        
+        if (guid.Value == dto.Guid && _accountRepo.Exists(Guid.Parse(dto.Guid)))
+        {
+            var account = _accountRepo.GetAccountById(Guid.Parse(guid.Value), DbInclude.Raw);
+            
+            var loginSuccessResult = new LsLoginSuccessResult()
+            {
+                AccountDto = _mapper.Map<AccountDto>(account),
+                LikedTags = account.LikedTags,
+                Likes = _mapper.Map<List<LikeDto>>(_likeRepo.GetLikesByLiker(account))
+            };
+            return loginSuccessResult;
+        }
+        throw new InvalidAuthTokenException();
     }
 }

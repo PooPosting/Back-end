@@ -7,4 +7,5 @@ public interface IUserAccountService
 {
     Guid Create(CreateAccountDto dto);
     LoginSuccessResult GenerateJwt(LoginDto dto);
+    LsLoginSuccessResult VerifyJwt(LsLoginDto dto);
 }

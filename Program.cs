@@ -74,6 +74,7 @@ var builder = WebApplication.CreateBuilder();
     builder.Services.AddScoped<IValidator<PictureQuery>, PictureQueryValidator>();
     builder.Services.AddScoped<IValidator<PutAccountDto>, PutAccountDtoValidator>();
     builder.Services.AddScoped<IValidator<CreateAccountDto>, CreateAccountDtoValidator>();
+    builder.Services.AddScoped<IValidator<LsLoginDto>, LsLoginDtoValidator>();
 
     // Middleware
     builder.Services.AddScoped<ErrorHandlingMiddleware>();

@@ -35,7 +35,7 @@ public class ErrorHandlingMiddleware : IMiddleware
         }
         catch (InvalidAuthTokenException invalidAuthTokenException)
         {
-            context.Response.StatusCode = 500;
+            context.Response.StatusCode = 401;
             await context.Response.WriteAsync(invalidAuthTokenException.Message);
         }
         catch (Exception e)
