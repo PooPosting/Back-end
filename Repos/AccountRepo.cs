@@ -32,11 +32,9 @@ public class AccountRepo : IAccountRepo
                     .Include(a => a.Pictures)
                     .ThenInclude(p => p.Likes)
                     .ThenInclude(p => p.Liker)
-                    .AsSplitQuery()
                     .Include(a => a.Pictures)
                     .ThenInclude(p => p.Comments)
                     .ThenInclude(c => c.Author)
-                    .AsSplitQuery()
                     .Include(a => a.Likes)
                     .AsSplitQuery()
                     .SingleOrDefault(a => a.Id == id);
@@ -65,11 +63,9 @@ public class AccountRepo : IAccountRepo
                     .Include(a => a.Pictures)
                     .ThenInclude(p => p.Likes)
                     .ThenInclude(p => p.Liker)
-                    .AsSplitQuery()
                     .Include(a => a.Pictures)
                     .ThenInclude(p => p.Comments)
                     .ThenInclude(c => c.Author)
-                    .AsSplitQuery()
                     .Include(a => a.Likes)
                     .AsSplitQuery()
                     .SingleOrDefault(a => a.Nickname == nickname);
@@ -97,7 +93,6 @@ public class AccountRepo : IAccountRepo
                 accounts = _dbContext.Accounts
                     .Include(p => p.Pictures)
                     .ThenInclude(p => p.Likes)
-                    .AsSplitQuery()
                     .Include(p => p.Likes)
                     .AsSplitQuery();
                 break;
@@ -130,12 +125,16 @@ public class AccountRepo : IAccountRepo
     public void UpdateAccount(PutAccountDto dto, Guid id)
     {
         var account = _dbContext.Accounts.SingleOrDefault(a => a.Id == id)!;
+        if (dto.Email is not null)
+        {
+            account.Email = dto.Email;
+        }
         if (dto.Password is not null)
         {
-            var passwordHashed = _passwordHasher.HashPassword(account!, dto.Password);
+            var passwordHashed = _passwordHasher.HashPassword(account, dto.Password);
             account!.PasswordHash = passwordHashed;
         }
-        if (dto.Email is not null) account.Email = dto.Email;
+        _dbContext.SaveChanges();
     }
 
     public void DeleteAccount(Guid id)
