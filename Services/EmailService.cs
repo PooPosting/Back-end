@@ -39,8 +39,12 @@ public class EmailService : IEmailService
             
             var bodyBuilder = new BodyBuilder();
             bodyBuilder.HtmlBody = emailData.EmailBody;
-            var bytes = Encoding.ASCII.GetBytes(emailData.EmailJsonLog); 
-            bodyBuilder.Attachments.Add($"ErrorLog-{DateTime.Now.ToLocalTime()}.json", bytes);
+
+            if (emailData.EmailJsonLog != "")
+            {
+                var bytes = Encoding.ASCII.GetBytes(emailData.EmailJsonLog); 
+                bodyBuilder.Attachments.Add($"ErrorLog-{DateTime.Now.ToLocalTime()}.json", bytes);
+            }
 
             emailMessage.Body = bodyBuilder.ToMessageBody();
 

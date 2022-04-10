@@ -51,16 +51,14 @@ public class PictureService : IPictureService
             .ToList();
 
         var sortedQuery = SortPictures
-            .SortPics(baseQuery, query);
+            .SortPics(baseQuery, query)
+            .Skip(query.PageSize * (query.PageNumber - 1))
+            .Take(query.PageSize);
 
-        var pictures = sortedQuery
-            .Select(picture => _pictureRepo.GetPictureById(picture.Id))
-            .ToList();
-
-        if (pictures.Count == 0) throw new NotFoundException("pictures not found");
+        if (!sortedQuery.Any()) throw new NotFoundException("pictures not found");
         
         var resultCount = baseQuery.Count;
-        var pictureDtos = _mapper.Map<List<PictureDto>>(pictures).ToList();
+        var pictureDtos = _mapper.Map<List<PictureDto>>(sortedQuery).ToList();
         
         var result = new PagedResult<PictureDto>(pictureDtos, resultCount, query.PageSize, query.PageNumber);
         return result;
@@ -75,7 +73,7 @@ public class PictureService : IPictureService
         switch (query.SearchBy)
         {
             case SortSearchBy.MostPopular:
-                sortedQuery = SortPictures.SortPics(baseQuery, query);
+                sortedQuery = SortPictures.SortPics(baseQuery, query).ToList();
                 break;
             case SortSearchBy.Newest:
                 sortedQuery = baseQuery
@@ -103,6 +101,8 @@ public class PictureService : IPictureService
         var resultCount = pictures.Count;
         var pictureDtos = _mapper
             .Map<List<PictureDto>>(pictures)
+            .Skip(query.PageSize * (query.PageNumber - 1))
+            .Take(query.PageSize)
             .ToList();
 
         var result = new PagedResult<PictureDto>(pictureDtos, resultCount, query.PageSize, query.PageNumber);

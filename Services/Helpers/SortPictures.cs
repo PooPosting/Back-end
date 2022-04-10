@@ -8,12 +8,10 @@ namespace PicturesAPI.Services.Helpers;
 
 public static class SortPictures
 {
-    public static List<Picture> SortPics(IEnumerable<Picture> pictures, PictureQuery query)
+    public static List<Picture> SortPics(List<Picture> pictures, PictureQuery query)
     {
         var result = pictures
             .OrderByDescending(p => CountPicPoints(p, query))
-            .Skip(query.PageSize * (query.PageNumber - 1))
-            .Take(query.PageSize)
             .ToList();
         return result;
     }
