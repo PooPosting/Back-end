@@ -7,4 +7,7 @@ public class PictureQuery
     public int PageNumber { get; set; }
     public string LikedTags { get; set; } = " ";
 
+    
+    // change this in future
+    public int DaysSincePictureAdded { get; set; } = 30;
 }

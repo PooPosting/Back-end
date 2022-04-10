@@ -4,13 +4,16 @@ namespace PicturesAPI.Models.Validators;
 
 public class PictureQueryValidator : AbstractValidator<PictureQuery>
 {    
-    private readonly int[] _allowedPageSizes = { 10, 20, 40 };
+    private readonly int[] _allowedPageSizes = new[] { 10, 20, 40 };
 
     public PictureQueryValidator()
     {
 
         RuleFor(p => p.PageNumber)
             .GreaterThanOrEqualTo(1);
+
+        RuleFor(p => p.DaysSincePictureAdded)
+            .NotNull();
             
         RuleFor(p => p.LikedTags)
             .NotNull();
