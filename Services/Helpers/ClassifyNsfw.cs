@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using Newtonsoft.Json;
+using PicturesAPI.Configuration;
 using PicturesAPI.Models.HttpResponses;
 using PicturesAPI.Services.Interfaces;
 
@@ -7,29 +8,39 @@ namespace PicturesAPI.Services.Helpers;
 
 public class ClassifyNsfw : IClassifyNsfw
 {
-    private readonly IConfiguration _config;
+    private readonly RapidApiSettings _rapidApiSettings;
     public ClassifyNsfw(IConfiguration config)
     {
-        _config = config;
+        _rapidApiSettings = new RapidApiSettings()
+        {
+            AppUrl = config.GetValue<string>("RapidApiSettings:AppUrl"),
+            RapidApiHost = config.GetValue<string>("RapidApiSettings:RapidApiHost"),
+            RapidApiKey = config.GetValue<string>("RapidApiSettings:RapidApiKey"),
+            RapidApiUri = config.GetValue<string>("RapidApiSettings:RapidApiUri"),
+        };
     }
     public bool IsSafeForWork(string picId)
     {
         var isDevelopment = string.Equals(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"), "development",
             StringComparison.InvariantCultureIgnoreCase);
+
+        Console.WriteLine(_rapidApiSettings.AppUrl);
+        Console.WriteLine(_rapidApiSettings.RapidApiHost);
+        Console.WriteLine(_rapidApiSettings.RapidApiKey);
+        Console.WriteLine(_rapidApiSettings.RapidApiUri);
         
         if (isDevelopment) return true;
-        
-        var url = Path.Combine(_config.GetValue<string>("AppSecret:app-url"), $"wwwroot/pictures/{picId}.webp");
+        var url = Path.Combine(_rapidApiSettings.AppUrl, $"wwwroot/pictures/{picId}.webp");
         
         var client = new HttpClient();
         var request = new HttpRequestMessage
         {
             Method = HttpMethod.Post,
-            RequestUri = new Uri(_config.GetValue<string>("AppSecret:x-rapidapi-uri")),
+            RequestUri = new Uri(_rapidApiSettings.RapidApiUri),
             Headers =
             {
-                { "x-rapidapi-host", _config.GetValue<string>("AppSecret:x-rapidapi-host") },
-                { "x-rapidapi-key", _config.GetValue<string>("AppSecret:x-rapidapi-key") },
+                { "x-rapidapi-host", _rapidApiSettings.RapidApiHost },
+                { "x-rapidapi-key", _rapidApiSettings.RapidApiKey },
             },
             Content = new StringContent("{\r\"url\": \"" + url + "\"\r}")
             {
