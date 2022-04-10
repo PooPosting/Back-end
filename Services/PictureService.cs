@@ -49,12 +49,10 @@ public class PictureService : IPictureService
         var baseQuery = _pictureRepo
             .GetPictures()
             .ToList();
-        
+
         var sortedQuery = SortPictures
-            .SortPics(baseQuery, query)
-            .Skip(query.PageSize * (query.PageNumber - 1))
-            .Take(query.PageSize);
-        
+            .SortPics(baseQuery, query);
+
         var pictures = sortedQuery
             .Select(picture => _pictureRepo.GetPictureById(picture.Id))
             .ToList();
@@ -77,9 +75,7 @@ public class PictureService : IPictureService
         switch (query.SearchBy)
         {
             case SortSearchBy.MostPopular:
-                sortedQuery = baseQuery
-                    .OrderByDescending(p => p.Likes.Count)
-                    .ToList();
+                sortedQuery = SortPictures.SortPics(baseQuery, query);
                 break;
             case SortSearchBy.Newest:
                 sortedQuery = baseQuery
@@ -107,8 +103,6 @@ public class PictureService : IPictureService
         var resultCount = pictures.Count;
         var pictureDtos = _mapper
             .Map<List<PictureDto>>(pictures)
-            .Skip(query.PageSize * (query.PageNumber - 1))
-            .Take(query.PageSize)
             .ToList();
 
         var result = new PagedResult<PictureDto>(pictureDtos, resultCount, query.PageSize, query.PageNumber);

@@ -21,19 +21,22 @@ public class UserAccountService : IUserAccountService
     private readonly IAccountRepo _accountRepo;
     private readonly ILikeRepo _likeRepo;
     private readonly IMapper _mapper;
+    private readonly string _jwtIssuer;
 
     public UserAccountService(
         IPasswordHasher<Account> passwordHasher, 
         AuthenticationSettings authenticationSettings,
         IAccountRepo accountRepo,
         ILikeRepo likeRepo,
-        IMapper mapper)
+        IMapper mapper,
+        IConfiguration config)
     {
         _passwordHasher = passwordHasher;
         _authenticationSettings = authenticationSettings;
         _accountRepo = accountRepo;
         _likeRepo = likeRepo;
         _mapper = mapper;
+        _jwtIssuer = config.GetValue<string>("Authentication:JwtIssuer");
     }
         
     public Guid Create(CreateAccountDto dto)
@@ -102,12 +105,12 @@ public class UserAccountService : IUserAccountService
             jwtToken = handler.ReadToken(dto.JwtToken) as JwtSecurityToken;
             if (jwtToken is null) throw new InvalidAuthTokenException();
         }
-        catch (Exception e)
+        catch (Exception)
         {
             throw new InvalidAuthTokenException();
         }
         
-        
+        if (jwtToken.Issuer != _jwtIssuer) throw new InvalidAuthTokenException();
         var guid = jwtToken.Claims.First(c => c.Type == ClaimTypes.NameIdentifier);
         
         if (guid.Value == dto.Guid && _accountRepo.Exists(Guid.Parse(dto.Guid)))
