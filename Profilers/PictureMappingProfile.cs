@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using PicturesAPI.Entities;
 using PicturesAPI.Models.Dtos;
+using PicturesAPI.Services.Helpers;
 
 namespace PicturesAPI.Profilers;
 
@@ -17,10 +18,21 @@ public class PictureMappingProfile : Profile
                 dto => dto.AccountNickname,
                 opt => opt.MapFrom(
                     p => p.Account.IsDeleted ? "Unknown" : p.Account.Nickname))
+            .ForMember(dto => dto.Id,
+                opt => opt.MapFrom(
+                    p => GuidEncoder.Encode(p.Id)))
             .ForMember(
                 dto => dto.AccountId,
                 opt => opt.MapFrom(
-                    p => p.Account.IsDeleted ? Guid.Empty : p.Account.Id));
+                    p => p.Account.IsDeleted ? Guid.Empty.ToString() : GuidEncoder.Encode(p.Account.Id)));
+
+        CreateMap<PictureDto, Picture>()
+            .ForMember(p => p.Id,
+                opt => opt.MapFrom(
+                    pto => GuidEncoder.Decode(pto.Id)))
+            .ForMember(p => p.AccountId,
+                opt => opt.MapFrom(
+                    dto => GuidEncoder.Decode(dto.Id)));
 
         CreateMap<Account, AccountDto>()
             .ForMember(dto => dto.Email,
@@ -31,7 +43,12 @@ public class PictureMappingProfile : Profile
                     a => a.IsDeleted ? "Unknown" : a.Nickname))
             .ForMember(dto => dto.Id,
                 opt => opt.MapFrom(
-                    a => a.IsDeleted ? Guid.Empty : a.Id));
+                    a => a.IsDeleted ? Guid.Empty.ToString() : GuidEncoder.Encode(a.Id)));
+        
+        CreateMap<AccountDto, Account>()
+            .ForMember(acc => acc.Id,
+                opt => opt.MapFrom(
+                    ato => GuidEncoder.Decode(ato.Id)));
         
         CreateMap<Comment, CommentDto>()
             .ForMember(dto => dto.AuthorNickname,
@@ -39,10 +56,19 @@ public class PictureMappingProfile : Profile
                     c => c.Author.Nickname))
             .ForMember(dto => dto.PictureId,
                 opt => opt.MapFrom(
-                    c => c.Picture.Id))
+                    c => GuidEncoder.Encode(c.Picture.Id)))
             .ForMember(dto => dto.AuthorId,
                 opt => opt.MapFrom(
-                    c => c.Author.Id));
+                    c => GuidEncoder.Encode(c.Author.Id)))
+            .ForMember(dto => dto.Id,
+            opt => opt.MapFrom(
+                c => GuidEncoder.Encode(c.Id)));
+        
+        CreateMap<CommentDto, Comment>()
+            .ForMember(c => c.Id,
+                opt => opt.MapFrom(
+                    dto => GuidEncoder.Decode(dto.Id)));
+        
         
         CreateMap<CreateAccountDto, Account>()
             .ForMember(
@@ -62,12 +88,10 @@ public class PictureMappingProfile : Profile
                     l => l.Liker.Nickname))
             .ForMember(dto => dto.AccountId,
                 opt => opt.MapFrom(
-                    l => l.Liker.Id))
+                    l => GuidEncoder.Encode(l.Liker.Id)))
             .ForMember(dto => dto.PictureId,
                 opt => opt.MapFrom(
-                    l => l.Liked.Id));
-
-        
+                    l => GuidEncoder.Encode(l.Liked.Id)));
     }
 
     private static List<string> SerializeTags(string tags)
@@ -75,4 +99,6 @@ public class PictureMappingProfile : Profile
         var tagList = tags.Split(' ').ToList();
         return tagList;
     }
+
+
 }

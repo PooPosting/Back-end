@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
+using PicturesAPI.Services.Helpers;
 using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Controllers;
@@ -43,27 +44,27 @@ public class PictureController : ControllerBase
     [HttpGet]
     [AllowAnonymous]
     [Route("{id}")]
-    public IActionResult GetSinglePictureById([FromRoute] Guid id)
+    public IActionResult GetSinglePictureById([FromRoute] string id)
     {
-        var picture = _pictureService.GetById(id);
+        var picture = _pictureService.GetById(GuidEncoder.Decode(id));
         return Ok(picture);
     }
     
     [HttpGet]
     [AllowAnonymous]
     [Route("{id}/likes")]
-    public IActionResult GetPictureLikes([FromRoute] Guid id)
+    public IActionResult GetPictureLikes([FromRoute] string id)
     {
-        var likes = _pictureService.GetPicLikes(id);
+        var likes = _pictureService.GetPicLikes(GuidEncoder.Decode(id));
         return Ok(likes);
     }
     
     [HttpGet]
     [AllowAnonymous]
     [Route("{id}/likers")]
-    public IActionResult GetPictureLikers([FromRoute] Guid id)
+    public IActionResult GetPictureLikers([FromRoute] string id)
     {
-        var likes = _pictureService.GetPicLikers(id);
+        var likes = _pictureService.GetPicLikers(GuidEncoder.Decode(id));
         return Ok(likes);
     }
 
@@ -89,33 +90,33 @@ public class PictureController : ControllerBase
 
     [HttpPut]
     [Route("{id}")]
-    public IActionResult PutPictureUpdate([FromRoute] Guid id, [FromBody] PutPictureDto dto)
+    public IActionResult PutPictureUpdate([FromRoute] string id, [FromBody] PutPictureDto dto)
     {
-        var result = _pictureService.Put(id, dto);
+        var result = _pictureService.Put(GuidEncoder.Decode(id), dto);
         return Ok(result);
     }
 
     [HttpPatch]
     [Route("{id}/voteup")]
-    public IActionResult PatchPictureVoteUp([FromRoute] Guid id)
+    public IActionResult PatchPictureVoteUp([FromRoute] string id)
     {
-        var result = _pictureLikingService.Like(id);
+        var result = _pictureLikingService.Like(GuidEncoder.Decode(id));
         return Ok(result);
     }
         
     [HttpPatch]
     [Route("{id}/votedown")]
-    public IActionResult PatchPictureVoteDown([FromRoute] Guid id)
+    public IActionResult PatchPictureVoteDown([FromRoute] string id)
     {
-        var result = _pictureLikingService.DisLike(id);
+        var result = _pictureLikingService.DisLike(GuidEncoder.Decode(id));
         return Ok(result);
     }
 
     [HttpDelete]
     [Route("{id}")]
-    public IActionResult DeletePicture([FromRoute] Guid id)
+    public IActionResult DeletePicture([FromRoute] string id)
     {
-        var result = _pictureService.Delete(id);
+        var result = _pictureService.Delete(GuidEncoder.Decode(id));
         return Ok(result);
     }
 

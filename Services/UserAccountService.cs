@@ -10,6 +10,7 @@ using PicturesAPI.Exceptions;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Repos.Interfaces;
+using PicturesAPI.Services.Helpers;
 using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Services;
@@ -113,7 +114,7 @@ public class UserAccountService : IUserAccountService
         if (jwtToken.Issuer != _jwtIssuer) throw new InvalidAuthTokenException();
         var guid = jwtToken.Claims.First(c => c.Type == ClaimTypes.NameIdentifier);
         
-        if (guid.Value == dto.Guid && _accountRepo.Exists(Guid.Parse(dto.Guid)))
+        if (guid.Value == GuidEncoder.Decode(dto.Uid).ToString() && _accountRepo.Exists(GuidEncoder.Decode(dto.Uid)))
         {
             var account = _accountRepo.GetAccountById(Guid.Parse(guid.Value), DbInclude.Raw);
             

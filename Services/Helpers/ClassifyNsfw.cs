@@ -23,11 +23,6 @@ public class ClassifyNsfw : IClassifyNsfw
     {
         var isDevelopment = string.Equals(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"), "development",
             StringComparison.InvariantCultureIgnoreCase);
-
-        Console.WriteLine(_rapidApiSettings.AppUrl);
-        Console.WriteLine(_rapidApiSettings.RapidApiHost);
-        Console.WriteLine(_rapidApiSettings.RapidApiKey);
-        Console.WriteLine(_rapidApiSettings.RapidApiUri);
         
         if (isDevelopment) return true;
         var url = Path.Combine(_rapidApiSettings.AppUrl, $"wwwroot/pictures/{picId}.webp");

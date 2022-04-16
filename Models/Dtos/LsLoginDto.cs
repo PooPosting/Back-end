@@ -1,9 +1,7 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-
-namespace PicturesAPI.Models.Dtos;
+﻿namespace PicturesAPI.Models.Dtos;
 
 public class LsLoginDto
 {
     public string JwtToken { get; set; }
-    public string Guid { get; set; }
+    public string Uid { get; set; }
 }

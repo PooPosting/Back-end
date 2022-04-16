@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
+using PicturesAPI.Services.Helpers;
 using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Controllers;
@@ -24,9 +25,9 @@ public class AccountController : ControllerBase
     [HttpGet]
     [AllowAnonymous]
     [Route("{id}")]
-    public IActionResult GetAccountById([FromRoute] Guid id)
+    public IActionResult GetAccountById([FromRoute] string id)
     {
-        var account = _accountService.GetById(id);
+        var account = _accountService.GetById(GuidEncoder.Decode(id));
         return Ok(account);
     }
     
@@ -58,17 +59,17 @@ public class AccountController : ControllerBase
     [HttpGet]
     [AllowAnonymous]
     [Route("{id}/likes")]
-    public IActionResult GetPictureLikes([FromRoute] Guid id)
+    public IActionResult GetPictureLikes([FromRoute] string id)
     {
-        var likes = _accountService.GetAccLikes(id);
+        var likes = _accountService.GetAccLikes(GuidEncoder.Decode(id));
         return Ok(likes);
     }
 
     [HttpDelete] 
     [Route("{id}")]
-    public IActionResult DeleteAccount([FromRoute] Guid id)
+    public IActionResult DeleteAccount([FromRoute] string id)
     {
-        var result = _accountService.Delete(id);
+        var result = _accountService.Delete(GuidEncoder.Decode(id));
         return Ok(result);
     }
 

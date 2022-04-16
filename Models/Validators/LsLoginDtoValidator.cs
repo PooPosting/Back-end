@@ -7,7 +7,7 @@ public class LsLoginDtoValidator: AbstractValidator<LsLoginDto>
 {
     public LsLoginDtoValidator()
     {
-        RuleFor(x => x.Guid).NotEmpty();
+        RuleFor(x => x.Uid).NotEmpty();
         RuleFor(x => x.JwtToken).NotEmpty();
     }
 }
