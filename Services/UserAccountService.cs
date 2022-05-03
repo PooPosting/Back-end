@@ -90,7 +90,8 @@ public class UserAccountService : IUserAccountService
             AccountDto = _mapper.Map<AccountDto>(account),
             LikedTags = account.LikedTags,
             AuthToken = tokenHandler.WriteToken(token),
-            Likes = _mapper.Map<List<LikeDto>>(_likeRepo.GetLikesByLiker(account))
+            Likes = _mapper.Map<List<LikeDto>>(_likeRepo.GetLikesByLiker(account)),
+            // Verified = account.Verified
         };
         
         return loginSuccessResult;

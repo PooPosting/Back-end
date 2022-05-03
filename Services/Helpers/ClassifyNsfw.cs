@@ -24,8 +24,9 @@ public class ClassifyNsfw : IClassifyNsfw
         var isDevelopment = string.Equals(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"), "development",
             StringComparison.InvariantCultureIgnoreCase);
         
-        if (isDevelopment) return true;
-        var url = Path.Combine(_rapidApiSettings.AppUrl, $"wwwroot/pictures/{picId}.webp");
+        // if (isDevelopment) return true;
+        // var url = Path.Combine(_rapidApiSettings.AppUrl, $"wwwroot/pictures/{picId}.webp");
+        var url = "https://pictures-api.migra.ml/wwwroot/pictures/a7f228e8-573d-40a0-8b48-8873447abf98.webp";
         
         var client = new HttpClient();
         var request = new HttpRequestMessage

@@ -21,4 +21,10 @@ public class MailingController : ControllerBase
         var res = _emailService.SendLogsAsEmail(emailData);
         return res ?  Ok(true) : BadRequest(false);
     }
+
+    // [HttpPost]
+    // public IActionResult SendVerificationEmail()
+    // {
+    //     return Ok();
+    // }
 }

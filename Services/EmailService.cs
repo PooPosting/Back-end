@@ -3,7 +3,10 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using PicturesAPI.Configuration;
+using PicturesAPI.Enums;
+using PicturesAPI.Exceptions;
 using PicturesAPI.Models;
+using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services.Interfaces;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
@@ -11,9 +14,17 @@ namespace PicturesAPI.Services;
 
 public class EmailService : IEmailService
 {
+    private readonly IAccountRepo _accountRepo;
+    private readonly IAccountContextService _accountContextService;
     private readonly EmailSettings _emailSettings;
-    public EmailService(IConfiguration config)
+    public EmailService(
+        IConfiguration config,
+        IAccountRepo accountRepo,
+        IAccountContextService accountContextService
+        )
     {
+        _accountRepo = accountRepo;
+        _accountContextService = accountContextService;
         _emailSettings = new EmailSettings()
         {
             SendLogsToId = config.GetValue<string>("EmailSettings:SendLogsToId"),
@@ -55,6 +66,42 @@ public class EmailService : IEmailService
             emailClient.Send(emailMessage);
             emailClient.Disconnect(true);
             emailClient.Dispose();
+            return true;
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine(ex);
+            return false;
+        }
+    }
+
+    public bool SendVerificationToken()
+    {
+        var uid = _accountContextService.GetAccountId;
+        if (uid is null || !_accountRepo.Exists(Guid.Parse(uid))) throw new InvalidAuthTokenException();
+        var acc = _accountRepo.GetAccountById(Guid.Parse(uid), DbInclude.Raw);
+        // _accountRepo.SetVerificationCode(Guid.Parse(uid));
+        
+        try
+        {
+            var emailMessage = new MimeMessage();
+            var emailFrom = new MailboxAddress(_emailSettings.Name, _emailSettings.EmailId);
+            emailMessage.From.Add(emailFrom);
+            var emailTo = new MailboxAddress(acc.Nickname, acc.Email);
+            emailMessage.To.Add(emailTo);
+            emailMessage.Subject = $"PicturesUI | Weryfikacja adresu e-mail | Użytkownik: {acc.Nickname}";
+            
+            //send an email with a confirmation link.
+            
+            var bodyBuilder = new BodyBuilder();
+
+            var emailClient = new SmtpClient();
+            emailClient.Connect(_emailSettings.Host, _emailSettings.Port, _emailSettings.UseSsl);
+            emailClient.Authenticate(_emailSettings.EmailId, _emailSettings.Password);
+            emailClient.Send(emailMessage);
+            emailClient.Disconnect(true);
+            emailClient.Dispose();
+
             return true;
         }
         catch(Exception ex)

@@ -69,6 +69,14 @@ public class PictureController : ControllerBase
     }
 
     [HttpPost]
+    [Route("classify")]
+    public IActionResult ClassifyPicture([FromForm] IFormFile file)
+    {
+        var result = _pictureService.Classify(file);
+        return Ok(result);
+    }
+    
+    [HttpPost]
     [Route("create")]
     public IActionResult PostPicture(
         [FromForm] IFormFile file, 

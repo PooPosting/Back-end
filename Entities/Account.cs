@@ -24,7 +24,10 @@ public class Account
     
     [MaxLength(500)]
     public string LikedTags { get; set; } = "";
-    
+
+    // [Required]
+    // public bool Verified { get; set; } = false;
+
     [MaxLength(2)]
     public int RoleId { get; set; } = 1;
     

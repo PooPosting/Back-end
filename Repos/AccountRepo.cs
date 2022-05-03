@@ -178,7 +178,15 @@ public class AccountRepo : IAccountRepo
         account.LikedTags = string.Join(' ', accountTags);
         _dbContext.SaveChanges();
     }
-    
+
+    // public string SetVerificationCode(Guid id)
+    // {
+    //     var rnd = new Random();
+    //     var confToken = rnd.Next(100000, 999999).ToString();
+    //     var acc = _dbContext.Accounts.SingleOrDefault(a => a.Id == id);
+    //     acc!.ConfirmationToken = confToken;
+    //     return confToken;
+    // }
     public bool Exists(Guid id)
     {
         var account = _dbContext.Accounts.SingleOrDefault(a => a.Id == id);

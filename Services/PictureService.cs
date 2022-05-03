@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using NsfwSpyNS;
 using PicturesAPI.Authorization;
 using PicturesAPI.Entities;
 using PicturesAPI.Enums;
@@ -160,15 +161,30 @@ public class PictureService : IPictureService
             stream.Dispose();
         }
 
-        var isSafe = _classifyNsfw.IsSafeForWork(fileGuid.ToString());
-        if (!isSafe)
-        {
-            File.Delete(fullPath);
-            throw new BadRequestException("nsfw picture");
-        }
+        // var isSafe = _classifyNsfw.IsSafeForWork(fileGuid.ToString());
+        // if (!isSafe)
+        // {
+        //     File.Delete(fullPath);
+        //     throw new BadRequestException("nsfw picture");
+        // }
+        
         var result = _pictureRepo.CreatePicture(picture);
         return result;
 
+    }
+
+    public NsfwSpyResult Classify(IFormFile file)
+    {
+        var nsfwSpy = new NsfwSpy();
+        if (file is null) throw new BadRequestException("Invalid file");
+        using (var ms = new MemoryStream())
+        {
+            file.CopyTo(ms);
+            var fileBytes = ms.ToArray();
+            var result = nsfwSpy.ClassifyImage(fileBytes);
+
+            return result;
+        }
     }
 
     public PictureDto Put(Guid id, PutPictureDto dto)

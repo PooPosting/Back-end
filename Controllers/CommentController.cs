@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PicturesAPI.Models.Dtos;
+using PicturesAPI.Services.Helpers;
 using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Controllers;
@@ -19,25 +20,25 @@ public class CommentController: ControllerBase
     }
     
     [HttpPost]
-    public IActionResult PostComment([FromRoute] Guid id, [FromBody] PostPutCommentDto text)
+    public IActionResult PostComment([FromRoute] string id, [FromBody] PostPutCommentDto text)
     {
-        var result = _pictureCommentService.CreateComment(id, text.Text);
+        var result = _pictureCommentService.CreateComment(GuidEncoder.Decode(id), text.Text);
         return Ok(result);
     }
     
     [HttpPatch]
     [Route("{commId}")]
-    public IActionResult PatchComment([FromRoute] Guid commId, [FromBody] PostPutCommentDto text)
+    public IActionResult PatchComment([FromRoute] string commId, [FromBody] PostPutCommentDto text)
     {
-        var result = _pictureCommentService.ModifyComment(commId, text.Text);
+        var result = _pictureCommentService.ModifyComment(GuidEncoder.Decode(commId), text.Text);
         return Ok(result);
     }
     
     [HttpDelete]
     [Route("{commId}")]
-    public IActionResult DeleteComment([FromRoute] Guid commId)
+    public IActionResult DeleteComment([FromRoute] string commId)
     {
-        var result = _pictureCommentService.DeleteComment(commId);
+        var result = _pictureCommentService.DeleteComment(GuidEncoder.Decode(commId));
         return Ok(result);
     }
 }

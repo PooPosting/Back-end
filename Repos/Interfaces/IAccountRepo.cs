@@ -15,6 +15,7 @@ public interface IAccountRepo
     string GetLikedTags(Guid accId);
     void AddLikedTags(Account acc, Picture picture);
     void RemoveLikedTags(Account acc, Picture picture);
+    // string SetVerificationCode(Guid id);
     bool Exists(Guid id);
 
 }

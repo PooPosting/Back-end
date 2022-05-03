@@ -10,4 +10,5 @@ public class LoginSuccessResult
     public string LikedTags { get; set; }
     public string AuthToken { get; set; }
     public ICollection<LikeDto> Likes { get; set; }
+    // public bool Verified { get; set; }
 }
