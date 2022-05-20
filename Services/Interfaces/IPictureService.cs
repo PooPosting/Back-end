@@ -1,4 +1,4 @@
-﻿using NsfwSpyNS;
+﻿using Google.Cloud.Vision.V1;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
 
@@ -12,7 +12,7 @@ public interface IPictureService
     List<AccountDto> GetPicLikers(Guid id);
     PictureDto GetById(Guid id);
     Guid Create(IFormFile file, CreatePictureDto dto);
-    NsfwSpyResult Classify(IFormFile file);
+    SafeSearchAnnotation Classify(IFormFile file);
     PictureDto Put(Guid id, PutPictureDto dto);
     bool Delete(Guid id);
 }

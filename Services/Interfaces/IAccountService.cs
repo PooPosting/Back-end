@@ -10,5 +10,6 @@ public interface IAccountService
     PagedResult<AccountDto> GetAll(AccountQuery query);
     bool Update(PutAccountDto dto);
     bool Delete(Guid id);
+    bool DeleteAccountPictures(Guid id);
     public string GetLikedTags();
 }

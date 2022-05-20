@@ -11,5 +11,7 @@ public class PictureDbContext : DbContext
     public virtual DbSet<Role> Roles { get; set; }
     public virtual DbSet<Like> Likes { get; set; }
     public virtual DbSet<Comment> Comments { get; set; }
+    public virtual DbSet<RestrictedIp> RestrictedIps { get; set; }
+    
     // protected override void OnModelCreating(ModelBuilder modelBuilder) { }
 }

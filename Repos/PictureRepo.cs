@@ -21,12 +21,11 @@ public class PictureRepo : IPictureRepo
     public IEnumerable<Picture> GetPictures()
     {
         var pictures = _dbContext.Pictures
+            .Where(p => !p.IsDeleted)
             .Include(p => p.Likes)
             .ThenInclude(l => l.Liker)
-            .AsSplitQuery()
             .Include(p => p.Comments)
             .ThenInclude(c => c.Author)
-            .AsSplitQuery()
             .Include(p => p.Account)
             .AsSplitQuery();
 
@@ -36,12 +35,11 @@ public class PictureRepo : IPictureRepo
     public IEnumerable<Picture> GetPicturesByOwner(Account account)
     {
         var pictures = _dbContext.Pictures
+            .Where(p => !p.IsDeleted)
             .Include(p => p.Likes)
             .ThenInclude(l => l.Liker)
-            .AsSplitQuery()
             .Include(p => p.Comments)
             .ThenInclude(c => c.Author)
-            .AsSplitQuery()
             .Include(p => p.Account)
             .AsSplitQuery()
             .Where(p => p.Account == account);
@@ -51,12 +49,11 @@ public class PictureRepo : IPictureRepo
     public Picture GetPictureById(Guid id)
     {
         var picture = _dbContext.Pictures
+            .Where(p => !p.IsDeleted)
             .Include(p => p.Likes)
             .ThenInclude(l => l.Liker)
-            .AsSplitQuery()
             .Include(p => p.Comments)
             .ThenInclude(c => c.Author)
-            .AsSplitQuery()
             .Include(p => p.Account)
             .AsSplitQuery()
             .SingleOrDefault(p => p.Id == id);
@@ -92,8 +89,8 @@ public class PictureRepo : IPictureRepo
         if (likesToRemove is not null) _dbContext.Likes.RemoveRange(likesToRemove);
         
         var pictureToRemove = _dbContext.Pictures.SingleOrDefault(p => p == picture)!;
+        pictureToRemove.IsDeleted = true;
         
-        _dbContext.Pictures.Remove(pictureToRemove);
         _dbContext.SaveChanges();
         return true;
     }

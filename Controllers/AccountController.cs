@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using PicturesAPI.ActionFilters;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Services.Helpers;
@@ -66,14 +67,23 @@ public class AccountController : ControllerBase
     }
 
     [HttpDelete] 
-    [Route("{id}")]
+    [Route("{id}/all-pictures")]
     public IActionResult DeleteAccount([FromRoute] string id)
+    {
+        var result = _accountService.DeleteAccountPictures(GuidEncoder.Decode(id));
+        return Ok(result);
+    }
+    
+    [HttpDelete] 
+    [Route("{id}")]
+    public IActionResult DeleteAccountPictures([FromRoute] string id)
     {
         var result = _accountService.Delete(GuidEncoder.Decode(id));
         return Ok(result);
     }
 
     [HttpPost]
+    [ServiceFilter(typeof(IsIpBannedFilter))]
     [AllowAnonymous]
     [Route("register")]
     public IActionResult PostAccount([FromBody] CreateAccountDto dto)
@@ -83,6 +93,7 @@ public class AccountController : ControllerBase
     }
         
     [HttpPost]
+    [ServiceFilter(typeof(IsIpBannedFilter))]
     [AllowAnonymous]
     [Route("login")]
     public IActionResult Login([FromBody] LoginDto dto)
@@ -92,6 +103,7 @@ public class AccountController : ControllerBase
     }
     
     [HttpPost]
+    [ServiceFilter(typeof(IsIpBannedFilter))]
     [AllowAnonymous]
     [Route("verifyJwt")]
     public IActionResult VerifyJwt([FromBody] LsLoginDto dto)

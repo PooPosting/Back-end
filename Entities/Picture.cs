@@ -23,6 +23,7 @@ public class Picture
     [Required] [MaxLength(500)]
     public string Url { get; set; }
     public DateTime PictureAdded { get; set; } = DateTime.Now;
+    public bool IsDeleted { get; set; } = false;
         
     public virtual List<Like> Likes { get; set; }
     

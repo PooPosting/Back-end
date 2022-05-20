@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PicturesAPI.Entities;
 
@@ -10,9 +11,10 @@ using PicturesAPI.Entities;
 namespace PicturesAPI.Migrations
 {
     [DbContext(typeof(PictureDbContext))]
-    partial class PictureDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220504103321_Picture-added-IsDeleted")]
+    partial class PictureaddedIsDeleted
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -151,22 +153,6 @@ namespace PicturesAPI.Migrations
                     b.HasIndex("AccountId");
 
                     b.ToTable("Pictures");
-                });
-
-            modelBuilder.Entity("PicturesAPI.Entities.RestrictedIp", b =>
-                {
-                    b.Property<string>("IpAddress")
-                        .HasColumnType("varchar(95)");
-
-                    b.Property<bool>("Banned")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool>("CantPost")
-                        .HasColumnType("tinyint(1)");
-
-                    b.HasKey("IpAddress");
-
-                    b.ToTable("RestrictedIps");
                 });
 
             modelBuilder.Entity("PicturesAPI.Entities.Role", b =>

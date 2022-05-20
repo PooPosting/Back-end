@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PicturesAPI.ActionFilters;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Services.Helpers;
 using PicturesAPI.Services.Interfaces;
@@ -20,6 +21,8 @@ public class CommentController: ControllerBase
     }
     
     [HttpPost]
+    [ServiceFilter(typeof(IsIpRestrictedFilter))]
+    [ServiceFilter(typeof(IsIpBannedFilter))]
     public IActionResult PostComment([FromRoute] string id, [FromBody] PostPutCommentDto text)
     {
         var result = _pictureCommentService.CreateComment(GuidEncoder.Decode(id), text.Text);
@@ -27,6 +30,8 @@ public class CommentController: ControllerBase
     }
     
     [HttpPatch]
+    [ServiceFilter(typeof(IsIpRestrictedFilter))]
+    [ServiceFilter(typeof(IsIpBannedFilter))]
     [Route("{commId}")]
     public IActionResult PatchComment([FromRoute] string commId, [FromBody] PostPutCommentDto text)
     {

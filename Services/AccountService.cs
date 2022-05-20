@@ -115,7 +115,27 @@ public class AccountService : IAccountService
             "DELETE action succeed");
         return true;
     }
-    
+
+    public bool DeleteAccountPictures(Guid id)
+    {
+        var account = _accountRepo.GetAccountById(id, DbInclude.Include);
+        if (account is null || account.IsDeleted) throw new NotFoundException("account not found");
+        _logger.LogWarning($"Account with Nickname: {account.Nickname} DELETE ALL PICTURES action invoked");
+        AuthorizeAccountOperation(account, ResourceOperation.Delete ,"You have no rights to delete this account's pictures");
+
+        foreach (var pic in account.Pictures)
+        {
+            _pictureRepo.DeletePicture(pic);
+        }
+        _logger.LogWarning(
+            "Account with " +
+            $"Nickname: {account.Nickname}, " +
+            $"Id: {account.Id} " +
+            "DELETE ALL PICTURES action succeed");
+        
+        return true;
+    }
+
     private void AuthorizeAccountOperation(Account account, ResourceOperation operation, string message)
     {
         var user = _accountContextService.User;

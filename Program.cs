@@ -3,14 +3,15 @@ using System.Text;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using NLog.Web;
-using NsfwSpyNS;
 using PicturesAPI;
+using PicturesAPI.ActionFilters;
 using PicturesAPI.Authorization;
 using PicturesAPI.Entities;
 using PicturesAPI.Middleware;
@@ -76,10 +77,15 @@ var builder = WebApplication.CreateBuilder();
     builder.Services.AddScoped<IValidator<PutAccountDto>, PutAccountDtoValidator>();
     builder.Services.AddScoped<IValidator<CreateAccountDto>, CreateAccountDtoValidator>();
     builder.Services.AddScoped<IValidator<LsLoginDto>, LsLoginDtoValidator>();
+    builder.Services.AddScoped<IValidator<PatchRestrictedIp>, PatchRestrictedIpValidator>();
 
     // Middleware
     builder.Services.AddScoped<ErrorHandlingMiddleware>();
     builder.Services.AddScoped<RequestTimeMiddleware>();
+    builder.Services.AddScoped<UserDataMiddleware>();
+    builder.Services.AddScoped<IsIpBannedFilter>();
+    builder.Services.AddScoped<IsIpRestrictedFilter>();
+    builder.Services.AddScoped<IsUserAdminFilter>();
     
     // builder.Services
     builder.Services.AddScoped<IAccountContextService, AccountContextService>();
@@ -90,22 +96,22 @@ var builder = WebApplication.CreateBuilder();
     builder.Services.AddScoped<IPictureCommentService, PictureCommentService>();
     builder.Services.AddScoped<IPopularService, PopularService>();
     builder.Services.AddScoped<IUserAccountService, UserAccountService>();
-    
+    builder.Services.AddScoped<ILogsService, LogsService>();
+    builder.Services.AddScoped<IRestrictedIpsService, RestrictedIpsService>();
 
     // Repos
     builder.Services.AddScoped<IAccountRepo, AccountRepo>();
     builder.Services.AddScoped<ILikeRepo, LikeRepo>();
     builder.Services.AddScoped<IPictureRepo, PictureRepo>();
     builder.Services.AddScoped<ICommentRepo, CommentRepo>();
+    builder.Services.AddScoped<IRestrictedIpRepo, RestrictedIpRepo>();
     
     // Other stuff
     builder.Services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
-    builder.Services.AddScoped<IClassifyNsfw, ClassifyNsfw>();
     builder.Services.AddScoped<PictureSeeder>();
     builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
     builder.Services.AddHttpContextAccessor();
     builder.Services.AddSwaggerGen();
-    builder.Services.AddScoped<INsfwSpy, NsfwSpy>();
     builder.Services.AddCors(options =>
     {
         options.AddPolicy("FrontEndClient", policyBuilder =>
@@ -148,13 +154,21 @@ DbManagementService.UpdateDb(app);
 
     app.UseMiddleware<ErrorHandlingMiddleware>();
     app.UseMiddleware<RequestTimeMiddleware>();
+    app.UseMiddleware<UserDataMiddleware>();
+    // app.UseMiddleware<RestrictedIpsMiddleware>();
     app.UseAuthentication();
     app.UseHttpsRedirection();
     app.UseSwagger();
 
     app.UseSwaggerUI(c => 
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "PicturesAPI v1"));
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "PicturesAPI v2.0.0"));
 
+    app.UseForwardedHeaders(new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = ForwardedHeaders.All,
+        RequireHeaderSymmetry = false,
+        ForwardLimit = null,
+    });
     app.UseRouting();
     app.UseAuthorization();
     app.UseEndpoints(endpoints => { endpoints.MapControllers(); });

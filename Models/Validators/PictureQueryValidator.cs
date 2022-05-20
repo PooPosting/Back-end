@@ -4,7 +4,7 @@ namespace PicturesAPI.Models.Validators;
 
 public class PictureQueryValidator : AbstractValidator<PictureQuery>
 {    
-    private readonly int[] _allowedPageSizes = { 10, 20, 40 };
+    private readonly int[] _allowedPageSizes = { 10, 20, 40, 100 };
 
     public PictureQueryValidator()
     {

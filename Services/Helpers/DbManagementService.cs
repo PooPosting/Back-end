@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PicturesAPI.Entities;
 
-namespace PicturesAPI.Services;
+namespace PicturesAPI.Services.Helpers;
 
 public static class DbManagementService
 {

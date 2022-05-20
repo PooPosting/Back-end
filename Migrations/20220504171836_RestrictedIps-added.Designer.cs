@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PicturesAPI.Entities;
 
@@ -10,9 +11,10 @@ using PicturesAPI.Entities;
 namespace PicturesAPI.Migrations
 {
     [DbContext(typeof(PictureDbContext))]
-    partial class PictureDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220504171836_RestrictedIps-added")]
+    partial class RestrictedIpsadded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -155,16 +157,23 @@ namespace PicturesAPI.Migrations
 
             modelBuilder.Entity("PicturesAPI.Entities.RestrictedIp", b =>
                 {
-                    b.Property<string>("IpAddress")
-                        .HasColumnType("varchar(95)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
 
                     b.Property<bool>("Banned")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("CantComment")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("CantPost")
                         .HasColumnType("tinyint(1)");
 
-                    b.HasKey("IpAddress");
+                    b.Property<string>("IpAddress")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
 
                     b.ToTable("RestrictedIps");
                 });

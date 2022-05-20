@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using PicturesAPI.ActionFilters;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Services.Helpers;
@@ -69,6 +70,8 @@ public class PictureController : ControllerBase
     }
 
     [HttpPost]
+    [ServiceFilter(typeof(IsIpRestrictedFilter))]
+    [ServiceFilter(typeof(IsIpBannedFilter))]
     [Route("classify")]
     public IActionResult ClassifyPicture([FromForm] IFormFile file)
     {
@@ -77,6 +80,8 @@ public class PictureController : ControllerBase
     }
     
     [HttpPost]
+    [ServiceFilter(typeof(IsIpRestrictedFilter))]
+    [ServiceFilter(typeof(IsIpBannedFilter))]
     [Route("create")]
     public IActionResult PostPicture(
         [FromForm] IFormFile file, 
@@ -97,6 +102,8 @@ public class PictureController : ControllerBase
     }
 
     [HttpPut]
+    [ServiceFilter(typeof(IsIpRestrictedFilter))]
+    [ServiceFilter(typeof(IsIpBannedFilter))]
     [Route("{id}")]
     public IActionResult PutPictureUpdate([FromRoute] string id, [FromBody] PutPictureDto dto)
     {

@@ -6,7 +6,8 @@ public class ErrorHandlingMiddleware : IMiddleware
 {
     private readonly ILogger<ErrorHandlingMiddleware> _logger;
         
-    public ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger)
+    public ErrorHandlingMiddleware(
+        ILogger<ErrorHandlingMiddleware> logger)
     {
         _logger = logger;
     }
@@ -37,6 +38,11 @@ public class ErrorHandlingMiddleware : IMiddleware
         {
             context.Response.StatusCode = 401;
             await context.Response.WriteAsync(invalidAuthTokenException.Message);
+        }
+        catch (RestrictedException restrictedException)
+        {
+            context.Response.StatusCode = 403;
+            await context.Response.WriteAsync(restrictedException.Message);
         }
         catch (Exception e)
         {

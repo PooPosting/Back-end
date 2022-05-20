@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PicturesAPI.ActionFilters;
 using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Controllers;
@@ -10,8 +11,7 @@ public class PopularController : ControllerBase
     private readonly IPopularService _popularService;
 
     public PopularController(
-        IPopularService popularService
-        )
+        IPopularService popularService)
     {
         _popularService = popularService;
     }

@@ -9,8 +9,11 @@
     <ItemGroup>
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
         <PackageReference Include="FluentValidation.AspNetCore" Version="10.3.6" />
+        <PackageReference Include="Google.Apis.Vision.v1" Version="1.57.0.2634" />
+        <PackageReference Include="Google.Cloud.Vision.V1" Version="2.5.0" />
         <PackageReference Include="MailKit" Version="3.2.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.1" />
+        <PackageReference Include="Microsoft.AspNetCore.HttpOverrides" Version="2.2.0" />
         <PackageReference Include="Microsoft.AspNetCore.OData" Version="8.0.6" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.1" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.1">
@@ -19,7 +22,6 @@
         </PackageReference>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="NLog.Web.AspNetCore" Version="4.14.0" />
-        <PackageReference Include="NsfwSpy" Version="3.3.0" />
         <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.1" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     </ItemGroup>
