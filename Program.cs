@@ -89,7 +89,6 @@ var builder = WebApplication.CreateBuilder();
     
     // builder.Services
     builder.Services.AddScoped<IAccountContextService, AccountContextService>();
-    builder.Services.AddScoped<IEmailService, EmailService>();
     builder.Services.AddScoped<IPictureLikingService, PictureLikingService>();
     builder.Services.AddScoped<IAccountService, AccountService>();
     builder.Services.AddScoped<IPictureService, PictureService>();

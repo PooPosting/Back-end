@@ -5,3 +5,4 @@ Logs/internal-nlog.txt
 *.txt
 appsettings.Development.json
 authKey.json
+Logs/internal-nlog.txt
