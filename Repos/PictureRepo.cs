@@ -8,31 +8,39 @@ namespace PicturesAPI.Repos;
 public class PictureRepo : IPictureRepo
 {
     private readonly PictureDbContext _dbContext;
-    private readonly ILikeRepo _likeRepo;
 
-    public PictureRepo(
-        PictureDbContext dbContext, 
-        ILikeRepo likeRepo)
+    public PictureRepo(PictureDbContext dbContext)
     {
         _dbContext = dbContext;
-        _likeRepo = likeRepo;
     }
 
-    public IEnumerable<Picture> GetPictures()
+    public async Task<Picture> GetById(Guid id)
     {
-        var pictures = _dbContext.Pictures
+        return await _dbContext.Pictures
             .Where(p => !p.IsDeleted)
             .Include(p => p.Likes)
             .ThenInclude(l => l.Liker)
             .Include(p => p.Comments)
             .ThenInclude(c => c.Author)
             .Include(p => p.Account)
-            .AsSplitQuery();
-
-        return pictures;
+            .AsSplitQuery()
+            .SingleOrDefaultAsync(p => p.Id == id);
     }
 
-    public IEnumerable<Picture> GetPicturesByOwner(Account account)
+    public async Task<IEnumerable<Picture>> GetAll()
+    {
+        return await _dbContext.Pictures
+            .Where(p => !p.IsDeleted)
+            .Include(p => p.Likes)
+            .ThenInclude(l => l.Liker)
+            .Include(p => p.Comments)
+            .ThenInclude(c => c.Author)
+            .Include(p => p.Account)
+            .AsSplitQuery()
+            .ToListAsync();
+    }
+
+    public IEnumerable<Picture> GetByOwner(Account account)
     {
         var pictures = _dbContext.Pictures
             .Where(p => !p.IsDeleted)
@@ -45,59 +53,20 @@ public class PictureRepo : IPictureRepo
             .Where(p => p.Account == account);
         return pictures;
     }
-    
-    public Picture GetPictureById(Guid id)
-    {
-        var picture = _dbContext.Pictures
-            .Where(p => !p.IsDeleted)
-            .Include(p => p.Likes)
-            .ThenInclude(l => l.Liker)
-            .Include(p => p.Comments)
-            .ThenInclude(c => c.Author)
-            .Include(p => p.Account)
-            .AsSplitQuery()
-            .SingleOrDefault(p => p.Id == id);
-        return picture;
-    }
 
-    public Guid CreatePicture(Picture picture)
+    public async Task<Guid> Insert(Picture picture)
     {
-        _dbContext.Pictures.Add(picture);
-        _dbContext.SaveChanges();
+        await _dbContext.Pictures.AddAsync(picture);
         return picture.Id;
     }
 
-    public bool UpdatePicture(Picture picture, PutPictureDto dto)
+    public async Task Update(Picture picture)
     {
-        var pictureToUpdate = _dbContext.Pictures.SingleOrDefault(p => p == picture);
-        
-        if (dto.Description != null) pictureToUpdate!.Description = dto.Description;
-        if (dto.Name != null) pictureToUpdate!.Name = dto.Name;
-        if (dto.Tags != null)
-        {
-            dto.Tags = dto.Tags.Distinct().ToList();
-            pictureToUpdate!.Tags = string.Join(" ", dto.Tags).ToLower();
-        }
-        _dbContext.SaveChanges();
-        
-        return true;
+        _dbContext.Pictures.Update(picture);
     }
     
-    public bool DeletePicture(Picture picture)
+    public async Task Save()
     {
-        var likesToRemove = _likeRepo.GetLikesByLiked(picture);
-        if (likesToRemove is not null) _dbContext.Likes.RemoveRange(likesToRemove);
-        
-        var pictureToRemove = _dbContext.Pictures.SingleOrDefault(p => p == picture)!;
-        pictureToRemove.IsDeleted = true;
-        
-        _dbContext.SaveChanges();
-        return true;
-    }
-    
-    public bool Exists(Guid id)
-    {
-        var picture = _dbContext.Pictures.SingleOrDefault(c => c.Id == id);
-        return (picture is not null);
+        await _dbContext.SaveChangesAsync();
     }
 }

@@ -14,4 +14,6 @@ public class Comment
     public Account Author { get; set; }
     [Required]
     public Picture Picture { get; set; }
+
+    public bool IsDeleted { get; set; } = false;
 }

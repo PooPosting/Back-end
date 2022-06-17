@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Security.Claims;
+using PicturesAPI.Exceptions;
 using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Services;
@@ -14,6 +15,6 @@ public class AccountContextService : IAccountContextService
     }
 
     public ClaimsPrincipal User => _httpContextAccessor.HttpContext!.User;
-    public string? GetAccountId => User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-    public string? GetAccountRole => User.FindFirst(c => c.Type == ClaimTypes.Role)?.Value;
+    public Guid GetAccountId => Guid.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value!);
+    public int GetAccountRole => int.Parse(User.FindFirst(c => c.Type == ClaimTypes.Role)!.Value);
 }

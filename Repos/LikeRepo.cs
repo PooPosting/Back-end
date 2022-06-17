@@ -8,88 +8,53 @@ public class LikeRepo : ILikeRepo
 {
     private readonly PictureDbContext _dbContext;
 
-    public LikeRepo(
-        PictureDbContext dbContext)
+    public LikeRepo(PictureDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
-    public List<Like> GetLikesByLiker(Account liker)
+    public async Task<List<Like>> GetByLikerId(Guid id)
     {
-        var likes = _dbContext.Likes.Where(l => l.Liker == liker)
+        return await _dbContext.Likes.Where(l => l.Liker.Id == id)
             .Include(a => a.Liked)
             .Include(a => a.Liker)
-            .ToList();
-        
-        return likes;
+            .ToListAsync();
     }
-    public List<Like> GetLikesByLiker(Guid id)
+
+    public async Task<List<Like>> GetByLikedId(Guid id)
     {
-        var likes = _dbContext.Likes.Where(l => l.Liker.Id == id)
+        return await _dbContext.Likes.Where(l => l.Liked.Id == id)
             .Include(a => a.Liked)
             .Include(a => a.Liker)
-            .ToList();
-        
-        return likes;
+            .ToListAsync();
     }
 
-    public List<Like> GetLikesByLiked(Picture picture)
+    public async Task<Like> GetByLikerIdAndLikedId(Guid accountId, Guid pictureId)
     {
-        var likes = _dbContext.Likes.Where(l => l.Liked == picture)
-            .Include(a => a.Liked)
-            .Include(a => a.Liker)
-            .ToList();
-        return likes;
-    }
-    
-    public List<Like> GetLikesByLiked(Guid id)
-    {
-        var likes = _dbContext.Likes.Where(l => l.Liked.Id == id)
-            .Include(a => a.Liked)
-            .Include(a => a.Liker)
-            .ToList();
-        return likes;
+        return await _dbContext.Likes
+            .Include(l => l.Liker)
+            .Include(l => l.Liked)
+            .FirstOrDefaultAsync(l => l.Liker.Id == accountId && l.Liked.Id == pictureId);
     }
 
-    public Like GetLikeByLikerAndLiked(Account account, Picture picture)
+    public async Task Insert(Like like)
     {
-        var like = _dbContext.Likes
-            .FirstOrDefault(l => l.Liker == account && l.Liked == picture);
-        return like;
+        await _dbContext.Likes.AddAsync(like);
     }
 
-    public void AddLike(Like like)
-    {
-        _dbContext.Add(like);
-        _dbContext.SaveChanges();
-    }
-
-    public void RemoveLike(Like like)
+    public async Task Delete(Like like)
     {
         _dbContext.Remove(like);
-        _dbContext.SaveChanges();
     }
 
-    public void ChangeLike(Like like)
+    public async Task Update(Like like)
     {
-        var likeToChange = _dbContext.Likes.SingleOrDefault(l => l == like);
-        
-        likeToChange!.IsLike = !likeToChange.IsLike;
-        _dbContext.SaveChanges();
+        _dbContext.Likes.Update(like);
     }
-    
-    public int RemoveLikes(List<Like> likes)
+
+    public async Task Save()
     {
-        _dbContext.Likes.RemoveRange(likes);
-        _dbContext.SaveChanges();
-        
-        return likes.Count;
-    }
-    
-    public bool Exists(int id)
-    {
-        var like = _dbContext.Likes.SingleOrDefault(l => l.Id == id);
-        return (like is not null);
+        await _dbContext.SaveChangesAsync();
     }
     
 }

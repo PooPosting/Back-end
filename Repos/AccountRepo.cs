@@ -1,9 +1,6 @@
 ﻿#nullable enable
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PicturesAPI.Entities;
-using PicturesAPI.Enums;
-using PicturesAPI.Models.Dtos;
 using PicturesAPI.Repos.Interfaces;
 
 namespace PicturesAPI.Repos;
@@ -11,187 +8,91 @@ namespace PicturesAPI.Repos;
 public class AccountRepo : IAccountRepo
 {
     private readonly PictureDbContext _dbContext;
-    private readonly IPasswordHasher<Account> _passwordHasher;
 
-    public AccountRepo(
-        PictureDbContext dbContext, 
-        IPasswordHasher<Account> passwordHasher)
+    public AccountRepo(PictureDbContext dbContext)
     {
         _dbContext = dbContext;
-        _passwordHasher = passwordHasher;
     }
 
-    public Account? GetAccountById(Guid id, DbInclude option)
+    public async Task<IEnumerable<Account>> GetAll()
     {
-        Account? account;
-        switch (option) 
-        {
-            case DbInclude.Include:
-            {
-                account = _dbContext.Accounts
-                    .Include(a => a.Pictures)
-                    .ThenInclude(p => p.Likes)
-                    .ThenInclude(p => p.Liker)
-                    .Include(a => a.Pictures)
-                    .ThenInclude(p => p.Comments)
-                    .ThenInclude(c => c.Author)
-                    .Include(a => a.Likes)
-                    .AsSplitQuery()
-                    .SingleOrDefault(a => a.Id == id);
-                break;
-            }
-            case DbInclude.Raw:
-            {
-                account = _dbContext.Accounts
-                    .SingleOrDefault(a => a.Id == id);
-                break;
-            }
-            default:
-                throw new ArgumentOutOfRangeException(nameof(option), option, null);
-        }
-        return account;
+        return await _dbContext.Accounts
+            .Include(p => p.Pictures)
+            .ThenInclude(p => p.Likes)
+            .Include(p => p.Likes)
+            .AsSplitQuery()
+            .ToListAsync();
     }
 
-    public Account? GetAccountByNick(string nickname, DbInclude option)
+    public async Task<Account> GetById(Guid id)
     {
-        Account? account;
-        switch (option) 
-        {
-            case DbInclude.Include:
-            {
-                account = _dbContext.Accounts
-                    .Include(a => a.Pictures)
-                    .ThenInclude(p => p.Likes)
-                    .ThenInclude(p => p.Liker)
-                    .Include(a => a.Pictures)
-                    .ThenInclude(p => p.Comments)
-                    .ThenInclude(c => c.Author)
-                    .Include(a => a.Likes)
-                    .AsSplitQuery()
-                    .SingleOrDefault(a => a.Nickname == nickname);
-                break;
-            }
-            case DbInclude.Raw:
-            {
-                account = _dbContext.Accounts
-                    .SingleOrDefault(a => a.Nickname == nickname);
-                break;
-            }
-            default:
-                throw new ArgumentOutOfRangeException(nameof(option), option, null);
-        }
-        return account;
+        return (await _dbContext.Accounts
+            .Include(a => a.Pictures)
+            .ThenInclude(p => p.Likes)
+            .ThenInclude(p => p.Liker)
+            .Include(a => a.Pictures)
+            .ThenInclude(p => p.Comments)
+            .ThenInclude(c => c.Author)
+            .Include(a => a.Likes)
+            .AsSplitQuery()
+            .SingleOrDefaultAsync(a => a.Id == id))!;
     }
 
-    public IEnumerable<Account>? GetAccounts(DbInclude option)
+    public async Task<Guid> Insert(Account newAccount)
     {
-        IEnumerable<Account>? accounts;
-        switch (option)
-        {
-            case DbInclude.Include:
-            {
-                accounts = _dbContext.Accounts
-                    .Include(p => p.Pictures)
-                    .ThenInclude(p => p.Likes)
-                    .Include(p => p.Likes)
-                    .AsSplitQuery();
-                break;
-            }
-            case DbInclude.Raw:
-            {
-                accounts = _dbContext.Accounts;
-                break;
-            }
-            default:
-                throw new ArgumentOutOfRangeException(nameof(option), option, null);
-        }
-        return accounts;
-    }
-    
-    public string GetLikedTags(Guid accId)
-    {
-        var account = _dbContext.Accounts.SingleOrDefault(a => a.Id == accId);
-        return account!.LikedTags ?? string.Empty;
-    }
-    
-    public Guid CreateAccount(Account newAccount)
-    {
-        _dbContext.Accounts.Add(newAccount);
-        _dbContext.SaveChanges();
-        
+        await _dbContext.Accounts.AddAsync(newAccount);
         return newAccount.Id;
     }
-    
-    public void UpdateAccount(PutAccountDto dto, Guid id)
+
+    public async Task Update(Account account)
     {
-        var account = _dbContext.Accounts.SingleOrDefault(a => a.Id == id)!;
-        if (dto.Email is not null)
-        {
-            account.Email = dto.Email;
-        }
-        if (dto.Password is not null)
-        {
-            var passwordHashed = _passwordHasher.HashPassword(account, dto.Password);
-            account!.PasswordHash = passwordHashed;
-        }
-        _dbContext.SaveChanges();
+        _dbContext.Accounts.Update(account);
     }
 
-    public void DeleteAccount(Guid id)
+    public async Task Delete(Guid id)
     {
-        var accountToRemove = _dbContext.Accounts.SingleOrDefault(a => a.Id == id);
+        var accountToRemove = await _dbContext.Accounts.SingleOrDefaultAsync(a => a.Id == id);
         accountToRemove!.IsDeleted = true;
-        _dbContext.SaveChanges();
-    }
-    
-    public void AddLikedTags(Account acc, Picture picture)
-    {
-        var account = _dbContext.Accounts.SingleOrDefault(a => a == acc);
-        
-        var tagsToAdd = picture.Tags.Split(' ').Take(3).ToList();
-        
-        var accountTags = account!.LikedTags is null 
-            ? new List<string>() 
-            : account.LikedTags.Split(' ').ToList();
-        
-        accountTags.AddRange(tagsToAdd);
-        accountTags = accountTags.Distinct().ToList();
-
-        if (accountTags.Count > 50) accountTags = accountTags.TakeLast(50).ToList();
-        
-        account.LikedTags = string.Join(' ', accountTags);
-        _dbContext.SaveChanges();
-    }
-    
-    public void RemoveLikedTags(Account acc, Picture picture)
-    {
-        var account = _dbContext.Accounts.SingleOrDefault(a => a == acc);
-        var tagsToRemove = picture.Tags.Split(' ').Take(3).ToList();
-        var accountTags = account!.LikedTags is null 
-            ? new List<string>() 
-            : account.LikedTags.Split(' ').ToList();
-        foreach (var tag in tagsToRemove)
-        {
-            accountTags.Remove(tag);
-        }
-        accountTags = accountTags.Distinct().ToList();
-        account.LikedTags = string.Join(' ', accountTags);
-        _dbContext.SaveChanges();
     }
 
-    // public string SetVerificationCode(Guid id)
+    public async Task Save()
+    {
+        await _dbContext.SaveChangesAsync();
+    }
+
+    // public async Task AddLikedTags(Account acc, Picture picture)
     // {
-    //     var rnd = new Random();
-    //     var confToken = rnd.Next(100000, 999999).ToString();
-    //     var acc = _dbContext.Accounts.SingleOrDefault(a => a.Id == id);
-    //     acc!.ConfirmationToken = confToken;
-    //     return confToken;
+    //     var tagsToAdd = picture.Tags.Split(' ').Take(3).ToList();
+    //
+    //     var accountTags = acc!.LikedTags is null
+    //         ? new List<string>()
+    //         : acc.LikedTags.Split(' ').ToList();
+    //
+    //     accountTags.AddRange(tagsToAdd);
+    //     accountTags = accountTags.Distinct().ToList();
+    //     if (accountTags.Count > 50) accountTags = accountTags.TakeLast(50).ToList();
+    //     acc.LikedTags = string.Join(' ', accountTags);
+    //
+    //     ctx.Accounts.Update(acc);
+    //     await ctx.SaveChangesAsync();
     // }
-    public bool Exists(Guid id)
-    {
-        var account = _dbContext.Accounts.SingleOrDefault(a => a.Id == id);
-        if (account is not null) return !account.IsDeleted;
-        return false;
-    }
+    //
+    // public async Task RemoveLikedTags(Account acc, Picture picture)
+    // {
+    //     var tagsToRemove = picture.Tags.Split(' ').Take(3).ToList();
+    //     var accountTags = acc!.LikedTags is null
+    //         ? new List<string>()
+    //         : acc.LikedTags.Split(' ').ToList();
+    //     foreach (var tag in tagsToRemove)
+    //     {
+    //         accountTags.Remove(tag);
+    //     }
+    //     accountTags = accountTags.Distinct().ToList();
+    //     acc.LikedTags = string.Join(' ', accountTags);
+    //
+    //     ctx.Accounts.Update(acc);
+    //     await ctx.SaveChangesAsync();
+    // }
+
 
 }
