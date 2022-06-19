@@ -1,4 +1,5 @@
 ﻿using PicturesAPI.Entities;
+using PicturesAPI.Entities.Joins;
 using PicturesAPI.Repos.Interfaces;
 
 namespace PicturesAPI.Repos;
@@ -24,10 +25,29 @@ public class TagRepo : ITagRepo
             .ToList();
     }
 
-    public int Insert(Tag tag)
+    public Tag GetByValue(string value)
     {
+        return _dbContext.Tags.First(t => t.Value == value);
+    }
+
+    public Tag InsertAndSave(Tag tag)
+    {
+        if (_dbContext.Tags.Any(t => t.Value == tag.Value))
+        {
+            return _dbContext.Tags.FirstOrDefault(t => t.Value == tag.Value);
+        }
         _dbContext.Tags.Add(tag);
-        return tag.Id;
+        _dbContext.SaveChanges();
+        return tag;
+    }
+
+    public void InsertPictureTagJoin(Picture picture, Tag tag)
+    {
+        _dbContext.PictureTagJoins.Add(new PictureTagJoin()
+        {
+            Picture = picture,
+            Tag = tag
+        });
     }
 
     public void Delete(Tag tag)
@@ -54,6 +74,11 @@ public class TagRepo : ITagRepo
             .Where(a => a.AccountId == accountId)
             .Select(t => t.Tag)
             .ToList();
+    }
+
+    public void Save()
+    {
+        _dbContext.SaveChanges();
     }
 
 }

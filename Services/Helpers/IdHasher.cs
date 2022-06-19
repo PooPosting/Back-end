@@ -1,12 +1,15 @@
 ﻿using HashidsNet;
 
-namespace PicturesAPI.Configuration;
+namespace PicturesAPI.Services.Helpers;
 
 public static class IdHasher
 {
-    private static Hashids PictureHasher { get; set; } = new Hashids("p!c700re$", 12);
-    private static Hashids AccountHasher { get; set; } = new Hashids("a$$0un70Z", 12);
-    private static Hashids CommentHasher { get; set; } = new Hashids("C00m3n700", 12);
+    private const int MinHashLength = 12;
+    private const string HashAlphabet = "-_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    private static readonly Hashids PictureHasher = new("p!c700re$", MinHashLength, HashAlphabet);
+    private static readonly Hashids AccountHasher = new("a$$0un70Z", MinHashLength, HashAlphabet);
+    private static readonly Hashids CommentHasher = new("C00m3n700", MinHashLength, HashAlphabet);
 
 
     public static string EncodePictureId(int id)

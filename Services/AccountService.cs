@@ -59,8 +59,8 @@ public class AccountService : IAccountService
         var baseQuery = _accountRepo.GetAll()
             .Where(a => query.SearchPhrase == null || a.Nickname.ToLower().Contains(query.SearchPhrase.ToLower()))
             .Where(a => !a.IsDeleted)
-            .OrderByDescending(a => _pictureRepo.GetByOwner(a).Count())
-            .ThenByDescending(a => _pictureRepo.GetByOwner(a).Sum(picture => picture.Likes.Count))
+            .OrderByDescending(a => _pictureRepo.GetByAccountId(a.Id).Count())
+            .ThenByDescending(a => _pictureRepo.GetByAccountId(a.Id).Sum(picture => picture.Likes.Count))
             .ToList();
 
         var accounts = baseQuery

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PicturesAPI.ActionFilters;
-using PicturesAPI.Configuration;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Services.Helpers;
 using PicturesAPI.Services.Interfaces;

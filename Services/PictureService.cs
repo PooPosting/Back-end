@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Google.Apis.Util;
 using Google.Cloud.Vision.V1;
 using Microsoft.AspNetCore.Authorization;
 using PicturesAPI.Authorization;
@@ -23,6 +24,7 @@ public class PictureService : IPictureService
     private readonly IPictureRepo _pictureRepo;
     private readonly IAccountRepo _accountRepo;
     private readonly ILikeRepo _likeRepo;
+    private readonly ITagRepo _tagRepo;
 
     public PictureService(
         ILogger<PictureService> logger, 
@@ -31,6 +33,7 @@ public class PictureService : IPictureService
         IPictureRepo pictureRepo,
         IAccountRepo accountRepo,
         ILikeRepo likeRepo,
+        ITagRepo tagRepo,
         IMapper mapper)
     {
         _logger = logger;
@@ -40,11 +43,21 @@ public class PictureService : IPictureService
         _pictureRepo = pictureRepo;
         _accountRepo = accountRepo;
         _likeRepo = likeRepo;
+        _tagRepo = tagRepo;
     }
     
     public  PagedResult<PictureDto> GetAll(PictureQuery query)
     {
-        var baseQuery = _pictureRepo.GetAll();
+        List<Picture> baseQuery;
+
+        if (_accountContextService.TryGetAccountId() is not null)
+        {
+            baseQuery = _pictureRepo.GetNotSeenByAccountId(_accountContextService.GetAccountId());
+        }
+        else
+        {
+            baseQuery = _pictureRepo.GetAll();
+        }
 
         var sortedQuery = PictureSorter
             .SortPics(baseQuery, query)
@@ -137,8 +150,9 @@ public class PictureService : IPictureService
         var id = _accountContextService.GetAccountId();
         var account = _accountRepo.GetById(id);
 
-        // dto.Tags = dto.Tags.Distinct().ToList();
+        dto.Tags = dto.Tags.Distinct().ToList();
         var picture = _mapper.Map<Picture>(dto);
+
         picture.Account = account;
 
         if (file is not { Length: > 0 }) throw new BadRequestException("invalid picture");
@@ -155,6 +169,16 @@ public class PictureService : IPictureService
             stream.Dispose();
         }
         _pictureRepo.Insert(picture);
+
+        foreach (var tag in dto.Tags)
+        {
+            _tagRepo.InsertAndSave(new Tag()
+            {
+                Value = tag,
+            });
+            _tagRepo.InsertPictureTagJoin(picture, _tagRepo.GetByValue(tag));
+        }
+
         _pictureRepo.Save();
         return picture.Id;
 

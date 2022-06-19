@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using PicturesAPI.Configuration;
 using PicturesAPI.Entities;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Services.Helpers;

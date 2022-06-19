@@ -17,6 +17,8 @@ public class PictureRepo : IPictureRepo
     {
         return _dbContext.Pictures
             .Where(p => !p.IsDeleted)
+            .Include(p => p.PictureTagJoins)
+            .ThenInclude(j => j.Tag)
             .Include(p => p.Likes)
             .ThenInclude(l => l.Liker)
             .Include(p => p.Comments)
@@ -30,26 +32,42 @@ public class PictureRepo : IPictureRepo
     {
         return _dbContext.Pictures
             .Where(p => !p.IsDeleted)
+            .Include(p => p.PictureTagJoins)
+            .ThenInclude(j => j.Tag)
             .Include(p => p.Likes)
-            .ThenInclude(l => l.Liker)
             .Include(p => p.Comments)
-            .ThenInclude(c => c.Author)
             .Include(p => p.Account)
             .AsSplitQuery()
             .ToList();
     }
 
-    public List<Picture> GetByOwner(Account account)
+    public List<Picture> GetNotSeenByAccountId(int accountId)
+    {
+        return _dbContext.Pictures
+            .Where(p =>
+                !_dbContext.PictureAccountJoins
+                .Where(p => p.AccountId == accountId)
+                .AsSplitQuery()
+                .Select(p => p.PictureId)
+                .Any(i => i != p.Id))
+            .Include(p => p.PictureTagJoins)
+            .ThenInclude(j => j.Tag)
+            .Include(p => p.Account)
+            .Include(p => p.Likes)
+            .Include(p => p.Comments)
+            .AsSplitQuery()
+            .ToList();
+    }
+
+    public List<Picture> GetByAccountId(int accountId)
     {
         return _dbContext.Pictures
             .Where(p => !p.IsDeleted)
             .Include(p => p.Likes)
-            .ThenInclude(l => l.Liker)
             .Include(p => p.Comments)
-            .ThenInclude(c => c.Author)
             .Include(p => p.Account)
             .AsSplitQuery()
-            .Where(p => p.Account == account)
+            .Where(p => p.Account.Id == accountId)
             .ToList();
     }
 

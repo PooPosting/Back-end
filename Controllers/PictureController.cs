@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using PicturesAPI.ActionFilters;
-using PicturesAPI.Configuration;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Services.Helpers;
@@ -87,14 +86,14 @@ public class PictureController : ControllerBase
     public IActionResult PostPicture(
         [FromForm] IFormFile file, 
         [FromForm] string name, 
-        [FromForm] string description)
-        // [FromForm] string[] tags)
+        [FromForm] string description,
+        [FromForm] string tags)
     {
         var dto = new CreatePictureDto()
         {
             Name = name,
             Description = description,
-            // Tags = tags.ToList()
+            Tags = tags.Split(' ').ToList()
         };
         
         var pictureId = _pictureService.Create(file, dto);

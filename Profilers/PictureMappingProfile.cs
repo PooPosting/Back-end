@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using PicturesAPI.Configuration;
 using PicturesAPI.Entities;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Services.Helpers;
@@ -13,7 +12,7 @@ public class PictureMappingProfile : Profile
         CreateMap<Picture, PictureDto>()
             .ForMember(dto => dto.Tags,
                 opt => opt.MapFrom(
-                    p => p.PictureTagJoins.Select(ptj => ptj.Tag)))
+                    p => p.PictureTagJoins.Select(p => p.Tag.Value)))
             .ForMember(
                 dto => dto.AccountNickname,
                 opt => opt.MapFrom(
@@ -35,6 +34,17 @@ public class PictureMappingProfile : Profile
                     dto => IdHasher.DecodeAccountId(dto.AccountId)));
 
         CreateMap<CreatePictureDto, Picture>();
+    }
+
+    private List<string> GetPictureTags(Picture picture)
+    {
+        List<string> tags;
+
+        tags = picture.PictureTagJoins
+            .Select(p => p.Tag.Value)
+            .ToList();
+
+        return tags;
     }
 
 }

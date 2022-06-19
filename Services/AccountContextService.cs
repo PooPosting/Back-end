@@ -28,6 +28,12 @@ public class AccountContextService : IAccountContextService
         return int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
     }
 
+    public int? TryGetAccountId()
+    {
+        var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return idClaim is not null ? int.Parse(idClaim) : null;
+    }
+
     public int GetAccountRole()
     {
         ValidateJwt();

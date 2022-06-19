@@ -7,7 +7,8 @@ public interface IPictureRepo
 {
     Picture GetById(int id);
     List<Picture> GetAll();
-    List<Picture> GetByOwner(Account account);
+    List<Picture> GetNotSeenByAccountId(int accountId);
+    List<Picture> GetByAccountId(int accountId);
     int Insert(Picture picture);
     void Update(Picture picture);
     void DeleteById(int id);
