@@ -8,8 +8,8 @@ public class PictureDto
         
     public string Name { get; set; }
     public string Description { get; set; }
-    public ICollection<string> Tags { get; set; }
-        
+    // public ICollection<string> Tags { get; set; }
+
     public string Url { get; set; }
     public DateTime PictureAdded { get; set; }
 

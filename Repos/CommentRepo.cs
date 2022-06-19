@@ -13,28 +13,34 @@ public class CommentRepo : ICommentRepo
     {
         _dbContext = dbContext;
     }
-    public Task<Comment> GetById(Guid commId)
+    public Comment GetById(int commId)
     {
         return _dbContext.Comments
             .Include(c => c.Picture)
             .Include(c => c.Author)
             .AsSplitQuery()
-            .SingleOrDefaultAsync(c => c.Id == commId)!;
+            .SingleOrDefault(c => c.Id == commId)!;
     }
 
-    public async Task<Guid> Insert(Comment comment)
+    public int Insert(Comment comment)
     {
-        await _dbContext.Comments.AddAsync(comment);
+        _dbContext.Comments.Add(comment);
         return comment.Id;
     }
 
-    public async Task Update(Comment comment)
+    public void Update(Comment comment)
     {
-        _dbContext.Update(comment);
+        _dbContext.Comments.Update(comment);
+    }
+
+    public void DeleteById(int id)
+    {
+        var comm =  _dbContext.Comments.SingleOrDefault(c => c.Id == id);
+        comm!.IsDeleted = true;
     }
     
-    public async Task Save()
+    public bool Save()
     {
-        await _dbContext.SaveChangesAsync();
+        return _dbContext.SaveChanges() > 0;
     }
 }

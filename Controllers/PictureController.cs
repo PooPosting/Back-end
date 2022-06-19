@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using PicturesAPI.ActionFilters;
+using PicturesAPI.Configuration;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Services.Helpers;
@@ -47,7 +48,7 @@ public class PictureController : ControllerBase
     [Route("{id}")]
     public IActionResult GetSinglePictureById([FromRoute] string id)
     {
-        var picture = _pictureService.GetById(GuidEncoder.Decode(id));
+        var picture = _pictureService.GetById(IdHasher.DecodePictureId(id));
         return Ok(picture);
     }
     
@@ -56,7 +57,7 @@ public class PictureController : ControllerBase
     [Route("{id}/likes")]
     public IActionResult GetPictureLikes([FromRoute] string id)
     {
-        var likes = _pictureService.GetPicLikes(GuidEncoder.Decode(id));
+        var likes = _pictureService.GetPicLikes(IdHasher.DecodePictureId(id));
         return Ok(likes);
     }
     
@@ -65,13 +66,13 @@ public class PictureController : ControllerBase
     [Route("{id}/likers")]
     public IActionResult GetPictureLikers([FromRoute] string id)
     {
-        var likes = _pictureService.GetPicLikers(GuidEncoder.Decode(id));
+        var likes = _pictureService.GetPicLikers(IdHasher.DecodePictureId(id));
         return Ok(likes);
     }
 
     [HttpPost]
-    [ServiceFilter(typeof(IsIpRestrictedFilter))]
-    [ServiceFilter(typeof(IsIpBannedFilter))]
+    [ServiceFilter(typeof(CanPostFilter))]
+    [ServiceFilter(typeof(CanGetFilter))]
     [Route("classify")]
     public IActionResult ClassifyPicture([FromForm] IFormFile file)
     {
@@ -80,20 +81,20 @@ public class PictureController : ControllerBase
     }
     
     [HttpPost]
-    [ServiceFilter(typeof(IsIpRestrictedFilter))]
-    [ServiceFilter(typeof(IsIpBannedFilter))]
+    [ServiceFilter(typeof(CanPostFilter))]
+    [ServiceFilter(typeof(CanGetFilter))]
     [Route("create")]
     public IActionResult PostPicture(
         [FromForm] IFormFile file, 
         [FromForm] string name, 
-        [FromForm] string description, 
-        [FromForm] string[] tags)
+        [FromForm] string description)
+        // [FromForm] string[] tags)
     {
         var dto = new CreatePictureDto()
         {
             Name = name,
             Description = description,
-            Tags = tags.ToList()
+            // Tags = tags.ToList()
         };
         
         var pictureId = _pictureService.Create(file, dto);
@@ -102,12 +103,12 @@ public class PictureController : ControllerBase
     }
 
     [HttpPut]
-    [ServiceFilter(typeof(IsIpRestrictedFilter))]
-    [ServiceFilter(typeof(IsIpBannedFilter))]
+    [ServiceFilter(typeof(CanPostFilter))]
+    [ServiceFilter(typeof(CanGetFilter))]
     [Route("{id}")]
     public IActionResult PutPictureUpdate([FromRoute] string id, [FromBody] PutPictureDto dto)
     {
-        var result = _pictureService.Put(GuidEncoder.Decode(id), dto);
+        var result = _pictureService.Update(IdHasher.DecodePictureId(id), dto);
         return Ok(result);
     }
 
@@ -115,7 +116,7 @@ public class PictureController : ControllerBase
     [Route("{id}/voteup")]
     public IActionResult PatchPictureVoteUp([FromRoute] string id)
     {
-        var result = _pictureLikingService.Like(GuidEncoder.Decode(id));
+        var result = _pictureLikingService.Like(IdHasher.DecodePictureId(id));
         return Ok(result);
     }
         
@@ -123,7 +124,7 @@ public class PictureController : ControllerBase
     [Route("{id}/votedown")]
     public IActionResult PatchPictureVoteDown([FromRoute] string id)
     {
-        var result = _pictureLikingService.DisLike(GuidEncoder.Decode(id));
+        var result = _pictureLikingService.DisLike(IdHasher.DecodePictureId(id));
         return Ok(result);
     }
 
@@ -131,8 +132,8 @@ public class PictureController : ControllerBase
     [Route("{id}")]
     public IActionResult DeletePicture([FromRoute] string id)
     {
-        var result = _pictureService.Delete(GuidEncoder.Decode(id));
-        return Ok(result);
+        _pictureService.Delete(IdHasher.DecodePictureId(id));
+        return NoContent();
     }
 
 }

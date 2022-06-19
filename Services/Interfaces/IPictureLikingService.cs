@@ -4,6 +4,6 @@ namespace PicturesAPI.Services.Interfaces;
 
 public interface IPictureLikingService
 {
-    PictureDto Like(Guid id);
-    PictureDto DisLike(Guid id);
+    PictureDto Like(int id);
+    PictureDto DisLike(int id);
 }

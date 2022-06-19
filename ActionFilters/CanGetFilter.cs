@@ -4,11 +4,11 @@ using PicturesAPI.Repos.Interfaces;
 
 namespace PicturesAPI.ActionFilters;
 
-public class IsIpBannedFilter: ActionFilterAttribute
+public class CanGetFilter: ActionFilterAttribute
 {
     private readonly IRestrictedIpRepo _restrictedIpRepo;
 
-    public IsIpBannedFilter(
+    public CanGetFilter(
         IRestrictedIpRepo restrictedIpRepo)
     {
         _restrictedIpRepo = restrictedIpRepo;
@@ -17,8 +17,8 @@ public class IsIpBannedFilter: ActionFilterAttribute
     public override void OnActionExecuting(ActionExecutingContext context)
     {
         var remoteIp = context.HttpContext.Connection.RemoteIpAddress!.ToString();
-        var restrictedIp = _restrictedIpRepo.GetRestrictedIp(remoteIp);
+        var restrictedIp = _restrictedIpRepo.GetByIp(remoteIp);
         if (restrictedIp is null) return;
-        if (restrictedIp.Banned) throw new ForbidException("Your ip is banned");
+        if (restrictedIp.CantPost) throw new ForbidException("Your ip is restricted");
     }
 }

@@ -8,57 +8,55 @@ namespace PicturesAPI.Services;
 public class RestrictedIpsService: IRestrictedIpsService
 {
     private readonly IRestrictedIpRepo _restrictedIpRepo;
-    private readonly IAccountContextService _accountContextService;
 
     public RestrictedIpsService(
-        IRestrictedIpRepo restrictedIpRepo,
-        IAccountContextService accountContextService)
+        IRestrictedIpRepo restrictedIpRepo)
     {
         _restrictedIpRepo = restrictedIpRepo;
-        _accountContextService = accountContextService;
     }
     
-    public List<RestrictedIp> GetAllRestrictedIps()
+    public List<RestrictedIp> GetAll()
     {
-        return _restrictedIpRepo.GetRestrictedIps();
+        return _restrictedIpRepo.GetAll();
     }
     
-    public RestrictedIp GetRestrictedIp(string ip)
+    public RestrictedIp GetByIp(string ip)
     {
-        return _restrictedIpRepo.GetRestrictedIp(ip) ?? throw new NotFoundException("There is no such a restricted ip");
+        return _restrictedIpRepo.GetByIp(ip) ?? throw new NotFoundException("There is no such a restricted ip");
     }
     
-    public bool AddRestrictedIp(string ip, bool banned, bool cantPost)
+    public void Add(string ip, bool cantGet, bool cantPost)
     {
-        return _restrictedIpRepo.AddRestrictedIp(ip, banned, cantPost);
+        var restrictedIp = new RestrictedIp()
+        {
+            IpAddress = ip,
+            CantGet = cantGet,
+            CantPost = cantPost
+        };
+        _restrictedIpRepo.Insert(restrictedIp);
+        _restrictedIpRepo.Save();
     }
     
-    public bool UpdateRestrictedIps(List<string> ips, bool? banned, bool? cantPost)
+    public void UpdateMany(List<RestrictedIp> ips, bool cantGet, bool cantPost)
     {
-        var changeBans = banned is not null;
-        var changePosts = cantPost is not null;
-        
         foreach (var ip in ips)
         {
-            if (changeBans)
-            {
-                _restrictedIpRepo.RestrictIpBan(ip, banned.Value);
-            }
-            if (changePosts)
-            {
-                _restrictedIpRepo.RestrictIpBan(ip, cantPost.Value);
-            }
+            ip.CantGet = cantGet;
+            ip.CantPost = cantPost;
+            _restrictedIpRepo.Update(ip);
         }
         RemoveUnnecessaryIps();
-        return true;
+        _restrictedIpRepo.Save();
     }
 
     private void RemoveUnnecessaryIps()
     {
-        var unnecessaryIps = _restrictedIpRepo.GetRestrictedIps().Where(r => !r.Banned && !r.CantPost);
+        var unnecessaryIps =
+            (_restrictedIpRepo.GetAll())
+            .Where(r => !r.CantGet && !r.CantPost);
         foreach (var unnecessaryIp in unnecessaryIps)
         {
-            _restrictedIpRepo.DeleteRestrictedIp(unnecessaryIp.IpAddress);
+            _restrictedIpRepo.Drop(unnecessaryIp);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using PicturesAPI.Configuration;
 using PicturesAPI.Entities;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Services.Helpers;
@@ -15,9 +16,9 @@ public class LikeMappingProfile : Profile
                     l => l.Liker.Nickname))
             .ForMember(dto => dto.AccountId,
                 opt => opt.MapFrom(
-                    l => GuidEncoder.Encode(l.Liker.Id)))
+                    l => IdHasher.EncodeAccountId(l.Liker.Id)))
             .ForMember(dto => dto.PictureId,
                 opt => opt.MapFrom(
-                    l => GuidEncoder.Encode(l.Liked.Id)));
+                    l => IdHasher.EncodePictureId(l.Liked.Id)));
     }
 }

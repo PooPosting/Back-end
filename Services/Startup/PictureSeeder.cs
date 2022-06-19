@@ -1,17 +1,14 @@
-﻿using Microsoft.AspNetCore.Identity;
-using PicturesAPI.Entities;
+﻿using PicturesAPI.Entities;
 
-namespace PicturesAPI;
+namespace PicturesAPI.Services.Startup;
 
 public class PictureSeeder
 {
     private readonly PictureDbContext _dbContext;
-    private readonly IPasswordHasher<Account> _passwordHasher;
 
-    public PictureSeeder(PictureDbContext dbContext, IPasswordHasher<Account> passwordHasher)
+    public PictureSeeder(PictureDbContext dbContext)
     {
         _dbContext = dbContext;
-        _passwordHasher = passwordHasher;
     }
 
     public void Seed()
@@ -46,6 +43,7 @@ public class PictureSeeder
         {
             new Account()
             {
+                Id = 1,
                 Nickname = "ShrekTheCreator",
                 Email = "ILoveShrex@isMyPassword.IAmAdmin",
                 PasswordHash = "AQAAAAEAACcQAAAAENlo2UxvxGMwuRoOfyF6ZT5jxmB9zXLrQnLYCQpnfb0R/+NudFjqsTc+YkzDm7G0sQ==",
@@ -57,7 +55,7 @@ public class PictureSeeder
                         Description = "Shrek",
                         Url =
                             "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Focs-pl.oktawave.com%2Fv1%2FAUTH_2887234e-384a-4873-8bc5-405211db13a2%2Fsplay%2F2018%2F11%2Fshrek-reboot-film.jpeg&f=1&nofb=1",
-                        Tags = "shrek green handsomeMan original",
+                        // Tags = "shrek green handsomeMan original",
                         PictureAdded = DateTime.Now,
                     },
                     new Picture()
@@ -66,15 +64,16 @@ public class PictureSeeder
                         Description = "Shrek is stoned",
                         Url =
                             "http://3.bp.blogspot.com/_GoN5EPxM4Y8/S-3O8XQippI/AAAAAAAAAJI/HkXJaFXTr1g/w1200-h630-p-k-no-nu/shrek1ta5.jpg",
-                        Tags = "shrek 420 stoned green handsomeMan",
+                        // Tags = "shrek 420 stoned green handsomeMan",
                         PictureAdded = DateTime.Now,
                     }
                 },
                 AccountCreated = DateTime.Now,
-                RoleId = 3
+                Role = _dbContext.Roles.SingleOrDefault(r => r.Id == 3)
             },
             new Account()
             {
+                Id = 2,
                 Nickname = "ShrekTheManager",
                 Email = "ILoveShrex@isMyPassword.IAmManager",
                 PasswordHash = "AQAAAAEAACcQAAAAENlo2UxvxGMwuRoOfyF6ZT5jxmB9zXLrQnLYCQpnfb0R/+NudFjqsTc+YkzDm7G0sQ==",
@@ -86,15 +85,17 @@ public class PictureSeeder
                         Description = "Shrek is managing things",
                         Url =
                             "https://eskipaper.com/images/shrek-5.jpg",
-                        Tags = "shrek green handsomeMan manager",
+                        // Tags = "shrek green handsomeMan manager",
                         PictureAdded = DateTime.Now,
                     }
                 },
                 AccountCreated = DateTime.Now,
-                RoleId = 2
+                Role = _dbContext.Roles.SingleOrDefault(r => r.Id == 2)
+
             },
             new Account()
             {
+                Id = 3,
                 Nickname = "ShrekTheUser",
                 Email = "ILoveShrex@isMyPassword.IAmUser",
                 PasswordHash = "AQAAAAEAACcQAAAAENlo2UxvxGMwuRoOfyF6ZT5jxmB9zXLrQnLYCQpnfb0R/+NudFjqsTc+YkzDm7G0sQ==",
@@ -106,7 +107,7 @@ public class PictureSeeder
                         Description = "Shrek is on a mountain",
                         Url =
                             "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2F64.media.tumblr.com%2Fd32b6f7c291461fc12dda99c15d5fe1d%2Fd2859800230a5e2e-80%2Fs400x600%2F71db3c4f14aeacfe654cb9ada922648a59efb3d9.jpg&f=1&nofb=1",
-                        Tags = "shrek green mountain climbing",
+                        // Tags = "shrek green mountain climbing",
                         PictureAdded = DateTime.Now,
                     },
                     new Picture()
@@ -114,12 +115,13 @@ public class PictureSeeder
                         Name = "Shrek with glasses",
                         Description = "Shrek wearing glasses",
                         Url = "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fih0.redbubble.net%2Fimage.191779839.7433%2Fflat%2C1000x1000%2C075%2Cf.u1.jpg&f=1&nofb=1",
-                        Tags = "shrek green sun sunglasses glasses sexy",
+                        // Tags = "shrek green sun sunglasses glasses sexy",
                         PictureAdded = DateTime.Now,
                     }
                 },
                 AccountCreated = DateTime.Now,
-                RoleId = 1
+                Role = _dbContext.Roles.SingleOrDefault(r => r.Id == 1)
+
             }
                 
         };

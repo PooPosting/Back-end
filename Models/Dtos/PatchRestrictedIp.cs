@@ -1,8 +1,10 @@
-﻿namespace PicturesAPI.Models.Dtos;
+﻿using PicturesAPI.Entities;
+
+namespace PicturesAPI.Models.Dtos;
 
 public class PatchRestrictedIp
 {
-    public List<string> Ips { get; set; }
-    public bool? Banned { get; set; }
-    public bool? CantPost { get; set; }
+    public List<RestrictedIp> Ips { get; set; }
+    public bool CantGet { get; set; }
+    public bool CantPost { get; set; }
 }

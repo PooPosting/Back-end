@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using PicturesAPI.Configuration;
 using PicturesAPI.Entities;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Services.Helpers;
@@ -11,34 +12,26 @@ public class PictureMappingProfile : Profile
     {
         CreateMap<Picture, PictureDto>()
             .ForMember(
-                pto => pto.Tags,
-                opt => opt.MapFrom(
-                    p => SerializeTags(p.Tags)))
-            .ForMember(
                 dto => dto.AccountNickname,
                 opt => opt.MapFrom(
                     p => p.Account.IsDeleted ? "Unknown" : p.Account.Nickname))
             .ForMember(dto => dto.Id,
                 opt => opt.MapFrom(
-                    p => GuidEncoder.Encode(p.Id)))
+                    p => IdHasher.EncodePictureId(p.Id)))
             .ForMember(
                 dto => dto.AccountId,
                 opt => opt.MapFrom(
-                    p => p.Account.IsDeleted ? Guid.Empty.ToString() : GuidEncoder.Encode(p.Account.Id)));
+                    p => p.Account.IsDeleted ? "0" : IdHasher.EncodeAccountId(p.Account.Id)));
 
         CreateMap<PictureDto, Picture>()
             .ForMember(p => p.Id,
                 opt => opt.MapFrom(
-                    pto => GuidEncoder.Decode(pto.Id)))
+                    pto => IdHasher.DecodePictureId(pto.Id)))
             .ForMember(p => p.AccountId,
                 opt => opt.MapFrom(
-                    dto => GuidEncoder.Decode(dto.Id)));
+                    dto => IdHasher.DecodeAccountId(dto.AccountId)));
 
-        CreateMap<CreatePictureDto, Picture>()
-            .ForMember(
-                pic => pic.Tags,
-                opt => opt
-                    .MapFrom(c => string.Join(" ", c.Tags).ToLower()));
+        CreateMap<CreatePictureDto, Picture>();
     }
 
     private static List<string> SerializeTags(string tags)

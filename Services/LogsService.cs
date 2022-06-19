@@ -16,9 +16,10 @@ public class LogsService: ILogsService
     {
         _accountContextService = accountContextService;
     }
+
     public List<LogDirDto> GetLogsTree()
     {
-        var rootDir = DirectoryGenerator.GetLogsDir();
+        var rootDir = DirectoryGenerator.GetLogsDirectory();
         var dirs = Directory.GetDirectories(rootDir);
         var logDirs = new List<LogDirDto>();
         
@@ -40,10 +41,9 @@ public class LogsService: ILogsService
 
         return logDirs;
     }
-
     public string GetLog(string folder, string file)
     {
-        var logsDir = DirectoryGenerator.GetLogsDir();
+        var logsDir = DirectoryGenerator.GetLogsDirectory();
         string log;
         try
         {

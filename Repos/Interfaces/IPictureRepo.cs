@@ -5,10 +5,11 @@ namespace PicturesAPI.Repos.Interfaces;
 
 public interface IPictureRepo
 {
-    Task<Picture> GetById(Guid id);
-    Task<IEnumerable<Picture>> GetAll();
-    IEnumerable<Picture> GetByOwner(Account account);
-    Task<Guid> Insert(Picture picture);
-    Task Update(Picture picture);
-    Task Save();
+    Picture GetById(int id);
+    List<Picture> GetAll();
+    List<Picture> GetByOwner(Account account);
+    int Insert(Picture picture);
+    void Update(Picture picture);
+    void DeleteById(int id);
+    bool Save();
 }

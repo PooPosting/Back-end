@@ -24,27 +24,27 @@ public class PopularService: IPopularService
         _mapper = mapper;
     }
 
-    public PopularContentDto GetPopularContent()
+    public PopularContentDto Get()
     {
-        var mostVotedPics = _pictureRepo
-            .GetPictures()
+        var mostVotedPics =
+            (_pictureRepo.GetAll())
             .OrderByDescending(p => p.Likes.Count)
             .Take(5);
-        var mostLikedPics = _pictureRepo
-            .GetPictures()
+        var mostLikedPics =
+            (_pictureRepo.GetAll())
             .OrderByDescending(p => p.Likes.Count(l => l.IsLike))
             .Take(5);
-        var mostCommentedPics = _pictureRepo
-            .GetPictures()
+        var mostCommentedPics =
+            (_pictureRepo.GetAll())
             .OrderByDescending(p => p.Comments.Count)
             .Take(5);
 
-        var mostPostsAccs = _accountRepo
-            .GetAccounts(DbInclude.Include)
+        var mostPostsAccs =
+            (_accountRepo.GetAll())
             .OrderByDescending(a => a.Pictures.Count)
             .Take(5);
-        var mostLikedAccs = _accountRepo
-            .GetAccounts(DbInclude.Include)
+        var mostLikedAccs =
+            (_accountRepo.GetAll())
             .OrderByDescending(CountPicLikes)
             .Take(5);
 

@@ -14,19 +14,20 @@ public class AccountRepo : IAccountRepo
         _dbContext = dbContext;
     }
 
-    public async Task<IEnumerable<Account>> GetAll()
+    public List<Account> GetAll()
     {
-        return await _dbContext.Accounts
+        return _dbContext.Accounts
             .Include(p => p.Pictures)
             .ThenInclude(p => p.Likes)
             .Include(p => p.Likes)
+            .Include(a => a.Role)
             .AsSplitQuery()
-            .ToListAsync();
+            .ToList();
     }
 
-    public async Task<Account> GetById(Guid id)
+    public Account GetById(int id)
     {
-        return (await _dbContext.Accounts
+        return _dbContext.Accounts
             .Include(a => a.Pictures)
             .ThenInclude(p => p.Likes)
             .ThenInclude(p => p.Liker)
@@ -34,30 +35,46 @@ public class AccountRepo : IAccountRepo
             .ThenInclude(p => p.Comments)
             .ThenInclude(c => c.Author)
             .Include(a => a.Likes)
+            .Include(a => a.Role)
             .AsSplitQuery()
-            .SingleOrDefaultAsync(a => a.Id == id))!;
+            .SingleOrDefault(a => a.Id == id)!;
     }
 
-    public async Task<Guid> Insert(Account newAccount)
+    public Account GetByNick(string nickname)
     {
-        await _dbContext.Accounts.AddAsync(newAccount);
+        return _dbContext.Accounts
+            .Include(a => a.Pictures)
+            .ThenInclude(p => p.Likes)
+            .ThenInclude(p => p.Liker)
+            .Include(a => a.Pictures)
+            .ThenInclude(p => p.Comments)
+            .ThenInclude(c => c.Author)
+            .Include(a => a.Likes)
+            .Include(a => a.Role)
+            .AsSplitQuery()
+            .SingleOrDefault(a => a.Nickname == nickname)!;
+    }
+
+    public int Insert(Account newAccount)
+    {
+        _dbContext.Accounts.Add(newAccount);
         return newAccount.Id;
     }
 
-    public async Task Update(Account account)
+    public void Update(Account account)
     {
         _dbContext.Accounts.Update(account);
     }
 
-    public async Task Delete(Guid id)
+    public void DeleteById(int id)
     {
-        var accountToRemove = await _dbContext.Accounts.SingleOrDefaultAsync(a => a.Id == id);
+        var accountToRemove = _dbContext.Accounts.SingleOrDefault(a => a.Id == id);
         accountToRemove!.IsDeleted = true;
     }
 
-    public async Task Save()
+    public bool Save()
     {
-        await _dbContext.SaveChangesAsync();
+        return _dbContext.SaveChanges() > 0;
     }
 
     // public async Task AddLikedTags(Account acc, Picture picture)

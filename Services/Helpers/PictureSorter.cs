@@ -6,7 +6,7 @@ using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Services.Helpers;
 
-public static class SortPictures
+public static class PictureSorter
 {
     public static List<Picture> SortPics(List<Picture> pictures, PictureQuery query)
     {
@@ -23,16 +23,16 @@ public static class SortPictures
         var time = (date - DateTime.Now).TotalMinutes;
         var likePoints = 0.0;
 
-        picture.Likes.ForEach(l =>
+        picture.Likes.ToList().ForEach(l =>
         {
             if (l.IsLike) likePoints += 1;
             else likePoints += 0.5;
         });
         
 
-        var intersectedTags = picture.Tags
-            .Split(' ')
-            .Intersect(query.LikedTags.Split(' '));
+        // var intersectedTags = picture.Tags
+        //     .Split(' ')
+        //     .Intersect(query.LikedTags.Split(' '));
 
         if ((DateTime.Now - picture.PictureAdded).TotalMinutes < 180)
         {
@@ -46,8 +46,9 @@ public static class SortPictures
         {
             result += Math.Log(likePoints + 10) * 10;
         }
-        
-        return intersectedTags.Aggregate(result, (current, tag) => current * 1.15);
+
+        return result;
+        // return intersectedTags.Aggregate(result, (current, tag) => current * 1.15);
     }
     
     private static double CalcPicPointModifier(double x)

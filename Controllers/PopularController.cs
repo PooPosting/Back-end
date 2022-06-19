@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PicturesAPI.ActionFilters;
 using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Controllers;
@@ -19,6 +18,6 @@ public class PopularController : ControllerBase
     [HttpGet]
     public IActionResult GetPopularContent()
     {
-        return Ok(_popularService.GetPopularContent());
+        return Ok(_popularService.Get());
     }
 }

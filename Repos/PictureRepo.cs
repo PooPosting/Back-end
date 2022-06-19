@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PicturesAPI.Entities;
-using PicturesAPI.Models.Dtos;
 using PicturesAPI.Repos.Interfaces;
 
 namespace PicturesAPI.Repos;
@@ -14,9 +13,9 @@ public class PictureRepo : IPictureRepo
         _dbContext = dbContext;
     }
 
-    public async Task<Picture> GetById(Guid id)
+    public Picture GetById(int id)
     {
-        return await _dbContext.Pictures
+        return _dbContext.Pictures
             .Where(p => !p.IsDeleted)
             .Include(p => p.Likes)
             .ThenInclude(l => l.Liker)
@@ -24,12 +23,12 @@ public class PictureRepo : IPictureRepo
             .ThenInclude(c => c.Author)
             .Include(p => p.Account)
             .AsSplitQuery()
-            .SingleOrDefaultAsync(p => p.Id == id);
+            .SingleOrDefault(p => p.Id == id);
     }
 
-    public async Task<IEnumerable<Picture>> GetAll()
+    public List<Picture> GetAll()
     {
-        return await _dbContext.Pictures
+        return _dbContext.Pictures
             .Where(p => !p.IsDeleted)
             .Include(p => p.Likes)
             .ThenInclude(l => l.Liker)
@@ -37,12 +36,12 @@ public class PictureRepo : IPictureRepo
             .ThenInclude(c => c.Author)
             .Include(p => p.Account)
             .AsSplitQuery()
-            .ToListAsync();
+            .ToList();
     }
 
-    public IEnumerable<Picture> GetByOwner(Account account)
+    public List<Picture> GetByOwner(Account account)
     {
-        var pictures = _dbContext.Pictures
+        return _dbContext.Pictures
             .Where(p => !p.IsDeleted)
             .Include(p => p.Likes)
             .ThenInclude(l => l.Liker)
@@ -50,23 +49,29 @@ public class PictureRepo : IPictureRepo
             .ThenInclude(c => c.Author)
             .Include(p => p.Account)
             .AsSplitQuery()
-            .Where(p => p.Account == account);
-        return pictures;
+            .Where(p => p.Account == account)
+            .ToList();
     }
 
-    public async Task<Guid> Insert(Picture picture)
+    public int Insert(Picture picture)
     {
-        await _dbContext.Pictures.AddAsync(picture);
+        _dbContext.Pictures.Add(picture);
         return picture.Id;
     }
 
-    public async Task Update(Picture picture)
+    public void Update(Picture picture)
     {
         _dbContext.Pictures.Update(picture);
     }
-    
-    public async Task Save()
+
+    public void DeleteById(int id)
     {
-        await _dbContext.SaveChangesAsync();
+        var pic = _dbContext.Pictures.SingleOrDefault(p => p.Id == id);
+        pic.IsDeleted = true;
+    }
+    
+    public bool Save()
+    {
+        return _dbContext.SaveChanges() > 0;
     }
 }

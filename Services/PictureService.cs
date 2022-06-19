@@ -42,13 +42,11 @@ public class PictureService : IPictureService
         _likeRepo = likeRepo;
     }
     
-    public PagedResult<PictureDto> GetAll(PictureQuery query)
+    public  PagedResult<PictureDto> GetAll(PictureQuery query)
     {
-        var baseQuery = _pictureRepo
-            .GetPictures()
-            .ToList();
+        var baseQuery = _pictureRepo.GetAll();
 
-        var sortedQuery = SortPictures
+        var sortedQuery = PictureSorter
             .SortPics(baseQuery, query)
             .Skip(query.PageSize * (query.PageNumber - 1))
             .Take(query.PageSize);
@@ -62,16 +60,17 @@ public class PictureService : IPictureService
         return result;
     }
 
-    public PagedResult<PictureDto> SearchAll(SearchQuery query)
+    // refactor this whole method
+    public  PagedResult<PictureDto> SearchAll(SearchQuery query)
     {
-        var baseQuery = _pictureRepo.GetPictures().ToList();
+        var baseQuery = _pictureRepo.GetAll();
 
         List<Picture> sortedQuery;
 
         switch (query.SearchBy)
         {
             case SortSearchBy.MostPopular:
-                sortedQuery = SortPictures.SortPics(baseQuery, query).ToList();
+                sortedQuery = PictureSorter.SortPics(baseQuery, query).ToList();
                 break;
             case SortSearchBy.Newest:
                 sortedQuery = baseQuery
@@ -89,9 +88,9 @@ public class PictureService : IPictureService
 
         var pictures = sortedQuery
             .Where(p => query.SearchPhrase == null ||
-                        p.Name.ToLower().Contains(query.SearchPhrase.ToLower()) ||
-                        p.Tags.ToLower().Contains(query.SearchPhrase.ToLower()))
-            .Select(picture => _pictureRepo.GetPictureById(picture.Id))
+                        p.Name.ToLower().Contains(query.SearchPhrase.ToLower()))
+                        // p.Tags.ToLower().Contains(query.SearchPhrase.ToLower()))
+            .Select( picture => _pictureRepo.GetById(picture.Id))
             .ToList();
 
         if (pictures.Count == 0) throw new NotFoundException("pictures not found");
@@ -107,58 +106,57 @@ public class PictureService : IPictureService
         return result;
     }
 
-    public List<LikeDto> GetPicLikes(Guid id)
+    public  List<LikeDto> GetPicLikes(int id)
     {
-        if (_pictureRepo.Exists(id)) throw new NotFoundException("picture not found");
-        var likes = _likeRepo.GetLikesByLiked(id);
+        if (_pictureRepo.GetById(id) is null) throw new NotFoundException("picture not found");
+        var likes = _likeRepo.GetByLikedId(id);
         var likeDtos = _mapper.Map<List<LikeDto>>(likes);
 
         return likeDtos;
     }
     
-    public List<AccountDto> GetPicLikers(Guid id)
+    public  List<AccountDto> GetPicLikers(int id)
     {
-        if (_pictureRepo.Exists(id)) throw new NotFoundException("picture not found");
-        var likes = _likeRepo.GetLikesByLiked(id);
+        if (_pictureRepo.GetById(id) is null) throw new NotFoundException("picture not found");
+        var likes = _likeRepo.GetByLikedId(id);
         var accounts = likes.Select(like => like.Liker).ToList();
         var result = _mapper.Map<List<AccountDto>>(accounts);
         return result;
     }
     
-    public PictureDto GetById(Guid id)
+    public PictureDto GetById(int id)
     {
-        var picture = _pictureRepo.GetPictureById(id);
+        var picture = _pictureRepo.GetById(id);
         if (picture == null) throw new NotFoundException("picture not found");
         var result = _mapper.Map<PictureDto>(picture);
         return result;
     }
     
-    public Guid Create(IFormFile file, CreatePictureDto dto)
+    public int Create(IFormFile file, CreatePictureDto dto)
     {
-        var id = _accountContextService.GetAccountId!;
-        var account = _accountRepo.GetAccountById(Guid.Parse(id), DbInclude.Raw);
-        if (account is null || account.IsDeleted) throw new InvalidAuthTokenException();
-        
-        dto.Tags = dto.Tags.Distinct().ToList();
+        var id = _accountContextService.GetAccountId();
+        var account = _accountRepo.GetById(id);
+
+        // dto.Tags = dto.Tags.Distinct().ToList();
         var picture = _mapper.Map<Picture>(dto);
         picture.Account = account;
 
         if (file is not { Length: > 0 }) throw new BadRequestException("invalid picture");
         
         var rootPath = Directory.GetCurrentDirectory();
-        var fileGuid = Guid.NewGuid();
-        var fullPath = $"{rootPath}/wwwroot/pictures/{fileGuid}.webp";
-        picture.Id = fileGuid;
-        picture.Url = $"wwwroot/pictures/{fileGuid}.webp";
+
+        var randomName = $"{Path.GetRandomFileName().Replace('.', '-')}.webp";
+        var fullPath = Path.Combine(rootPath, "wwwroot", "pictures", $"{randomName}");
+        picture.Url = Path.Combine("wwwroot", "pictures", $"{randomName}");
         
         using (var stream = new FileStream(fullPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
         {
             file.CopyTo(stream);
             stream.Dispose();
         }
-
-        var result = _pictureRepo.CreatePicture(picture);
-        return result;
+        _pictureRepo.Insert(picture);
+        _pictureRepo.Save();
+        return picture.Id;
 
     }
 
@@ -168,44 +166,47 @@ public class PictureService : IPictureService
         using var ms = new MemoryStream();
         file.CopyTo(ms);
         var fileBytes = ms.ToArray();
-        return NsfwClassifier.Classify(fileBytes);
+        return NsfwClassifier.ClassifyAsync(fileBytes).Result;
     }
 
-    public PictureDto Put(Guid id, PutPictureDto dto)
+    public PictureDto Update(int id, PutPictureDto dto)
     {
-        var picture = _pictureRepo.GetPictureById(id);
+        var picture = _pictureRepo.GetById(id);
         if (picture is null) throw new NotFoundException("picture not found");
         
         AuthorizePictureOperation(picture, ResourceOperation.Update,"you cant modify picture you didnt added");
-        
-        _pictureRepo.UpdatePicture(picture, dto);
+
+        if (dto.Description is not null)
+        {
+            picture.Description = dto.Description;
+        }
+        if (dto.Name is not null)
+        {
+            picture.Name = dto.Name;
+        }
+        // if (dto.Tags is not null)
+        // {
+        //     picture.Tags = dto.Tags.ToString();
+        // }
+        _pictureRepo.Update(picture);
+        _pictureRepo.Save();
         var result = _mapper.Map<PictureDto>(picture);
         return result;
     }
         
-    public bool Delete(Guid id)
+    public void Delete(int id)
     {
-        var picture = _pictureRepo.GetPictureById(id);
+        var picture = _pictureRepo.GetById(id);
         if (picture is null) throw new NotFoundException("picture not found");
         _logger.LogWarning($"Picture with id: {id} DELETE action invoked");
 
-        AuthorizePictureOperation(picture,ResourceOperation.Delete ,"you have no rights to delete this picture");
+        AuthorizePictureOperation(picture, ResourceOperation.Delete ,"you have no rights to delete this picture");
 
-        var pictureDeleteResult = _pictureRepo.DeletePicture(picture);
-
-        if (pictureDeleteResult)
-        {
-            var rootPath = Directory.GetCurrentDirectory();
-            var fullPath = $"{rootPath}/wwwroot/pictures/{picture.Id}.webp";
-            if(File.Exists(fullPath))
-            {
-                File.Delete(fullPath);
-            }
-        }
-        
+        _pictureRepo.DeleteById(picture.Id);
+        var fullPath = Path.Combine(Directory.GetCurrentDirectory(), picture.Url);
+        File.Delete(fullPath);
+        _pictureRepo.Save();
         _logger.LogWarning($"Picture with id: {id} DELETE action success");
-
-        return pictureDeleteResult;
     }
     
     private void AuthorizePictureOperation(Picture picture, ResourceOperation operation, string message)

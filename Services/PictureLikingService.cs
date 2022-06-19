@@ -31,82 +31,85 @@ public class PictureLikingService : IPictureLikingService
         _accountContextService = accountContextService;
     }
     
-    public PictureDto Like(Guid id)
+    public PictureDto Like(int id)
     {
-        var picture = _pictureRepo.GetPictureById(id);
-        var accountId = _accountContextService.GetAccountId;
+        var picture = _pictureRepo.GetById(id);
+        var accountId = _accountContextService.GetAccountId();
 
         if (picture is null) throw new NotFoundException("picture not found");
-        if (accountId is null) throw new ForbidException("please log in");
-        if (!_accountRepo.Exists(Guid.Parse(accountId))) throw new InvalidAuthTokenException();
+
+        // set up like/dislike logic (database liked tags insertion/drop)
+        var account = _accountRepo.GetById(accountId);
+        var like = _likeRepo.GetByLikerIdAndLikedId(account.Id, picture.Id);
         
-        var account = _accountRepo.GetAccountById(Guid.Parse(accountId), DbInclude.Raw);
-        var like = _likeRepo.GetLikeByLikerAndLiked(account, picture);
-        
-        // If we call like
         if (like is not null)
         {
-            // like exists
+            // like exists and (IsLike == true)
             if (like.IsLike)
             {
-                // is like
-                _accountRepo.RemoveLikedTags(account, picture);
-                _likeRepo.RemoveLike(like);
-                return _mapper.Map<PictureDto>(picture);
+                _likeRepo.DeleteById(like.Id);
             }
-            // is dislike
-            _accountRepo.AddLikedTags(account, picture);
-            _likeRepo.ChangeLike(like);
-            return _mapper.Map<PictureDto>(picture);
+            // like exists and (IsLike == false)
+            else
+            {
+                like.IsLike = !like.IsLike;
+                _likeRepo.Update(like);
+            }
         }
         // like does not exist
-        _accountRepo.AddLikedTags(account, picture);
-        _likeRepo.AddLike(
-            new Like()
-            {
-                Liked = picture,
-                Liker = account,
-                IsLike = true
-            });
-        return _mapper.Map<PictureDto>(picture);
+        else
+        {
+            _likeRepo.Insert(
+                new Like()
+                {
+                    Liked = picture,
+                    Liker = account,
+                    IsLike = true
+                });
+        }
 
+        _likeRepo.Save();
+        return _mapper.Map<PictureDto>(picture);
     }
 
-    public PictureDto DisLike(Guid id)
+    public PictureDto DisLike(int id)
     {
-        var picture = _pictureRepo.GetPictureById(id);
-        var accountId = _accountContextService.GetAccountId;
-
+        var picture = _pictureRepo.GetById(id);
+        var accountId = _accountContextService.GetAccountId();
         if (picture is null) throw new NotFoundException("picture not found");
-        if (accountId is null) throw new ForbidException("please log in");
-        if (!_accountRepo.Exists(Guid.Parse(accountId))) throw new InvalidAuthTokenException();
-        
-        var account = _accountRepo.GetAccountById(Guid.Parse(accountId), DbInclude.Raw);
-        var like = _likeRepo.GetLikeByLikerAndLiked(account, picture);
-        
-        
-        // If we call dislike
+
+        // set up like/dislike logic (database liked tags insertion/drop)
+        var account = _accountRepo.GetById(accountId);
+        var like = _likeRepo.GetByLikerIdAndLikedId(account.Id, picture.Id);
+
         if (like is not null)
         {
-            // dislike exists
+            // like exists and (IsLike == false)
             if (like.IsLike == false)
             {
-                // is dislike
-                _likeRepo.RemoveLike(like);
-                return _mapper.Map<PictureDto>(picture);
+                _likeRepo.DeleteById(like.Id);
             }
-            // is like
-            _likeRepo.ChangeLike(like);
-            return _mapper.Map<PictureDto>(picture);
-        } 
-        // dislike does not exist
-        _likeRepo.AddLike(
-            new Like()
+            // like exists and (IsLike == true)
+            else
             {
-                Liked = picture,
-                Liker = account,
-                IsLike = false
-            });
+                like.IsLike = !like.IsLike;
+                _likeRepo.Update(like);
+            }
+
+        }
+        // does not exist
+        else
+        {
+            _likeRepo.Insert(
+                new Like()
+                {
+                    Liked = picture,
+                    Liker = account,
+                    IsLike = false
+                });
+        }
+
+        _likeRepo.Save();
         return _mapper.Map<PictureDto>(picture);
     }
 

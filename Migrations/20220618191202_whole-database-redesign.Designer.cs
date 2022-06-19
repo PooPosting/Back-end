@@ -11,8 +11,8 @@ using PicturesAPI.Entities;
 namespace PicturesAPI.Migrations
 {
     [DbContext(typeof(PictureDbContext))]
-    [Migration("20220315155833_Comment-added")]
-    partial class Commentadded
+    [Migration("20220618191202_whole-database-redesign")]
+    partial class wholedatabaseredesign
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,9 +23,9 @@ namespace PicturesAPI.Migrations
 
             modelBuilder.Entity("PicturesAPI.Entities.Account", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("AccountCreated")
                         .HasColumnType("datetime");
@@ -52,29 +52,33 @@ namespace PicturesAPI.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("varchar(500)");
 
-                    b.Property<int>("RoleId")
-                        .HasMaxLength(2)
+                    b.Property<int?>("RoleId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
 
                     b.ToTable("Accounts");
                 });
 
             modelBuilder.Entity("PicturesAPI.Entities.Comment", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("int");
 
-                    b.Property<Guid?>("AuthorId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("AuthorId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CommentAdded")
                         .HasColumnType("datetime");
 
-                    b.Property<Guid?>("PictureId")
-                        .HasColumnType("char(36)");
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("PictureId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -99,11 +103,11 @@ namespace PicturesAPI.Migrations
                     b.Property<bool>("IsLike")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<Guid?>("LikedId")
-                        .HasColumnType("char(36)");
+                    b.Property<int?>("LikedId")
+                        .HasColumnType("int");
 
-                    b.Property<Guid?>("LikerId")
-                        .HasColumnType("char(36)");
+                    b.Property<int?>("LikerId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -116,16 +120,19 @@ namespace PicturesAPI.Migrations
 
             modelBuilder.Entity("PicturesAPI.Entities.Picture", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("AccountId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("AccountId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("varchar(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -152,6 +159,26 @@ namespace PicturesAPI.Migrations
                     b.ToTable("Pictures");
                 });
 
+            modelBuilder.Entity("PicturesAPI.Entities.RestrictedIp", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<bool>("CantGet")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("CantPost")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("IpAddress")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RestrictedIps");
+                });
+
             modelBuilder.Entity("PicturesAPI.Entities.Role", b =>
                 {
                     b.Property<int>("Id")
@@ -167,15 +194,28 @@ namespace PicturesAPI.Migrations
                     b.ToTable("Roles");
                 });
 
+            modelBuilder.Entity("PicturesAPI.Entities.Account", b =>
+                {
+                    b.HasOne("PicturesAPI.Entities.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId");
+
+                    b.Navigation("Role");
+                });
+
             modelBuilder.Entity("PicturesAPI.Entities.Comment", b =>
                 {
                     b.HasOne("PicturesAPI.Entities.Account", "Author")
                         .WithMany("Comments")
-                        .HasForeignKey("AuthorId");
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("PicturesAPI.Entities.Picture", "Picture")
                         .WithMany("Comments")
-                        .HasForeignKey("PictureId");
+                        .HasForeignKey("PictureId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Author");
 

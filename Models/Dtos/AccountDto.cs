@@ -6,6 +6,10 @@ public class AccountDto
     public string Nickname { get; set; }
     public string Email { get; set; }
 
+    public string ProfilePicUrl { get; set; }
+
+    public string BackgroundPicUrl { get; set; }
+
     public ICollection<PictureDto> Pictures { get; set; }
     public ICollection<CommentDto> Comments { get; set; }
     

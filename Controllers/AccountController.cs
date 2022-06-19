@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using PicturesAPI.ActionFilters;
+using PicturesAPI.Configuration;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Services.Helpers;
@@ -28,17 +29,17 @@ public class AccountController : ControllerBase
     [Route("{id}")]
     public IActionResult GetAccountById([FromRoute] string id)
     {
-        var account = _accountService.GetById(GuidEncoder.Decode(id));
+        var account = _accountService.GetById(IdHasher.DecodeAccountId(id));
         return Ok(account);
     }
     
-    [HttpGet]
-    [Route("likedTags")]
-    public IActionResult GetTags ()
-    {
-        var tags = _accountService.GetLikedTags();
-        return Ok(tags);
-    }
+    // [HttpGet]
+    // [Route("likedTags")]
+    // public IActionResult GetTags()
+    // {
+    //     var tags = _accountService.GetLikedTags();
+    //     return Ok(tags);
+    // }
     
     [HttpGet]
     [AllowAnonymous]
@@ -62,7 +63,7 @@ public class AccountController : ControllerBase
     [Route("{id}/likes")]
     public IActionResult GetPictureLikes([FromRoute] string id)
     {
-        var likes = _accountService.GetAccLikes(GuidEncoder.Decode(id));
+        var likes = _accountService.GetAccLikes(IdHasher.DecodeAccountId(id));
         return Ok(likes);
     }
 
@@ -70,7 +71,7 @@ public class AccountController : ControllerBase
     [Route("{id}/all-pictures")]
     public IActionResult DeleteAccount([FromRoute] string id)
     {
-        var result = _accountService.DeleteAccountPictures(GuidEncoder.Decode(id));
+        var result = _accountService.DeleteAccPics(IdHasher.DecodeAccountId(id));
         return Ok(result);
     }
     
@@ -78,12 +79,12 @@ public class AccountController : ControllerBase
     [Route("{id}")]
     public IActionResult DeleteAccountPictures([FromRoute] string id)
     {
-        var result = _accountService.Delete(GuidEncoder.Decode(id));
+        var result = _accountService.Delete(IdHasher.DecodeAccountId(id));
         return Ok(result);
     }
 
     [HttpPost]
-    [ServiceFilter(typeof(IsIpBannedFilter))]
+    [ServiceFilter(typeof(CanPostFilter))]
     [AllowAnonymous]
     [Route("register")]
     public IActionResult PostAccount([FromBody] CreateAccountDto dto)
@@ -93,7 +94,7 @@ public class AccountController : ControllerBase
     }
         
     [HttpPost]
-    [ServiceFilter(typeof(IsIpBannedFilter))]
+    [ServiceFilter(typeof(CanPostFilter))]
     [AllowAnonymous]
     [Route("login")]
     public IActionResult Login([FromBody] LoginDto dto)
@@ -103,7 +104,7 @@ public class AccountController : ControllerBase
     }
     
     [HttpPost]
-    [ServiceFilter(typeof(IsIpBannedFilter))]
+    [ServiceFilter(typeof(CanPostFilter))]
     [AllowAnonymous]
     [Route("verifyJwt")]
     public IActionResult VerifyJwt([FromBody] LsLoginDto dto)

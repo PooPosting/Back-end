@@ -11,6 +11,7 @@
         <PackageReference Include="FluentValidation.AspNetCore" Version="10.3.6" />
         <PackageReference Include="Google.Apis.Vision.v1" Version="1.57.0.2634" />
         <PackageReference Include="Google.Cloud.Vision.V1" Version="2.5.0" />
+        <PackageReference Include="Hashids.net" Version="1.6.1" />
         <PackageReference Include="MailKit" Version="3.2.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.1" />
         <PackageReference Include="Microsoft.AspNetCore.HttpOverrides" Version="2.2.0" />

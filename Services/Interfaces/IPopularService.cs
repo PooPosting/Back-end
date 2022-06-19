@@ -4,5 +4,5 @@ namespace PicturesAPI.Services.Interfaces;
 
 public interface IPopularService
 {
-    PopularContentDto GetPopularContent();
+    PopularContentDto Get();
 }

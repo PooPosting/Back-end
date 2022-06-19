@@ -18,7 +18,7 @@ public class AccountService : IAccountService
     private readonly IMapper _mapper;
     private readonly ILogger<AccountService> _logger;
     private readonly IAccountContextService _accountContextService;
-    private readonly IAccountRepo _accRepo;
+    private readonly IAccountRepo _accountRepo;
     private readonly IPictureRepo _pictureRepo;
     private readonly ILikeRepo _likeRepo;
     private readonly IAuthorizationService _authorizationService;
@@ -37,16 +37,16 @@ public class AccountService : IAccountService
         _mapper = mapper;
         _logger = logger;
         _accountContextService = accountContextService;
-        _accRepo = accountRepo;
+        _accountRepo = accountRepo;
         _pictureRepo = pictureRepo;
         _likeRepo = likeRepo;
         _authorizationService = authorizationService;
         _passwordHasher = passwordHasher;
     }
         
-    public AccountDto GetById(Guid id)
+    public AccountDto GetById(int id)
     {
-        var account = _accRepo.GetById(id).Result;
+        var account = _accountRepo.GetById(id);
         if (account is null || account.IsDeleted) throw new NotFoundException("account not found");
         var result = _mapper.Map<AccountDto>(account);
         return result;
@@ -56,11 +56,11 @@ public class AccountService : IAccountService
     {
         #region Update this
 
-        var baseQuery = _accRepo.GetAll().Result
+        var baseQuery = _accountRepo.GetAll()
             .Where(a => query.SearchPhrase == null || a.Nickname.ToLower().Contains(query.SearchPhrase.ToLower()))
             .Where(a => !a.IsDeleted)
-            .OrderByDescending(a => _pictureRepo.GetPicturesByOwner(a).Count())
-            .ThenByDescending(a => _pictureRepo.GetPicturesByOwner(a).Sum(picture => picture.Likes.Count))
+            .OrderByDescending(a => _pictureRepo.GetByOwner(a).Count())
+            .ThenByDescending(a => _pictureRepo.GetByOwner(a).Sum(picture => picture.Likes.Count))
             .ToList();
 
         var accounts = baseQuery
@@ -69,7 +69,7 @@ public class AccountService : IAccountService
             .ToList();
 
         #endregion
-        
+
         if (accounts.Count == 0) throw new NotFoundException("accounts not found");
         
         var resultCount = baseQuery.Count;
@@ -79,25 +79,25 @@ public class AccountService : IAccountService
         return result;
     }
 
-    public List<LikeDto> GetAccLikes(Guid id)
+    public List<LikeDto> GetAccLikes(int id)
     {
-        if (_accRepo.GetById(id) is null) throw new NotFoundException("account not found");
+        if (_accountRepo.GetById(id) is null) throw new NotFoundException("account not found");
         
-        var likes = _likeRepo.GetLikesByLiker(id);
+        var likes = _likeRepo.GetByLikerId(id);
         var likeDtos = _mapper.Map<List<LikeDto>>(likes);
         return likeDtos;
     }
 
-    public string GetLikedTags()
-    {
-        var id = _accountContextService.GetAccountId!;
-        return _accRepo.GetById(id).Result.LikedTags;
-    }
+    // public string GetLikedTags()
+    // {
+    //     var id = _accountContextService.GetAccountId();
+    //     return _accountRepo.GetById(id).LikedTags;
+    // }
     
     public bool Update(PutAccountDto dto)
     {
-        var id = _accountContextService.GetAccountId;
-        var account = _accRepo.GetById(id).Result;
+        var id = _accountContextService.GetAccountId();
+        var account = _accountRepo.GetById(id);
 
         if (dto.Email is not null)
             account.Email = dto.Email;
@@ -110,35 +110,37 @@ public class AccountService : IAccountService
             account.PasswordHash = _passwordHasher.HashPassword(account, dto.Password);
         }
 
-        _accRepo.Save();
+        _accountRepo.Save();
         return true;
     }
 
-    public bool Delete(Guid id)
+    public bool Delete(int id)
     {
-        var account = _accRepo.GetById(id).Result;
+        var account = _accountRepo.GetById(id);
         if (account is null || account.IsDeleted) throw new NotFoundException("account not found");
         _logger.LogWarning($"Account with Nickname: {account.Nickname} DELETE action invoked");
         AuthorizeAccountOperation(account, ResourceOperation.Delete ,"You have no rights to delete this account");
         
-        _accRepo.Delete(id);
+        _accountRepo.DeleteById(id);
 
         _logger.LogWarning($"Account with Nickname: {account.Nickname}, Id: {account.Id} DELETE (HIDE) action succeed");
 
         return true;
     }
 
-    public bool DeleteAccountPictures(Guid id)
+    public bool DeleteAccPics(int id)
     {
-        var account = _accRepo.GetById(id).Result;
+        var account = _accountRepo.GetById(id);
         if (account is null || account.IsDeleted) throw new NotFoundException("account not found");
 
         _logger.LogWarning($"Account with Nickname: {account.Nickname} DELETE ALL PICTURES action invoked");
         AuthorizeAccountOperation(account, ResourceOperation.Delete ,"You have no rights to delete this account's pictures");
+
         foreach (var pic in account.Pictures)
         {
-            _pictureRepo.DeletePicture(pic);
+            _pictureRepo.DeleteById(pic.Id);
         }
+
         _logger.LogWarning($"Account with Nickname: {account.Nickname}, Id: {account.Id} DELETE (HIDE) ALL PICTURES action succeed");
         
         return true;

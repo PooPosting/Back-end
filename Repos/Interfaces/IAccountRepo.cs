@@ -6,11 +6,12 @@ namespace PicturesAPI.Repos.Interfaces;
 
 public interface IAccountRepo
 {
-    Task<IEnumerable<Account>> GetAll();
-    Task<Account> GetById(Guid id);
-    Task<Guid> Insert(Account account);
-    Task Update(Account account);
-    Task Delete(Guid id);
-    Task Save();
+    List<Account> GetAll();
+    Account GetById(int id);
+    Account GetByNick(string nickname);
+    int Insert(Account account);
+    void Update(Account account);
+    void DeleteById(int guid);
+    bool Save();
 
 }

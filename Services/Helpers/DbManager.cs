@@ -3,7 +3,7 @@ using PicturesAPI.Entities;
 
 namespace PicturesAPI.Services.Helpers;
 
-public static class DbManagementService
+public static class DbManager
 {
     public static void UpdateDb(IApplicationBuilder app)
     {

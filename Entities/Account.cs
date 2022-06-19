@@ -1,13 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
+using PicturesAPI.Entities.Interfaces;
 
 namespace PicturesAPI.Entities;
 
-public class Account
+public class Account: IDeletable
 {
-    [Key] 
-    public Guid Id { get; set; }
-        
+    [Key]
+    public int Id { get; set; }
+
     [Required] 
     [MinLength(4)] 
     [MaxLength(25)]
@@ -22,24 +24,37 @@ public class Account
     [MaxLength(500)]
     public string PasswordHash { get; set; }
     
-    [MaxLength(500)]
-    public string LikedTags { get; set; } = "";
+    // [MaxLength(500)]
+    // public string LikedTags { get; set; } = "";
 
-    // [Required]
-    // public bool Verified { get; set; } = false;
+    [Required]
+    public bool Verified { get; set; } = false;
 
-    [MaxLength(2)]
+    [AllowNull]
+    [MaxLength(250)]
+    public string ProfilePicUrl { get; set; }
+
+    [AllowNull]
+    [MaxLength(250)]
+    public string BackgroundPicUrl { get; set; }
+
+
     public int RoleId { get; set; } = 1;
+    public Role Role { get; set; }
     
-    [AllowNull] 
+    public DateTime AccountCreated { get; set; } = DateTime.Now;
+
+    public bool IsDeleted { get; set; } = false;
+
+
+    [AllowNull]
     public virtual ICollection<Picture> Pictures { get; set; }
     [AllowNull]
     public virtual ICollection<Like> Likes { get; set; }
-    [AllowNull] 
+    [AllowNull]
     public virtual ICollection<Comment> Comments { get; set; }
 
-    public bool IsDeleted { get; set; } = false;
-    
-    public DateTime AccountCreated { get; set; } = DateTime.Now;
+    public virtual ICollection<PictureSeenByAccountJoin> PictureAccountJoins { get; set; }
+    public virtual ICollection<AccountLikedTagJoin> AccountLikedTagJoins { get; set; }
 
 }

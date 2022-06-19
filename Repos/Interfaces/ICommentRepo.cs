@@ -5,8 +5,9 @@ namespace PicturesAPI.Repos.Interfaces;
 
 public interface ICommentRepo
 {
-    Task<Comment> GetById(Guid commId);
-    Task<Guid> Insert(Comment comment);
-    Task Update(Comment comment);
-    Task Save();
+    Comment GetById(int id);
+    int Insert(Comment comment);
+    void Update(Comment comment);
+    void DeleteById(int guid);
+    bool Save();
 }

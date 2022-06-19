@@ -8,11 +8,11 @@ public interface IPictureService
 {
     PagedResult<PictureDto> GetAll(PictureQuery query);
     PagedResult<PictureDto> SearchAll(SearchQuery query);
-    List<LikeDto> GetPicLikes(Guid id);
-    List<AccountDto> GetPicLikers(Guid id);
-    PictureDto GetById(Guid id);
-    Guid Create(IFormFile file, CreatePictureDto dto);
+    List<LikeDto> GetPicLikes(int id);
+    List<AccountDto> GetPicLikers(int id);
+    PictureDto GetById(int id);
+    int Create(IFormFile file, CreatePictureDto dto);
     SafeSearchAnnotation Classify(IFormFile file);
-    PictureDto Put(Guid id, PutPictureDto dto);
-    bool Delete(Guid id);
+    PictureDto Update(int id, PutPictureDto dto);
+    void Delete(int id);
 }

@@ -45,7 +45,7 @@ public class AdminController: ControllerBase
     [Route("restrictedIps")]
     public IActionResult GetRestrictedIps()
     {
-        var result = _restrictedIpsService.GetAllRestrictedIps();
+        var result = _restrictedIpsService.GetAll();
         return Ok(result);
     }
     
@@ -53,7 +53,7 @@ public class AdminController: ControllerBase
     [Route("restrictedIp/{ip}")]
     public IActionResult GetRestrictedIp([FromRoute] string ip)
     {
-        var result = _restrictedIpsService.GetRestrictedIp(ip);
+        var result = _restrictedIpsService.GetByIp(ip);
         return Ok(result);
     }
     
@@ -61,16 +61,16 @@ public class AdminController: ControllerBase
     [Route("restrictedIp")]
     public IActionResult AddRestrictedIp([FromBody] RestrictedIp restrictedIp)
     {
-        var result = _restrictedIpsService.AddRestrictedIp(restrictedIp.IpAddress, restrictedIp.Banned, restrictedIp.CantPost);
-        return Ok(result);
+        _restrictedIpsService.Add(restrictedIp.IpAddress, restrictedIp.CantGet, restrictedIp.CantPost);
+        return NoContent();
     }
     
     [HttpPatch]
     [Route("restrictedIp")]
     public IActionResult UpdateRestrictedIps([FromBody] PatchRestrictedIp restrictedIp)
     {
-        var result = _restrictedIpsService.UpdateRestrictedIps(restrictedIp.Ips, restrictedIp.Banned, restrictedIp.CantPost);
-        return Ok(result);
+        _restrictedIpsService.UpdateMany(restrictedIp.Ips, restrictedIp.CantGet, restrictedIp.CantPost);
+        return NoContent();
     }
     
 }

@@ -4,8 +4,8 @@ namespace PicturesAPI.Services.Interfaces;
 
 public interface IRestrictedIpsService
 {
-    List<RestrictedIp> GetAllRestrictedIps();
-    RestrictedIp GetRestrictedIp(string ip);
-    bool AddRestrictedIp(string ip, bool banned, bool cantPost);
-    bool UpdateRestrictedIps(List<string> ips, bool? banned, bool? cantPost);
+    List<RestrictedIp> GetAll();
+    RestrictedIp GetByIp(string ip);
+    void Add(string ip, bool cantGet, bool cantPost);
+    void UpdateMany(List<RestrictedIp> ips, bool cantGet, bool cantPost);
 }

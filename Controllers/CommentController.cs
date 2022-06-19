@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PicturesAPI.ActionFilters;
+using PicturesAPI.Configuration;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Services.Helpers;
 using PicturesAPI.Services.Interfaces;
@@ -21,21 +22,21 @@ public class CommentController: ControllerBase
     }
     
     [HttpPost]
-    [ServiceFilter(typeof(IsIpRestrictedFilter))]
-    [ServiceFilter(typeof(IsIpBannedFilter))]
+    [ServiceFilter(typeof(CanPostFilter))]
+    [ServiceFilter(typeof(CanGetFilter))]
     public IActionResult PostComment([FromRoute] string id, [FromBody] PostPutCommentDto text)
     {
-        var result = _pictureCommentService.CreateComment(GuidEncoder.Decode(id), text.Text);
-        return Ok(result);
+        var result = _pictureCommentService.Create(IdHasher.DecodeCommentId(id), text.Text);
+        return Created($"api/picture/{result.PictureId}",result);
     }
     
     [HttpPatch]
-    [ServiceFilter(typeof(IsIpRestrictedFilter))]
-    [ServiceFilter(typeof(IsIpBannedFilter))]
+    [ServiceFilter(typeof(CanPostFilter))]
+    [ServiceFilter(typeof(CanGetFilter))]
     [Route("{commId}")]
     public IActionResult PatchComment([FromRoute] string commId, [FromBody] PostPutCommentDto text)
     {
-        var result = _pictureCommentService.ModifyComment(GuidEncoder.Decode(commId), text.Text);
+        var result = _pictureCommentService.Update(IdHasher.DecodeCommentId(commId), text.Text);
         return Ok(result);
     }
     
@@ -43,7 +44,7 @@ public class CommentController: ControllerBase
     [Route("{commId}")]
     public IActionResult DeleteComment([FromRoute] string commId)
     {
-        var result = _pictureCommentService.DeleteComment(GuidEncoder.Decode(commId));
-        return Ok(result);
+        _pictureCommentService.Delete(IdHasher.DecodeCommentId(commId));
+        return NoContent();
     }
 }

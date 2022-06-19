@@ -4,15 +4,11 @@ using System.Text;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using Org.BouncyCastle.Asn1.Ocsp;
-using Org.BouncyCastle.Utilities.Net;
 using PicturesAPI.Entities;
-using PicturesAPI.Enums;
 using PicturesAPI.Exceptions;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Repos.Interfaces;
-using PicturesAPI.Services.Helpers;
 using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Services;
@@ -24,6 +20,7 @@ public class UserAccountService : IUserAccountService
     private readonly IAccountRepo _accountRepo;
     private readonly ILikeRepo _likeRepo;
     private readonly IMapper _mapper;
+    private readonly IRoleRepo _roleRepo;
     private readonly string _jwtIssuer;
 
     public UserAccountService(
@@ -32,74 +29,76 @@ public class UserAccountService : IUserAccountService
         IAccountRepo accountRepo,
         ILikeRepo likeRepo,
         IMapper mapper,
-        IConfiguration config)
+        IConfiguration config,
+        IRoleRepo roleRepo)
     {
         _passwordHasher = passwordHasher;
         _authenticationSettings = authenticationSettings;
         _accountRepo = accountRepo;
         _likeRepo = likeRepo;
         _mapper = mapper;
+        _roleRepo = roleRepo;
         _jwtIssuer = config.GetValue<string>("Authentication:JwtIssuer");
     }
         
-    public Guid Create(CreateAccountDto dto)
+    public int Create(CreateAccountDto dto)
     {
         var newAccount = new Account()
         {
             Nickname = dto.Nickname,
-            Email = dto.Email,
-            RoleId = dto.RoleId
+            Email = dto.Email
         };
 
         var hashedPassword = _passwordHasher.HashPassword(newAccount, dto.Password);
         newAccount.PasswordHash = hashedPassword;
         
-        var newAccountId = _accountRepo.CreateAccount(newAccount);
-        return newAccountId;
+        var result = _accountRepo.Insert(newAccount);
+        _accountRepo.Save();
+        return result;
     }
     public LoginSuccessResult GenerateJwt(LoginDto dto)
     {
-        var account = _accountRepo.GetAccountByNick(dto.Nickname, DbInclude.Raw);
-        if (account is null || account.IsDeleted)
-            throw new BadRequestException("Invalid nickname or password");
+        var account = _accountRepo.GetByNick(dto.Nickname);
+            if (account is null || account.IsDeleted)
+                throw new BadRequestException("Invalid nickname or password");
 
-        var result = _passwordHasher.VerifyHashedPassword(account, account.PasswordHash, dto.Password);
-        if (result == PasswordVerificationResult.Failed)
-            throw new BadRequestException("Invalid nickname or password");
+            var result = _passwordHasher.VerifyHashedPassword(account, account.PasswordHash, dto.Password);
+            if (result == PasswordVerificationResult.Failed)
+                throw new BadRequestException("Invalid nickname or password");
 
-        var claims = new List<Claim>()
-        {
-            new Claim(ClaimTypes.NameIdentifier, (account.Id.ToString())),
-            new Claim(ClaimTypes.Name, account.Nickname),
-            new Claim(ClaimTypes.Role, account.RoleId.ToString()),
-        };
+            var claims = new List<Claim>()
+            {
+                new Claim(ClaimTypes.NameIdentifier, (account.Id.ToString())),
+                new Claim(ClaimTypes.Name, account.Nickname),
+                new Claim(ClaimTypes.Role, account.Role.Id.ToString()),
+            };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authenticationSettings.JwtKey));
-        var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        var expires = DateTime.Now.AddDays(_authenticationSettings.JwtExpireDays);
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authenticationSettings.JwtKey));
+            var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var expires = DateTime.Now.AddDays(_authenticationSettings.JwtExpireDays);
 
-        var token = new JwtSecurityToken(
-            _authenticationSettings.JwtIssuer,
-            _authenticationSettings.JwtIssuer,
-            claims,
-            expires: expires,
-            signingCredentials: cred);
+            var token = new JwtSecurityToken(
+                _authenticationSettings.JwtIssuer,
+                _authenticationSettings.JwtIssuer,
+                claims,
+                expires: expires,
+                signingCredentials: cred);
 
-        var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenHandler = new JwtSecurityTokenHandler();
 
-        var loginSuccessResult = new LoginSuccessResult()
-        {
-            AccountDto = _mapper.Map<AccountDto>(account),
-            LikedTags = account.LikedTags,
-            AuthToken = tokenHandler.WriteToken(token),
-            Likes = _mapper.Map<List<LikeDto>>(_likeRepo.GetLikesByLiker(account)),
-            // Verified = account.Verified
-        };
-        
-        return loginSuccessResult;
+            var loginSuccessResult = new LoginSuccessResult()
+            {
+                AccountDto = _mapper.Map<AccountDto>(account),
+                AuthToken = tokenHandler.WriteToken(token),
+                Likes = _mapper.Map<List<LikeDto>>(_likeRepo.GetByLikerId(account.Id)),
+                // Verified = account.Verified
+            };
+
+            return loginSuccessResult;
 
     }
 
+    //rewrite this whole method
     public LsLoginSuccessResult VerifyJwt(LsLoginDto dto)
     {
         var handler = new JwtSecurityTokenHandler();
@@ -113,22 +112,33 @@ public class UserAccountService : IUserAccountService
         {
             throw new InvalidAuthTokenException();
         }
-        
         if (jwtToken.Issuer != _jwtIssuer) throw new InvalidAuthTokenException();
-        var guid = jwtToken.Claims.First(c => c.Type == ClaimTypes.NameIdentifier);
-        
-        if (guid.Value == GuidEncoder.Decode(dto.Uid).ToString() && _accountRepo.Exists(GuidEncoder.Decode(dto.Uid)))
+
+
+        var id = jwtToken.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+        if (
+            (_accountRepo.GetById(int.Parse(id)) is null)
+        )
         {
-            var account = _accountRepo.GetAccountById(Guid.Parse(guid.Value), DbInclude.Raw);
-            
-            var loginSuccessResult = new LsLoginSuccessResult()
-            {
-                AccountDto = _mapper.Map<AccountDto>(account),
-                LikedTags = account.LikedTags,
-                Likes = _mapper.Map<List<LikeDto>>(_likeRepo.GetLikesByLiker(account))
-            };
-            return loginSuccessResult;
+            throw new UnauthorizedException("please log in");
         }
-        throw new InvalidAuthTokenException();
+
+        if (
+            false
+            // (DateTime.Now - DateTime.Parse(exp) > TimeSpan.FromDays(5))
+        )
+        {
+            throw new ExpiredJwtException("jwt token has expired.");
+        }
+
+        var account = _accountRepo.GetById(int.Parse(id));
+
+        var loginSuccessResult = new LsLoginSuccessResult()
+        {
+            AccountDto = _mapper.Map<AccountDto>(account),
+            // LikedTags = account.LikedTags,
+            Likes = _mapper.Map<List<LikeDto>>(_likeRepo.GetByLikerId(account.Id))
+        };
+        return loginSuccessResult;
     }
 }

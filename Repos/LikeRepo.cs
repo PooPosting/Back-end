@@ -13,48 +13,49 @@ public class LikeRepo : ILikeRepo
         _dbContext = dbContext;
     }
 
-    public async Task<List<Like>> GetByLikerId(Guid id)
+    public List<Like> GetByLikerId(int id)
     {
-        return await _dbContext.Likes.Where(l => l.Liker.Id == id)
+        return _dbContext.Likes.Where(l => l.Liker.Id == id)
             .Include(a => a.Liked)
             .Include(a => a.Liker)
-            .ToListAsync();
+            .ToList();
     }
 
-    public async Task<List<Like>> GetByLikedId(Guid id)
+    public List<Like> GetByLikedId(int id)
     {
-        return await _dbContext.Likes.Where(l => l.Liked.Id == id)
+        return _dbContext.Likes.Where(l => l.Liked.Id == id)
             .Include(a => a.Liked)
             .Include(a => a.Liker)
-            .ToListAsync();
+            .ToList();
     }
 
-    public async Task<Like> GetByLikerIdAndLikedId(Guid accountId, Guid pictureId)
+    public Like GetByLikerIdAndLikedId(int accountId, int pictureId)
     {
-        return await _dbContext.Likes
+        return _dbContext.Likes
             .Include(l => l.Liker)
             .Include(l => l.Liked)
-            .FirstOrDefaultAsync(l => l.Liker.Id == accountId && l.Liked.Id == pictureId);
+            .FirstOrDefault(l => l.Liker.Id == accountId && l.Liked.Id == pictureId);
     }
 
-    public async Task Insert(Like like)
+    public void Insert(Like like)
     {
-        await _dbContext.Likes.AddAsync(like);
+        _dbContext.Likes.Add(like);
     }
 
-    public async Task Delete(Like like)
+    public void DeleteById(int id)
     {
-        _dbContext.Remove(like);
+        var like = _dbContext.Likes.SingleOrDefaultAsync(l => l.Id == id).Result;
+        _dbContext.Likes.Remove(like);
     }
 
-    public async Task Update(Like like)
+    public void Update(Like like)
     {
         _dbContext.Likes.Update(like);
     }
 
-    public async Task Save()
+    public bool Save()
     {
-        await _dbContext.SaveChangesAsync();
+        return _dbContext.SaveChanges() > 0;
     }
     
 }
