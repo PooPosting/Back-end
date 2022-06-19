@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using PicturesAPI.Entities.Interfaces;
+using PicturesAPI.Entities.Joins;
 
 namespace PicturesAPI.Entities;
 

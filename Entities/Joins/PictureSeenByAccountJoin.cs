@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace PicturesAPI.Entities;
+namespace PicturesAPI.Entities.Joins;
 
 public class PictureSeenByAccountJoin
 {

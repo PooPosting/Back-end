@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PicturesAPI.Entities.Joins;
 
 namespace PicturesAPI.Entities;
 

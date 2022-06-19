@@ -1,4 +1,4 @@
-﻿namespace PicturesAPI.Entities;
+﻿namespace PicturesAPI.Entities.Joins;
 
 public class PictureTagJoin
 {

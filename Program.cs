@@ -105,6 +105,7 @@ builder.Services.AddScoped<IPictureRepo, PictureRepo>();
 builder.Services.AddScoped<ICommentRepo, CommentRepo>();
 builder.Services.AddScoped<IRestrictedIpRepo, RestrictedIpRepo>();
 builder.Services.AddScoped<IRoleRepo, RoleRepo>();
+builder.Services.AddScoped<ITagRepo, TagRepo>();
 
 // Other stuff
 builder.Services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();

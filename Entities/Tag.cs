@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using PicturesAPI.Entities.Joins;
 
 namespace PicturesAPI.Entities;
 

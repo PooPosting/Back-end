@@ -11,6 +11,9 @@ public class PictureMappingProfile : Profile
     public PictureMappingProfile()
     {
         CreateMap<Picture, PictureDto>()
+            .ForMember(dto => dto.Tags,
+                opt => opt.MapFrom(
+                    p => p.PictureTagJoins.Select(ptj => ptj.Tag)))
             .ForMember(
                 dto => dto.AccountNickname,
                 opt => opt.MapFrom(
@@ -33,12 +36,5 @@ public class PictureMappingProfile : Profile
 
         CreateMap<CreatePictureDto, Picture>();
     }
-
-    private static List<string> SerializeTags(string tags)
-    {
-        var tagList = tags.Split(' ').ToList();
-        return tagList;
-    }
-
 
 }
