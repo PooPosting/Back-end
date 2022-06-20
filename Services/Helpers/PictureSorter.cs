@@ -6,9 +6,19 @@ using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Services.Helpers;
 
-public static class PictureSorter
+public class PictureSortingService
 {
-    public static List<Picture> SortPics(List<Picture> pictures, PictureQuery query)
+    private readonly PictureDbContext _dbContext;
+    private readonly IAccountContextService _accountContextService;
+
+    public PictureSortingService(
+        PictureDbContext dbContext,
+        IAccountContextService accountContextService)
+    {
+        _dbContext = dbContext;
+        _accountContextService = accountContextService;
+    }
+    public List<Picture> SortPics(IEnumerable<Picture> pictures, PictureQuery query)
     {
         var result = pictures
             .OrderByDescending(p => CountPicPoints(p, query))
@@ -16,7 +26,7 @@ public static class PictureSorter
         return result;
     }
 
-    private static double CountPicPoints(Picture picture, PictureQuery query)
+    private double CountPicPoints(Picture picture, Account user)
     {
         var result = 0.0;
         var date = DateTime.Today.AddDays(-7);
@@ -28,11 +38,9 @@ public static class PictureSorter
             if (l.IsLike) likePoints += 1;
             else likePoints += 0.5;
         });
-        
 
-        // var intersectedTags = picture.Tags
-        //     .Split(' ')
-        //     .Intersect(query.LikedTags.Split(' '));
+
+        var accountLikedTags = picture.PictureTagJoins.Select(j => j.Tag);
 
         if ((DateTime.Now - picture.PictureAdded).TotalMinutes < 180)
         {
@@ -48,15 +56,15 @@ public static class PictureSorter
         }
 
         return result;
-        // return intersectedTags.Aggregate(result, (current, tag) => current * 1.15);
+        // return intersectedTags.Aggregate(result, (current, tag) => current * 2.5);
     }
     
-    private static double CalcPicPointModifier(double x)
+    private double CalcPicPointModifier(double x)
     {
         var fx = Math.Log(0.1, 30) * (x + 1);
         return fx;
     }
-    private static double CalcPicPoints(double likes, double time)
+    private double CalcPicPoints(double likes, double time)
     {
         var gx = CalcPicPointModifier(likes + 10) * (time / 4);
         return gx;
