@@ -21,7 +21,7 @@ public class CommentOperationRequirementHandler : AuthorizationHandler<CommentOp
         var userId = context.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
         var userRole = context.User.FindFirst(c => c.Type == ClaimTypes.Role)!.Value;
         
-        if (resource.Author.Id.ToString() == userId)
+        if (resource.Account.Id.ToString() == userId)
         {
             context.Succeed(requirement);
         }

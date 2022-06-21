@@ -9,7 +9,7 @@ namespace PicturesAPI.Controllers;
 
 [ApiController]
 [Authorize]
-[Route("api/picture/{id}/comment")]
+[Route("api/picture/{picId}/comment")]
 public class CommentController: ControllerBase
 {
     private readonly IPictureCommentService _pictureCommentService;
@@ -22,16 +22,14 @@ public class CommentController: ControllerBase
     
     [HttpPost]
     [ServiceFilter(typeof(CanPostFilter))]
-    [ServiceFilter(typeof(CanGetFilter))]
-    public IActionResult PostComment([FromRoute] string id, [FromBody] PostPutCommentDto text)
+    public IActionResult PostComment([FromRoute] string picId, [FromBody] PostPutCommentDto text)
     {
-        var result = _pictureCommentService.Create(IdHasher.DecodeCommentId(id), text.Text);
+        var result = _pictureCommentService.Create(IdHasher.DecodePictureId(picId), text.Text);
         return Created($"api/picture/{result.PictureId}",result);
     }
     
     [HttpPatch]
     [ServiceFilter(typeof(CanPostFilter))]
-    [ServiceFilter(typeof(CanGetFilter))]
     [Route("{commId}")]
     public IActionResult PatchComment([FromRoute] string commId, [FromBody] PostPutCommentDto text)
     {

@@ -9,9 +9,9 @@ public class CreatePictureDto
     public string Name { get; set; }
         
     [MaxLength(400)]
-    public string Description { get; set; }
+    public string? Description { get; set; }
         
     [MaxLength(4)]
-    public List<string> Tags { get; set; }
+    public List<string>? Tags { get; set; }
     
 }

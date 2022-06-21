@@ -21,8 +21,9 @@ public class PictureRepo : IPictureRepo
             .ThenInclude(j => j.Tag)
             .Include(p => p.Likes)
             .ThenInclude(l => l.Liker)
-            .Include(p => p.Comments)
-            .ThenInclude(c => c.Author)
+            .Include(p => p.Comments
+                .Where(p => p.IsDeleted == false))
+            .ThenInclude(c => c.Account)
             .Include(p => p.Account)
             .AsSplitQuery()
             .SingleOrDefault(p => p.Id == id);
@@ -35,7 +36,8 @@ public class PictureRepo : IPictureRepo
             .Include(p => p.PictureTagJoins)
             .ThenInclude(j => j.Tag)
             .Include(p => p.Likes)
-            .Include(p => p.Comments)
+            .Include(p => p.Comments
+                .Where(p => p.IsDeleted == false))
             .Include(p => p.Account)
             .AsSplitQuery()
             .ToList();
@@ -44,6 +46,7 @@ public class PictureRepo : IPictureRepo
     public List<Picture> GetNotSeenByAccountId(int accountId)
     {
         return _dbContext.Pictures
+            .Where(p => !p.IsDeleted)
             .Where(p =>
                 !_dbContext.PictureAccountJoins
                 .Where(p => p.AccountId == accountId)
@@ -54,7 +57,8 @@ public class PictureRepo : IPictureRepo
             .ThenInclude(j => j.Tag)
             .Include(p => p.Account)
             .Include(p => p.Likes)
-            .Include(p => p.Comments)
+            .Include(p => p.Comments
+                .Where(p => p.IsDeleted == false))
             .AsSplitQuery()
             .ToList();
     }
@@ -64,7 +68,8 @@ public class PictureRepo : IPictureRepo
         return _dbContext.Pictures
             .Where(p => !p.IsDeleted)
             .Include(p => p.Likes)
-            .Include(p => p.Comments)
+            .Include(p => p.Comments
+                .Where(p => p.IsDeleted == false))
             .Include(p => p.Account)
             .AsSplitQuery()
             .Where(p => p.Account.Id == accountId)

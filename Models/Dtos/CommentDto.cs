@@ -1,12 +1,17 @@
-﻿namespace PicturesAPI.Models.Dtos;
+﻿using Newtonsoft.Json;
+using PicturesAPI.Models.Interfaces;
 
-public class CommentDto
+namespace PicturesAPI.Models.Dtos;
+
+public class CommentDto: IModifiable
 {
     public string Id { get; set; }
-    public string Text { get; set; }
-    public DateTime CommentAdded { get; set; } = DateTime.Now;
+    [JsonProperty("AuthorId")]
+    public string AccountId { get; set; }
     public string AuthorNickname { get; set; }
     public string PictureId { get; set; }
-    public string AuthorId { get; set; }
     public bool IsModifiable { get; set; } = false;
+
+    public string Text { get; set; }
+    public DateTime CommentAdded { get; set; } = DateTime.Now;
 }

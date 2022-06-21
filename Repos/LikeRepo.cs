@@ -13,6 +13,11 @@ public class LikeRepo : ILikeRepo
         _dbContext = dbContext;
     }
 
+    public Like GetById(int id)
+    {
+        return _dbContext.Likes.SingleOrDefault(l => l.Id == id);
+    }
+
     public List<Like> GetByLikerId(int id)
     {
         return _dbContext.Likes.Where(l => l.Liker.Id == id)
@@ -45,7 +50,7 @@ public class LikeRepo : ILikeRepo
     public void DeleteById(int id)
     {
         var like = _dbContext.Likes.SingleOrDefaultAsync(l => l.Id == id).Result;
-        _dbContext.Likes.Remove(like);
+        _dbContext.Likes.Remove(like!);
     }
 
     public void Update(Like like)

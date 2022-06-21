@@ -1,6 +1,6 @@
 ﻿namespace PicturesAPI.Entities.Joins;
 
-public class AccountLikedTagJoin
+public class AccountLikedTagsJoin
 {
     public int Id { get; set; }
 

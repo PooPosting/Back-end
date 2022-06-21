@@ -9,5 +9,5 @@ public class Tag
     [MaxLength(25)]
     public string Value { get; set; }
     public ICollection<PictureTagJoin> PictureTagJoins { get; set; }
-    public ICollection<AccountLikedTagJoin> AccountLikedTagJoins { get; set; }
+    public ICollection<AccountLikedTagsJoin> AccountLikedTagJoins { get; set; }
 }

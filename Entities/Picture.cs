@@ -2,8 +2,8 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
-using PicturesAPI.Entities.Interfaces;
 using PicturesAPI.Entities.Joins;
+using PicturesAPI.Models.Interfaces;
 
 namespace PicturesAPI.Entities;
 

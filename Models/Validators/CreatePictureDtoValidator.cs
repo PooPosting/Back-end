@@ -1,6 +1,13 @@
-﻿namespace PicturesAPI.Models.Validators;
+﻿using FluentValidation;
+using PicturesAPI.Models.Dtos;
 
-public class CreatePictureDtoValidator
+namespace PicturesAPI.Models.Validators;
+
+public class CreatePictureDtoValidator : AbstractValidator<CreatePictureDto>
 {
-    
+    public CreatePictureDtoValidator()
+    {
+        RuleFor(p => p.Name)
+            .NotEmpty();
+    }
 }

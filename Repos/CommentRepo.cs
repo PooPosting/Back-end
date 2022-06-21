@@ -17,7 +17,7 @@ public class CommentRepo : ICommentRepo
     {
         return _dbContext.Comments
             .Include(c => c.Picture)
-            .Include(c => c.Author)
+            .Include(c => c.Account)
             .AsSplitQuery()
             .SingleOrDefault(c => c.Id == commId)!;
     }

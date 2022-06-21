@@ -41,7 +41,7 @@ public class PictureCommentService : IPictureCommentService
 
         var comment = new Comment()
         {
-            Author = _accountRepo.GetById(accountId),
+            Account = _accountRepo.GetById(accountId),
             Picture = _pictureRepo.GetById(picId),
             Text = text
         };

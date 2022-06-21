@@ -12,13 +12,13 @@ public class CommentMappingProfile : Profile
         CreateMap<Comment, CommentDto>()
             .ForMember(dto => dto.AuthorNickname,
                 opt => opt.MapFrom(
-                    c => c.Author.Nickname))
+                    c => c.Account.Nickname))
             .ForMember(dto => dto.PictureId,
                 opt => opt.MapFrom(
                     c => IdHasher.EncodePictureId(c.Picture.Id)))
-            .ForMember(dto => dto.AuthorId,
+            .ForMember(dto => dto.AccountId,
                 opt => opt.MapFrom(
-                    c => IdHasher.EncodeAccountId(c.Author.Id)))
+                    c => IdHasher.EncodeAccountId(c.Account.Id)))
             .ForMember(dto => dto.Id,
                 opt => opt.MapFrom(
                     c => IdHasher.EncodeCommentId(c.Id)));
@@ -26,6 +26,6 @@ public class CommentMappingProfile : Profile
         CreateMap<CommentDto, Comment>()
             .ForMember(c => c.Id,
                 opt => opt.MapFrom(
-                    dto => dto.Id));
+                    dto => IdHasher.DecodeCommentId(dto.Id)));
     }
 }

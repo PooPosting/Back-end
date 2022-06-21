@@ -48,25 +48,30 @@ public class PictureService : IPictureService
     
     public  PagedResult<PictureDto> GetAll(PictureQuery query)
     {
-        List<Picture> baseQuery;
+        IEnumerable<Picture> baseQuery;
+        IEnumerable<Picture> sortedQuery;
 
         if (_accountContextService.TryGetAccountId() is not null)
         {
-            baseQuery = _pictureRepo.GetNotSeenByAccountId(_accountContextService.GetAccountId());
+            var accId = _accountContextService.GetAccountId();
+            baseQuery = _pictureRepo.GetNotSeenByAccountId(accId);
+            sortedQuery = PictureSorter
+                .SortPics(baseQuery, _tagRepo.GetTagsByAccountId(accId))
+                .Skip(query.PageSize * (query.PageNumber - 1))
+                .Take(query.PageSize);
         }
         else
         {
             baseQuery = _pictureRepo.GetAll();
+            sortedQuery = PictureSorter
+                .SortPics(baseQuery)
+                .Skip(query.PageSize * (query.PageNumber - 1))
+                .Take(query.PageSize);
         }
-
-        var sortedQuery = PictureSorter
-            .SortPics(baseQuery, query)
-            .Skip(query.PageSize * (query.PageNumber - 1))
-            .Take(query.PageSize);
 
         if (!sortedQuery.Any()) throw new NotFoundException("pictures not found");
         
-        var resultCount = baseQuery.Count;
+        var resultCount = baseQuery.ToList().Count;
         var pictureDtos = _mapper.Map<List<PictureDto>>(sortedQuery).ToList();
         
         var result = new PagedResult<PictureDto>(pictureDtos, resultCount, query.PageSize, query.PageNumber);
@@ -83,7 +88,7 @@ public class PictureService : IPictureService
         switch (query.SearchBy)
         {
             case SortSearchBy.MostPopular:
-                sortedQuery = PictureSorter.SortPics(baseQuery, query).ToList();
+                sortedQuery = PictureSorter.SortPics(baseQuery).ToList();
                 break;
             case SortSearchBy.Newest:
                 sortedQuery = baseQuery
@@ -150,7 +155,6 @@ public class PictureService : IPictureService
         var id = _accountContextService.GetAccountId();
         var account = _accountRepo.GetById(id);
 
-        dto.Tags = dto.Tags.Distinct().ToList();
         var picture = _mapper.Map<Picture>(dto);
 
         picture.Account = account;
@@ -170,13 +174,16 @@ public class PictureService : IPictureService
         }
         _pictureRepo.Insert(picture);
 
-        foreach (var tag in dto.Tags)
+        if (dto.Tags is not null)
         {
-            _tagRepo.InsertAndSave(new Tag()
+            foreach (var tag in dto.Tags.Distinct())
             {
-                Value = tag,
-            });
-            _tagRepo.InsertPictureTagJoin(picture, _tagRepo.GetByValue(tag));
+                _tagRepo.InsertAndSave(new Tag()
+                {
+                    Value = tag,
+                });
+                _tagRepo.TryInsertPictureTagJoin(picture, _tagRepo.GetByValue(tag));
+            }
         }
 
         _pictureRepo.Save();

@@ -14,7 +14,7 @@ public class TagRepo : ITagRepo
 
     public List<Tag> GetAll()
     {
-        return _dbContext.Tags.ToList();
+        return _dbContext.Tags.ToList() ?? new List<Tag>(){};
     }
 
     public List<Tag> GetByPhrase(string phrase)
@@ -22,7 +22,7 @@ public class TagRepo : ITagRepo
         return _dbContext.Tags
             .Where(t => t.Value.Contains(phrase))
             .Take(5)
-            .ToList();
+            .ToList() ?? new List<Tag>(){};
     }
 
     public Tag GetByValue(string value)
@@ -41,13 +41,43 @@ public class TagRepo : ITagRepo
         return tag;
     }
 
-    public void InsertPictureTagJoin(Picture picture, Tag tag)
+    public void TryInsertPictureTagJoin(Picture picture, Tag tag)
     {
-        _dbContext.PictureTagJoins.Add(new PictureTagJoin()
+        if (!_dbContext.PictureTagJoins
+                .Any(j => (j.Picture == picture) && (j.Tag == tag))
+            )
         {
-            Picture = picture,
-            Tag = tag
-        });
+            _dbContext.PictureTagJoins.Add(new PictureTagJoin()
+            {
+                Picture = picture,
+                Tag = tag
+            });
+        }
+    }
+
+    public void TryInsertAccountLikedTag(Account account, Tag tag)
+    {
+        if (!_dbContext.AccountLikedTagJoins
+            .Any(j => (j.Account == account) && j.Tag == tag)
+            )
+        {
+            _dbContext.AccountLikedTagJoins.Add(new AccountLikedTagsJoin()
+            {
+                Account = account,
+                Tag = tag
+            });
+        }
+    }
+
+    public void TryDeleteAccountLikedTag(Account account, Tag tag)
+    {
+        var accLikedTag = _dbContext.AccountLikedTagJoins
+            .SingleOrDefault(j => (j.Account == account) && (j.Tag == tag));
+
+        if (accLikedTag is not null)
+        {
+            _dbContext.AccountLikedTagJoins.Remove(accLikedTag);
+        }
     }
 
     public void Delete(Tag tag)
@@ -65,7 +95,7 @@ public class TagRepo : ITagRepo
         return _dbContext.PictureTagJoins
             .Where(p => p.PictureId == pictureId)
             .Select(p => p.Tag)
-            .ToList();
+            .ToList() ?? new List<Tag>(){};
     }
 
     public List<Tag> GetTagsByAccountId(int accountId)
@@ -73,7 +103,7 @@ public class TagRepo : ITagRepo
         return _dbContext.AccountLikedTagJoins
             .Where(a => a.AccountId == accountId)
             .Select(t => t.Tag)
-            .ToList();
+            .ToList() ?? new List<Tag>(){};
     }
 
     public void Save()

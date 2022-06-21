@@ -1,34 +1,30 @@
-﻿using Microsoft.OData.Edm;
-using PicturesAPI.Entities;
-using PicturesAPI.Models;
-using PicturesAPI.Models.Dtos;
-using PicturesAPI.Services.Interfaces;
+﻿using PicturesAPI.Entities;
 
 namespace PicturesAPI.Services.Helpers;
 
-public class PictureSortingService
+// this whole class is really processor-heavy due to its methods which calculate score values for every picture in the database
+// redesign this or your server will die
+public static class PictureSorter
 {
-    private readonly PictureDbContext _dbContext;
-    private readonly IAccountContextService _accountContextService;
-
-    public PictureSortingService(
-        PictureDbContext dbContext,
-        IAccountContextService accountContextService)
-    {
-        _dbContext = dbContext;
-        _accountContextService = accountContextService;
-    }
-    public List<Picture> SortPics(IEnumerable<Picture> pictures, PictureQuery query)
+    public static List<Picture> SortPics(IEnumerable<Picture> pictures, IEnumerable<Tag> tags)
     {
         var result = pictures
-            .OrderByDescending(p => CountPicPoints(p, query))
+            .OrderByDescending(p => MultiplyPicPoints(p, CountPicPoints(p), tags))
             .ToList();
         return result;
     }
 
-    private double CountPicPoints(Picture picture, Account user)
+    public static List<Picture> SortPics(IEnumerable<Picture> pictures)
     {
-        var result = 0.0;
+        var result = pictures
+            .OrderByDescending(CountPicPoints)
+            .ToList();
+        return result;
+    }
+
+    private static double CountPicPoints(Picture picture)
+    {
+        double result = 0;
         var date = DateTime.Today.AddDays(-7);
         var time = (date - DateTime.Now).TotalMinutes;
         var likePoints = 0.0;
@@ -38,9 +34,6 @@ public class PictureSortingService
             if (l.IsLike) likePoints += 1;
             else likePoints += 0.5;
         });
-
-
-        var accountLikedTags = picture.PictureTagJoins.Select(j => j.Tag);
 
         if ((DateTime.Now - picture.PictureAdded).TotalMinutes < 180)
         {
@@ -54,17 +47,27 @@ public class PictureSortingService
         {
             result += Math.Log(likePoints + 10) * 10;
         }
-
         return result;
-        // return intersectedTags.Aggregate(result, (current, tag) => current * 2.5);
     }
-    
-    private double CalcPicPointModifier(double x)
+
+    private static double MultiplyPicPoints(Picture picture, double pointCount, IEnumerable<Tag> tags)
+    {
+        var accountLikedTags = picture.PictureTagJoins.Select(j => j.Tag);
+
+        var picTags = tags as Tag[] ?? tags.ToArray();
+        pointCount = accountLikedTags
+            .Aggregate(pointCount, (current1, accTag) => picTags
+                .Where(picTag => picTag == accTag)
+            .Aggregate(current1, (current, picTag) => current * 2.5));
+        return pointCount;
+    }
+
+    private static double CalcPicPointModifier(double x)
     {
         var fx = Math.Log(0.1, 30) * (x + 1);
         return fx;
     }
-    private double CalcPicPoints(double likes, double time)
+    private static double CalcPicPoints(double likes, double time)
     {
         var gx = CalcPicPointModifier(likes + 10) * (time / 4);
         return gx;

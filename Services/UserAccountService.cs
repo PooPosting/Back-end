@@ -123,22 +123,14 @@ public class UserAccountService : IUserAccountService
             throw new UnauthorizedException("please log in");
         }
 
-        if (
-            false
-            // (DateTime.Now - DateTime.Parse(exp) > TimeSpan.FromDays(5))
-        )
-        {
-            throw new ExpiredJwtException("jwt token has expired.");
-        }
-
         var account = _accountRepo.GetById(int.Parse(id));
 
         var loginSuccessResult = new LsLoginSuccessResult()
         {
             AccountDto = _mapper.Map<AccountDto>(account),
-            // LikedTags = account.LikedTags,
             Likes = _mapper.Map<List<LikeDto>>(_likeRepo.GetByLikerId(account.Id))
         };
+
         return loginSuccessResult;
     }
 }

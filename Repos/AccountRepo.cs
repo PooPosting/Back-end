@@ -19,7 +19,9 @@ public class AccountRepo : IAccountRepo
         return _dbContext.Accounts
             .Include(p => p.Pictures)
             .ThenInclude(p => p.Likes)
-            .Include(p => p.Likes)
+            .Include(p => p.Pictures)
+            .ThenInclude(p => p.Comments
+                .Where(c => c.IsDeleted == false))
             .Include(a => a.Role)
             .AsSplitQuery()
             .ToList();
@@ -32,8 +34,9 @@ public class AccountRepo : IAccountRepo
             .ThenInclude(p => p.Likes)
             .ThenInclude(p => p.Liker)
             .Include(a => a.Pictures)
-            .ThenInclude(p => p.Comments)
-            .ThenInclude(c => c.Author)
+            .ThenInclude(p => p.Comments
+                .Where(p => p.IsDeleted == false))
+            .ThenInclude(c => c.Account)
             .Include(a => a.Likes)
             .Include(a => a.Role)
             .AsSplitQuery()
@@ -48,7 +51,7 @@ public class AccountRepo : IAccountRepo
             .ThenInclude(p => p.Liker)
             .Include(a => a.Pictures)
             .ThenInclude(p => p.Comments)
-            .ThenInclude(c => c.Author)
+            .ThenInclude(c => c.Account)
             .Include(a => a.Likes)
             .Include(a => a.Role)
             .AsSplitQuery()

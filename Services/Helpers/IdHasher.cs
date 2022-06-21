@@ -4,7 +4,7 @@ namespace PicturesAPI.Services.Helpers;
 
 public static class IdHasher
 {
-    private const int MinHashLength = 12;
+    private const int MinHashLength = 7;
     private const string HashAlphabet = "-_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     private static readonly Hashids PictureHasher = new("p!c700re$", MinHashLength, HashAlphabet);

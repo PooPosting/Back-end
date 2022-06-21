@@ -13,6 +13,7 @@ public class PictureLikingService : IPictureLikingService
 {
     private readonly IPictureRepo _pictureRepo;
     private readonly IMapper _mapper;
+    private readonly ITagRepo _tagRepo;
     private readonly ILikeRepo _likeRepo;
     private readonly IAccountRepo _accountRepo;
     private readonly IAccountContextService _accountContextService;
@@ -22,10 +23,12 @@ public class PictureLikingService : IPictureLikingService
         IAccountRepo accountRepo,
         IPictureRepo pictureRepo,
         IMapper mapper,
+        ITagRepo tagRepo,
         IAccountContextService accountContextService)
     {
         _pictureRepo = pictureRepo;
         _mapper = mapper;
+        _tagRepo = tagRepo;
         _likeRepo = likeRepo;
         _accountRepo = accountRepo;
         _accountContextService = accountContextService;
@@ -41,19 +44,29 @@ public class PictureLikingService : IPictureLikingService
         // set up like/dislike logic (database liked tags insertion/drop)
         var account = _accountRepo.GetById(accountId);
         var like = _likeRepo.GetByLikerIdAndLikedId(account.Id, picture.Id);
-        
+
+
+        var tags = _tagRepo.GetTagsByPictureId(picture.Id);
         if (like is not null)
         {
             // like exists and (IsLike == true)
             if (like.IsLike)
             {
                 _likeRepo.DeleteById(like.Id);
+                foreach (var tag in tags)
+                {
+                    _tagRepo.TryDeleteAccountLikedTag(account, tag);
+                }
             }
             // like exists and (IsLike == false)
             else
             {
                 like.IsLike = !like.IsLike;
                 _likeRepo.Update(like);
+                foreach (var tag in tags)
+                {
+                    _tagRepo.TryInsertAccountLikedTag(account, tag);
+                }
             }
         }
         // like does not exist
@@ -66,6 +79,10 @@ public class PictureLikingService : IPictureLikingService
                     Liker = account,
                     IsLike = true
                 });
+            foreach (var tag in tags)
+            {
+                _tagRepo.TryInsertAccountLikedTag(account, tag);
+            }
         }
 
         _likeRepo.Save();
@@ -94,8 +111,12 @@ public class PictureLikingService : IPictureLikingService
             {
                 like.IsLike = !like.IsLike;
                 _likeRepo.Update(like);
+                var tags = _tagRepo.GetTagsByPictureId(picture.Id);
+                foreach (var tag in tags)
+                {
+                    _tagRepo.TryDeleteAccountLikedTag(account, tag);
+                }
             }
-
         }
         // does not exist
         else

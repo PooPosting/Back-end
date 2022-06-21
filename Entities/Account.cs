@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
-using PicturesAPI.Entities.Interfaces;
 using PicturesAPI.Entities.Joins;
+using PicturesAPI.Models.Interfaces;
 
 namespace PicturesAPI.Entities;
 
@@ -24,9 +24,7 @@ public class Account: IDeletable
     [Required] 
     [MaxLength(500)]
     public string PasswordHash { get; set; }
-    
-    // [MaxLength(500)]
-    // public string LikedTags { get; set; } = "";
+
 
     [Required]
     public bool Verified { get; set; } = false;
@@ -56,6 +54,6 @@ public class Account: IDeletable
     public virtual ICollection<Comment> Comments { get; set; }
 
     public virtual ICollection<PictureSeenByAccountJoin> PictureAccountJoins { get; set; }
-    public virtual ICollection<AccountLikedTagJoin> AccountLikedTagJoins { get; set; }
+    public virtual ICollection<AccountLikedTagsJoin> AccountLikedTagJoins { get; set; }
 
 }

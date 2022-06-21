@@ -1,4 +1,4 @@
-﻿namespace PicturesAPI.Entities.Interfaces;
+﻿namespace PicturesAPI.Models.Interfaces;
 
 public interface IDeletable
 {

@@ -4,6 +4,7 @@ namespace PicturesAPI.Repos.Interfaces;
 
 public interface ILikeRepo
 {
+    Like GetById(int id);
     List<Like> GetByLikerId(int id);
     List<Like> GetByLikedId(int id);
     Like GetByLikerIdAndLikedId(int accountId, int pictureId);

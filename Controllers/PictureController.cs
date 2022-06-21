@@ -71,17 +71,16 @@ public class PictureController : ControllerBase
 
     [HttpPost]
     [ServiceFilter(typeof(CanPostFilter))]
-    [ServiceFilter(typeof(CanGetFilter))]
     [Route("classify")]
     public IActionResult ClassifyPicture([FromForm] IFormFile file)
     {
+        // change this to async!
         var result = _pictureService.Classify(file);
         return Ok(result);
     }
     
     [HttpPost]
     [ServiceFilter(typeof(CanPostFilter))]
-    [ServiceFilter(typeof(CanGetFilter))]
     [Route("create")]
     public IActionResult PostPicture(
         [FromForm] IFormFile file, 
@@ -93,17 +92,15 @@ public class PictureController : ControllerBase
         {
             Name = name,
             Description = description,
-            Tags = tags.Split(' ').ToList()
         };
-        
+        if (tags is not null) dto.Tags = tags.Split(' ').ToList();
+
         var pictureId = _pictureService.Create(file, dto);
-        
         return Created($"api/picture/{pictureId}", null);
     }
 
     [HttpPut]
     [ServiceFilter(typeof(CanPostFilter))]
-    [ServiceFilter(typeof(CanGetFilter))]
     [Route("{id}")]
     public IActionResult PutPictureUpdate([FromRoute] string id, [FromBody] PutPictureDto dto)
     {

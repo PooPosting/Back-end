@@ -43,14 +43,7 @@ public class AccountContextService : IAccountContextService
 
     private void ValidateJwt()
     {
-        // test
         var exp = User.FindAll(c => true);
-
-        // foreach (var item in exp)
-        // {
-        //     Console.WriteLine($"{item.Type} - {item.Value}");
-        // }
-
         var role = User.FindFirst(c => c.Type == ClaimTypes.Role)!.Value;
         var id = User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
 
