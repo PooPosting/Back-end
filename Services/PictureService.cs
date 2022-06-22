@@ -2,12 +2,14 @@
 using Google.Apis.Util;
 using Google.Cloud.Vision.V1;
 using Microsoft.AspNetCore.Authorization;
+using Org.BouncyCastle.Asn1.X509.Qualified;
 using PicturesAPI.Authorization;
 using PicturesAPI.Entities;
 using PicturesAPI.Enums;
 using PicturesAPI.Exceptions;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
+using PicturesAPI.Models.Interfaces;
 using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services.Helpers;
 using PicturesAPI.Services.Interfaces;
@@ -73,7 +75,7 @@ public class PictureService : IPictureService
         
         var resultCount = baseQuery.ToList().Count;
         var pictureDtos = _mapper.Map<List<PictureDto>>(sortedQuery).ToList();
-        
+        AllowModifyItems(pictureDtos);
         var result = new PagedResult<PictureDto>(pictureDtos, resultCount, query.PageSize, query.PageNumber);
         return result;
     }
@@ -119,7 +121,7 @@ public class PictureService : IPictureService
             .Skip(query.PageSize * (query.PageNumber - 1))
             .Take(query.PageSize)
             .ToList();
-
+        AllowModifyItems(pictureDtos);
         var result = new PagedResult<PictureDto>(pictureDtos, resultCount, query.PageSize, query.PageNumber);
         return result;
     }
@@ -239,7 +241,36 @@ public class PictureService : IPictureService
         _pictureRepo.Save();
         _logger.LogWarning($"Picture with id: {id} DELETE action success");
     }
-    
+
+
+    private void AllowModifyItems(List<PictureDto> items)
+    {
+        var accountRole = _accountContextService.GetAccountRole();
+        var accountId = _accountContextService.GetEncodedAccountId();
+        foreach (var item in items)
+        {
+            if (item.AccountId == accountId)
+            {
+                item.IsModifiable = true;
+            }
+            else if (accountRole == 3)
+            {
+                item.IsAdminModifiable = true;
+            }
+            foreach (var comment in item.Comments)
+            {
+                if (comment.AccountId == accountId)
+                {
+                    comment.IsModifiable = true;
+                }
+                else if (accountRole == 3)
+                {
+                    item.IsAdminModifiable = true;
+                }
+            }
+        }
+    }
+
     private void AuthorizePictureOperation(Picture picture, ResourceOperation operation, string message)
     {
         var user = _accountContextService.User;

@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using PicturesAPI.Entities;
 using PicturesAPI.Exceptions;
+using PicturesAPI.Services.Helpers;
 using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Services;
@@ -21,6 +22,12 @@ public class AccountContextService : IAccountContextService
     }
 
     public ClaimsPrincipal User => _httpContextAccessor.HttpContext!.User;
+
+    public string GetEncodedAccountId()
+    {
+        ValidateJwt();
+        return IdHasher.EncodeAccountId(int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value));
+    }
 
     public int GetAccountId()
     {

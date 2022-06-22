@@ -10,8 +10,8 @@ public class AccountDto
 
     public string BackgroundPicUrl { get; set; }
 
-    public ICollection<PictureDto> Pictures { get; set; }
-    public ICollection<CommentDto> Comments { get; set; }
+    public IEnumerable<PictureDto> Pictures { get; set; }
+    public IEnumerable<CommentDto> Comments { get; set; }
     
     public int RoleId { get; set; }
     public DateTime AccountCreated { get; set; }

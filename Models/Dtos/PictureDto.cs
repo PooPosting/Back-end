@@ -2,7 +2,7 @@
 
 namespace PicturesAPI.Models.Dtos;
 
-public class PictureDto: IModifiable
+public class PictureDto
 {
     public string Id { get; set; }
     public string AccountId { get; set; }
@@ -15,7 +15,8 @@ public class PictureDto: IModifiable
     public string Url { get; set; }
     public DateTime PictureAdded { get; set; }
 
-    public ICollection<LikeDto> Likes { get; set; }
-    public ICollection<CommentDto> Comments { get; set; }
+    public IEnumerable<LikeDto> Likes { get; set; }
+    public IEnumerable<CommentDto> Comments { get; set; }
     public bool IsModifiable { get; set; } = false;
+    public bool IsAdminModifiable { get; set; } = false;
 }

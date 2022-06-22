@@ -7,7 +7,9 @@ using PicturesAPI.Enums;
 using PicturesAPI.Exceptions;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
+using PicturesAPI.Models.Interfaces;
 using PicturesAPI.Repos.Interfaces;
+using PicturesAPI.Services.Helpers;
 using PicturesAPI.Services.Interfaces;
 // ReSharper disable TemplateIsNotCompileTimeConstantProblem
 
@@ -75,7 +77,6 @@ public class AccountService : IAccountService
         var resultCount = baseQuery.Count;
         var accountDtos = _mapper.Map<List<AccountDto>>(accounts).ToList();
         var result = new PagedResult<AccountDto>(accountDtos, resultCount, query.PageSize, query.PageNumber);
-        
         return result;
     }
 
