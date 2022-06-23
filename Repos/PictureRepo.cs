@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PicturesAPI.Entities;
 using PicturesAPI.Repos.Interfaces;
+using PicturesAPI.Services.Helpers;
 
 namespace PicturesAPI.Repos;
 
@@ -38,8 +39,10 @@ public class PictureRepo : IPictureRepo
             .Include(p => p.PictureTagJoins)
             .ThenInclude(j => j.Tag)
             .Include(p => p.Likes)
+            .ThenInclude(l => l.Liker)
             .Include(p => p.Comments
                 .Where(c => c.IsDeleted == false))
+            .ThenInclude(c => c.Account)
             .Include(p => p.Account)
             .OrderByDescending(p => p.PopularityScore)
             .Skip(itemsToSkip)
@@ -58,10 +61,11 @@ public class PictureRepo : IPictureRepo
                 .Any(j => j.PictureId == p.Id && j.AccountId == accountId))
             .Include(p => p.PictureTagJoins)
             .ThenInclude(j => j.Tag)
-            .Include(p => p.Account)
             .Include(p => p.Likes)
+            .ThenInclude(l => l.Liker)
             .Include(p => p.Comments
                 .Where(c => c.IsDeleted == false))
+            .ThenInclude(c => c.Account)
             .OrderByDescending(p => p.PopularityScore *
                                     (p.PictureTagJoins.Select(j =>
                                          j.Tag.AccountLikedTagJoins.Select(a => a.AccountId == accountId)).Count() *
@@ -79,8 +83,10 @@ public class PictureRepo : IPictureRepo
             .Include(p => p.PictureTagJoins)
             .ThenInclude(j => j.Tag)
             .Include(p => p.Likes)
+            .ThenInclude(l => l.Liker)
             .Include(p => p.Comments
                 .Where(c => c.IsDeleted == false))
+            .ThenInclude(c => c.Account)
             .Include(p => p.Account)
             .OrderByDescending(p => p.PopularityScore)
             .Skip(itemsToSkip)
@@ -96,8 +102,10 @@ public class PictureRepo : IPictureRepo
             .Include(p => p.PictureTagJoins)
             .ThenInclude(j => j.Tag)
             .Include(p => p.Likes)
+            .ThenInclude(l => l.Liker)
             .Include(p => p.Comments
                 .Where(c => c.IsDeleted == false))
+            .ThenInclude(c => c.Account)
             .Include(p => p.Account)
             .OrderByDescending(p => p.PictureAdded)
             .Skip(itemsToSkip)
@@ -113,13 +121,22 @@ public class PictureRepo : IPictureRepo
             .Include(p => p.PictureTagJoins)
             .ThenInclude(j => j.Tag)
             .Include(p => p.Likes)
+            .ThenInclude(l => l.Liker)
             .Include(p => p.Comments
                 .Where(c => c.IsDeleted == false))
+            .ThenInclude(c => c.Account)
             .Include(p => p.Account)
             .OrderByDescending(p => p.Likes.Count(l => l.IsLike))
             .Skip(itemsToSkip)
             .Take(itemsToTake)
             .AsSplitQuery();
+    }
+
+    public void UpdatePicScore (Picture picture)
+    {
+        picture.PopularityScore = PictureScoreCalculator.CalcPoints(picture);
+        _dbContext.Pictures.Update(picture);
+        Save();
     }
 
     public int Insert(Picture picture)

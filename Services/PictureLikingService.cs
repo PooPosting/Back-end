@@ -52,6 +52,7 @@ public class PictureLikingService : IPictureLikingService
                     _tagRepo.TryDeleteAccountLikedTag(account, tag);
                 }
                 _likeRepo.Save();
+                _pictureRepo.UpdatePicScore(picture);
                 return LikeState.Deleted;
             }
             // like exists and (IsLike == false)
@@ -64,6 +65,7 @@ public class PictureLikingService : IPictureLikingService
                     _tagRepo.TryInsertAccountLikedTag(account, tag);
                 }
                 _likeRepo.Save();
+                _pictureRepo.UpdatePicScore(picture);
                 return LikeState.Liked;
             }
         }
@@ -82,6 +84,7 @@ public class PictureLikingService : IPictureLikingService
                 _tagRepo.TryInsertAccountLikedTag(account, tag);
             }
             _likeRepo.Save();
+            _pictureRepo.UpdatePicScore(picture);
             return LikeState.Liked;
         }
 
@@ -103,6 +106,7 @@ public class PictureLikingService : IPictureLikingService
             if (like.IsLike == false)
             {
                 _likeRepo.DeleteById(like.Id);
+                _pictureRepo.UpdatePicScore(picture);
                 _likeRepo.Save();
                 return LikeState.Deleted;
             }
@@ -116,6 +120,7 @@ public class PictureLikingService : IPictureLikingService
                 {
                     _tagRepo.TryDeleteAccountLikedTag(account, tag);
                 }
+                _pictureRepo.UpdatePicScore(picture);
                 _likeRepo.Save();
                 return LikeState.DisLiked;
             }
@@ -130,6 +135,7 @@ public class PictureLikingService : IPictureLikingService
                     Liker = account,
                     IsLike = false
                 });
+            _pictureRepo.UpdatePicScore(picture);
             _likeRepo.Save();
             return LikeState.DisLiked;
         }

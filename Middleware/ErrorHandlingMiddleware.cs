@@ -1,4 +1,5 @@
-﻿using PicturesAPI.Exceptions;
+﻿using HashidsNet;
+using PicturesAPI.Exceptions;
 
 namespace PicturesAPI.Middleware;
 
@@ -35,7 +36,6 @@ public class ErrorHandlingMiddleware : IMiddleware
             context.Response.StatusCode = 401;
             await context.Response.WriteAsync(unauthorizedException.Message);
         }
-
         catch (ForbidException forbidException)
         {
             context.Response.StatusCode = 403;
@@ -47,6 +47,11 @@ public class ErrorHandlingMiddleware : IMiddleware
             await context.Response.WriteAsync(restrictedException.Message);
         }
 
+        catch (NoResultException)
+        {
+            context.Response.StatusCode = 404;
+            await context.Response.WriteAsync("item not found");
+        }
         catch (NotFoundException notFoundException)
         {
             context.Response.StatusCode = 404;

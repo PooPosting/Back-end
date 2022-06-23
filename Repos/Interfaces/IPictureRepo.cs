@@ -12,6 +12,7 @@ public interface IPictureRepo
     IEnumerable<Picture> SearchNewest(int itemsToSkip, int itemsToTake, string itemSearchPhrase);
     IEnumerable<Picture> SearchMostLikes(int itemsToSkip, int itemsToTake, string itemSearchPhrase);
     int Insert(Picture picture);
+    void UpdatePicScore(Picture picture);
     void Update(Picture picture);
     void DeleteById(int id);
     bool Save();
