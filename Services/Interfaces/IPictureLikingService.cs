@@ -1,9 +1,9 @@
-﻿using PicturesAPI.Models.Dtos;
+﻿using PicturesAPI.Enums;
 
 namespace PicturesAPI.Services.Interfaces;
 
 public interface IPictureLikingService
 {
-    PictureDto Like(int id);
-    PictureDto DisLike(int id);
+    LikeState Like(int id);
+    LikeState DisLike(int id);
 }

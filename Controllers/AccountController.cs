@@ -32,14 +32,6 @@ public class AccountController : ControllerBase
         return Ok(account);
     }
     
-    // [HttpGet]
-    // [Route("likedTags")]
-    // public IActionResult GetTags()
-    // {
-    //     var tags = _accountService.GetLikedTags();
-    //     return Ok(tags);
-    // }
-    
     [HttpGet]
     [AllowAnonymous]
     [EnableQuery]
@@ -88,8 +80,8 @@ public class AccountController : ControllerBase
     [Route("register")]
     public IActionResult PostAccount([FromBody] CreateAccountDto dto)
     {
-        var accountId = _userAccountService.Create(dto);
-        return Created($"api/accounts/{accountId}", null);
+        var result = _userAccountService.Create(dto);
+        return Ok(result);
     }
         
     [HttpPost]

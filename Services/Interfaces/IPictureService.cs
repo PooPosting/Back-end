@@ -6,7 +6,7 @@ namespace PicturesAPI.Services.Interfaces;
 
 public interface IPictureService
 {
-    PagedResult<PictureDto> GetAll(PictureQuery query);
+    List<PictureDto> GetPictures(PictureQuery query);
     PagedResult<PictureDto> SearchAll(SearchQuery query);
     List<LikeDto> GetPicLikes(int id);
     List<AccountDto> GetPicLikers(int id);

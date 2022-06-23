@@ -5,7 +5,7 @@ namespace PicturesAPI.Services.Interfaces;
 
 public interface IUserAccountService
 {
-    int Create(CreateAccountDto dto);
+    bool Create(CreateAccountDto dto);
     LoginSuccessResult GenerateJwt(LoginDto dto);
     LsLoginSuccessResult VerifyJwt(LsLoginDto dto);
 }

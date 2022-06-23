@@ -7,7 +7,6 @@ public class PagedResult<T>
         Items = items;
         Page = pageNumber;
         PageSize = pageSize;
-        TotalItems = totalItemsCount;
     }
     
     public List<T> Items { get; set; }

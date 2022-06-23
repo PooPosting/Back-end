@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PicturesAPI.Entities;
 
@@ -10,9 +11,10 @@ using PicturesAPI.Entities;
 namespace PicturesAPI.Migrations
 {
     [DbContext(typeof(PictureDbContext))]
-    partial class PictureDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220623162656_added-picture-popularityscore")]
+    partial class addedpicturepopularityscore
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -27,10 +29,6 @@ namespace PicturesAPI.Migrations
 
                     b.Property<DateTime>("AccountCreated")
                         .HasColumnType("datetime");
-
-                    b.Property<string>("AccountDescription")
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
 
                     b.Property<string>("BackgroundPicUrl")
                         .HasMaxLength(250)
@@ -142,7 +140,7 @@ namespace PicturesAPI.Migrations
 
                     b.HasIndex("PictureId");
 
-                    b.ToTable("PictureSeenByAccountJoins");
+                    b.ToTable("PictureAccountJoins");
                 });
 
             modelBuilder.Entity("PicturesAPI.Entities.Joins.PictureTagJoin", b =>
@@ -331,13 +329,13 @@ namespace PicturesAPI.Migrations
 
             modelBuilder.Entity("PicturesAPI.Entities.Joins.PictureSeenByAccountJoin", b =>
                 {
-                    b.HasOne("PicturesAPI.Entities.Account", "Account")
+                    b.HasOne("PicturesAPI.Entities.Picture", "Picture")
                         .WithMany("PictureAccountJoins")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PicturesAPI.Entities.Picture", "Picture")
+                    b.HasOne("PicturesAPI.Entities.Account", "Account")
                         .WithMany("PictureAccountJoins")
                         .HasForeignKey("PictureId")
                         .OnDelete(DeleteBehavior.Cascade)

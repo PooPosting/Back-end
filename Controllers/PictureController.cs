@@ -28,7 +28,7 @@ public class PictureController : ControllerBase
     [AllowAnonymous]
     public IActionResult GetAllPictures([FromQuery] PictureQuery query)
     {
-        var pictures = _pictureService.GetAll(query);
+        var pictures = _pictureService.GetPictures(query);
         return Ok(pictures);
     }
     

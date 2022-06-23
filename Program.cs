@@ -106,6 +106,7 @@ builder.Services.AddScoped<ICommentRepo, CommentRepo>();
 builder.Services.AddScoped<IRestrictedIpRepo, RestrictedIpRepo>();
 builder.Services.AddScoped<IRoleRepo, RoleRepo>();
 builder.Services.AddScoped<ITagRepo, TagRepo>();
+builder.Services.AddScoped<IPopularRepo, PopularRepo>();
 
 // Other stuff
 builder.Services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
@@ -155,7 +156,6 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseMiddleware<RequestTimeMiddleware>();
 app.UseMiddleware<UserDataMiddleware>();
-// app.UseMiddleware<RestrictedIpsMiddleware>();
 app.UseAuthentication();
 app.UseHttpsRedirection();
 app.UseSwagger();

@@ -19,12 +19,13 @@ public class Picture: IDeletable
     [MaxLength(500)]
     public string Description { get; set; }
         
-    [Comment("Picture URL")]
     [Required] [MaxLength(250)]
     public string Url { get; set; }
     public DateTime PictureAdded { get; set; } = DateTime.Now;
     public bool IsDeleted { get; set; } = false;
 
+    [Required]
+    public long PopularityScore { get; set; } = 36500;
 
     // navigation props
         

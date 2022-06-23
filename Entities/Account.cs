@@ -37,6 +37,10 @@ public class Account: IDeletable
     [MaxLength(250)]
     public string BackgroundPicUrl { get; set; }
 
+    [AllowNull]
+    [MaxLength(500)]
+    public string AccountDescription { get; set; }
+
 
     public int RoleId { get; set; } = 1;
     public Role Role { get; set; }

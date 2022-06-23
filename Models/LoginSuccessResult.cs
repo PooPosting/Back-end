@@ -6,8 +6,6 @@ namespace PicturesAPI.Models;
 
 public class LoginSuccessResult
 {
-    public AccountDto AccountDto { get; set; }
     public string AuthToken { get; set; }
-    public ICollection<LikeDto> Likes { get; set; }
-    // public bool Verified { get; set; }
+    public string Uid { get; set; }
 }

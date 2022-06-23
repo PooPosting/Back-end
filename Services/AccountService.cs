@@ -7,11 +7,8 @@ using PicturesAPI.Enums;
 using PicturesAPI.Exceptions;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
-using PicturesAPI.Models.Interfaces;
 using PicturesAPI.Repos.Interfaces;
-using PicturesAPI.Services.Helpers;
 using PicturesAPI.Services.Interfaces;
-// ReSharper disable TemplateIsNotCompileTimeConstantProblem
 
 namespace PicturesAPI.Services;
 
@@ -51,18 +48,19 @@ public class AccountService : IAccountService
         var account = _accountRepo.GetById(id);
         if (account is null || account.IsDeleted) throw new NotFoundException("account not found");
         var result = _mapper.Map<AccountDto>(account);
+        AllowModifyItems(result);
         return result;
     }
 
     public PagedResult<AccountDto> GetAll(AccountQuery query)
     {
-        #region Update this
+        #region Update this - write repo for this
 
         var baseQuery = _accountRepo.GetAll()
             .Where(a => query.SearchPhrase == null || a.Nickname.ToLower().Contains(query.SearchPhrase.ToLower()))
             .Where(a => !a.IsDeleted)
-            .OrderByDescending(a => _pictureRepo.GetByAccountId(a.Id).Count())
-            .ThenByDescending(a => _pictureRepo.GetByAccountId(a.Id).Sum(picture => picture.Likes.Count))
+            .OrderByDescending(a => a.Pictures.Count)
+            .ThenByDescending(a => a.Pictures.Sum(picture => picture.Likes.Count))
             .ToList();
 
         var accounts = baseQuery
@@ -74,8 +72,9 @@ public class AccountService : IAccountService
 
         if (accounts.Count == 0) throw new NotFoundException("accounts not found");
         
-        var resultCount = baseQuery.Count;
+        var resultCount = 0;
         var accountDtos = _mapper.Map<List<AccountDto>>(accounts).ToList();
+        AllowModifyItems(accountDtos);
         var result = new PagedResult<AccountDto>(accountDtos, resultCount, query.PageSize, query.PageNumber);
         return result;
     }
@@ -89,12 +88,6 @@ public class AccountService : IAccountService
         return likeDtos;
     }
 
-    // public string GetLikedTags()
-    // {
-    //     var id = _accountContextService.GetAccountId();
-    //     return _accountRepo.GetById(id).LikedTags;
-    // }
-    
     public bool Update(PutAccountDto dto)
     {
         var id = _accountContextService.GetAccountId();
@@ -147,11 +140,96 @@ public class AccountService : IAccountService
         return true;
     }
 
+    #region Private methods
+
+    private void AllowModifyItems(List<AccountDto> accounts)
+    {
+        if (_accountContextService.TryGetAccountId() is null) return;
+        var accountRole = _accountContextService.GetAccountRole();
+        var accountId = _accountContextService.GetEncodedAccountId();
+        foreach (var account in accounts)
+        {
+            foreach (var item in account.Pictures)
+            {
+                if (item.AccountId == accountId)
+                {
+                    item.IsModifiable = true;
+                }
+                else if (accountRole == 3)
+                {
+                    item.IsAdminModifiable = true;
+                }
+
+                foreach (var comment in item.Comments)
+                {
+                    if (comment.AccountId == accountId)
+                    {
+                        comment.IsModifiable = true;
+                    }
+                    else if (accountRole == 3)
+                    {
+                        item.IsAdminModifiable = true;
+                    }
+                }
+
+                if (item.Likes.Any(l => (l.AccountId == accountId && l.IsLike)))
+                {
+                    item.LikeState = LikeState.Liked;
+                }
+                if (item.Likes.Any(l => (l.AccountId == accountId && !l.IsLike)))
+                {
+                    item.LikeState = LikeState.DisLiked;
+                }
+            }
+        }
+    }
+
+    private void AllowModifyItems(AccountDto account)
+    {
+        if (_accountContextService.TryGetAccountId() is null) return;
+        var accountRole = _accountContextService.GetAccountRole();
+        var accountId = _accountContextService.GetEncodedAccountId();
+        foreach (var item in account.Pictures)
+        {
+            if (item.AccountId == accountId)
+            {
+                item.IsModifiable = true;
+            }
+            else if (accountRole == 3)
+            {
+                item.IsAdminModifiable = true;
+            }
+
+            foreach (var comment in item.Comments)
+            {
+                if (comment.AccountId == accountId)
+                {
+                    comment.IsModifiable = true;
+                }
+                else if (accountRole == 3)
+                {
+                    item.IsAdminModifiable = true;
+                }
+            }
+
+            if (item.Likes.Any(l => (l.AccountId == accountId && l.IsLike)))
+            {
+                item.LikeState = LikeState.Liked;
+            }
+            if (item.Likes.Any(l => (l.AccountId == accountId && !l.IsLike)))
+            {
+                item.LikeState = LikeState.DisLiked;
+            }
+        }
+    }
+
     private void AuthorizeAccountOperation(Account account, ResourceOperation operation, string message)
     {
         var user = _accountContextService.User;
         var authorizationResult = _authorizationService.AuthorizeAsync(user, account, new AccountOperationRequirement(operation)).Result;
         if (!authorizationResult.Succeeded) throw new ForbidException(message);
     }
+
+    #endregion
 
 }

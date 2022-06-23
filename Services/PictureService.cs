@@ -1,19 +1,15 @@
 ﻿using AutoMapper;
-using Google.Apis.Util;
 using Google.Cloud.Vision.V1;
 using Microsoft.AspNetCore.Authorization;
-using Org.BouncyCastle.Asn1.X509.Qualified;
 using PicturesAPI.Authorization;
 using PicturesAPI.Entities;
 using PicturesAPI.Enums;
 using PicturesAPI.Exceptions;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
-using PicturesAPI.Models.Interfaces;
 using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services.Helpers;
 using PicturesAPI.Services.Interfaces;
-// ReSharper disable TemplateIsNotCompileTimeConstantProblem
 
 namespace PicturesAPI.Services;
 
@@ -48,78 +44,71 @@ public class PictureService : IPictureService
         _tagRepo = tagRepo;
     }
     
-    public  PagedResult<PictureDto> GetAll(PictureQuery query)
+    public List<PictureDto> GetPictures(PictureQuery query)
     {
-        IEnumerable<Picture> baseQuery;
-        IEnumerable<Picture> sortedQuery;
+        List<PictureDto> pictureDtos;
 
         if (_accountContextService.TryGetAccountId() is not null)
         {
             var accId = _accountContextService.GetAccountId();
-            baseQuery = _pictureRepo.GetNotSeenByAccountId(accId);
-            sortedQuery = PictureSorter
-                .SortPics(baseQuery, _tagRepo.GetTagsByAccountId(accId))
-                .Skip(query.PageSize * (query.PageNumber - 1))
-                .Take(query.PageSize);
+            var pictures = _pictureRepo.GetNotSeenByAccountId(accId, query.PageSize);
+
+            var picArray = pictures.ToArray();
+            foreach (var picture in picArray)
+            {
+                _accountRepo.MarkAsSeen(accId, picture.Id);
+            }
+            if (picArray.Any())
+            {
+                _accountRepo.Save();
+            }
+            pictureDtos = _mapper.Map<List<PictureDto>>(picArray).ToList();
         }
         else
         {
-            baseQuery = _pictureRepo.GetAll();
-            sortedQuery = PictureSorter
-                .SortPics(baseQuery)
-                .Skip(query.PageSize * (query.PageNumber - 1))
-                .Take(query.PageSize);
+            var pictures = _pictureRepo.GetFromAll(
+                query.PageSize * (query.PageNumber - 1),
+                query.PageSize
+            );
+            pictureDtos = _mapper.Map<List<PictureDto>>(pictures).ToList();
         }
-
-        if (!sortedQuery.Any()) throw new NotFoundException("pictures not found");
-        
-        var resultCount = baseQuery.ToList().Count;
-        var pictureDtos = _mapper.Map<List<PictureDto>>(sortedQuery).ToList();
-        AllowModifyItems(pictureDtos);
-        var result = new PagedResult<PictureDto>(pictureDtos, resultCount, query.PageSize, query.PageNumber);
-        return result;
+        return pictureDtos;
     }
 
-    // refactor this whole method
-    public  PagedResult<PictureDto> SearchAll(SearchQuery query)
+    public PagedResult<PictureDto> SearchAll(SearchQuery query)
     {
-        var baseQuery = _pictureRepo.GetAll();
-
-        List<Picture> sortedQuery;
+        IEnumerable<Picture> pictures;
 
         switch (query.SearchBy)
         {
             case SortSearchBy.MostPopular:
-                sortedQuery = PictureSorter.SortPics(baseQuery).ToList();
+                pictures = _pictureRepo.SearchAll(
+                    query.PageSize * (query.PageNumber - 1),
+                    query.PageSize,
+                    query.SearchPhrase);
                 break;
             case SortSearchBy.Newest:
-                sortedQuery = baseQuery
-                    .OrderByDescending(p => p.PictureAdded)
-                    .ToList();
+                pictures = _pictureRepo.SearchNewest(
+                    query.PageSize * (query.PageNumber - 1),
+                    query.PageSize,
+                    query.SearchPhrase);
                 break;
             case SortSearchBy.MostLikes:
-                sortedQuery = baseQuery
-                    .OrderByDescending(p => p.Likes.Count(l => l.IsLike))
-                    .ToList();
+                pictures = _pictureRepo.SearchMostLikes(
+                    query.PageSize * (query.PageNumber - 1),
+                    query.PageSize,
+                    query.SearchPhrase);
                 break;
             default:
                 throw new BadRequestException("Invalid 'search by' option");
         }
 
-        var pictures = sortedQuery
-            .Where(p => query.SearchPhrase == null ||
-                        p.Name.ToLower().Contains(query.SearchPhrase.ToLower()))
-                        // p.Tags.ToLower().Contains(query.SearchPhrase.ToLower()))
-            .Select( picture => _pictureRepo.GetById(picture.Id))
-            .ToList();
+        var picBuffer = pictures as Picture[] ?? pictures.ToArray();
+        if (!picBuffer.Any()) throw new NotFoundException("pictures not found");
 
-        if (pictures.Count == 0) throw new NotFoundException("pictures not found");
-        
-        var resultCount = pictures.Count;
+        var resultCount = picBuffer.Length;
         var pictureDtos = _mapper
             .Map<List<PictureDto>>(pictures)
-            .Skip(query.PageSize * (query.PageNumber - 1))
-            .Take(query.PageSize)
             .ToList();
         AllowModifyItems(pictureDtos);
         var result = new PagedResult<PictureDto>(pictureDtos, resultCount, query.PageSize, query.PageNumber);
@@ -149,6 +138,7 @@ public class PictureService : IPictureService
         var picture = _pictureRepo.GetById(id);
         if (picture == null) throw new NotFoundException("picture not found");
         var result = _mapper.Map<PictureDto>(picture);
+        AllowModifyItems(result);
         return result;
     }
     
@@ -217,10 +207,6 @@ public class PictureService : IPictureService
         {
             picture.Name = dto.Name;
         }
-        // if (dto.Tags is not null)
-        // {
-        //     picture.Tags = dto.Tags.ToString();
-        // }
         _pictureRepo.Update(picture);
         _pictureRepo.Save();
         var result = _mapper.Map<PictureDto>(picture);
@@ -242,9 +228,11 @@ public class PictureService : IPictureService
         _logger.LogWarning($"Picture with id: {id} DELETE action success");
     }
 
+    #region Private methods
 
     private void AllowModifyItems(List<PictureDto> items)
     {
+        if (_accountContextService.TryGetAccountId() is null) return;
         var accountRole = _accountContextService.GetAccountRole();
         var accountId = _accountContextService.GetEncodedAccountId();
         foreach (var item in items)
@@ -257,6 +245,7 @@ public class PictureService : IPictureService
             {
                 item.IsAdminModifiable = true;
             }
+
             foreach (var comment in item.Comments)
             {
                 if (comment.AccountId == accountId)
@@ -268,6 +257,51 @@ public class PictureService : IPictureService
                     item.IsAdminModifiable = true;
                 }
             }
+
+            if (item.Likes.Any(l => (l.AccountId == accountId && l.IsLike)))
+            {
+                item.LikeState = LikeState.Liked;
+            }
+            if (item.Likes.Any(l => (l.AccountId == accountId && !l.IsLike)))
+            {
+                item.LikeState = LikeState.DisLiked;
+            }
+        }
+    }
+
+    private void AllowModifyItems(PictureDto item)
+    {
+        if (_accountContextService.TryGetAccountId() is null) return;
+        var accountRole = _accountContextService.GetAccountRole();
+        var accountId = _accountContextService.GetEncodedAccountId();
+        if (item.AccountId == accountId)
+        {
+            item.IsModifiable = true;
+        }
+        else if (accountRole == 3)
+        {
+            item.IsAdminModifiable = true;
+        }
+
+        foreach (var comment in item.Comments)
+        {
+            if (comment.AccountId == accountId)
+            {
+                comment.IsModifiable = true;
+            }
+            else if (accountRole == 3)
+            {
+                item.IsAdminModifiable = true;
+            }
+        }
+
+        if (item.Likes.Any(l => (l.AccountId == accountId && l.IsLike)))
+        {
+            item.LikeState = LikeState.Liked;
+        }
+        if (item.Likes.Any(l => (l.AccountId == accountId && !l.IsLike)))
+        {
+            item.LikeState = LikeState.DisLiked;
         }
     }
 
@@ -277,5 +311,7 @@ public class PictureService : IPictureService
         var authorizationResult = _authorizationService.AuthorizeAsync(user, picture, new PictureOperationRequirement(operation)).Result;
         if (!authorizationResult.Succeeded) throw new ForbidException(message);
     }
+
+    #endregion
     
 }

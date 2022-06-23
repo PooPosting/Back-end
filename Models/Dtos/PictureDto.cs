@@ -1,4 +1,5 @@
-﻿using PicturesAPI.Models.Interfaces;
+﻿using PicturesAPI.Enums;
+using PicturesAPI.Models.Interfaces;
 
 namespace PicturesAPI.Models.Dtos;
 
@@ -17,6 +18,8 @@ public class PictureDto
 
     public IEnumerable<LikeDto> Likes { get; set; }
     public IEnumerable<CommentDto> Comments { get; set; }
+
+    public LikeState LikeState { get; set; } = LikeState.Deleted;
     public bool IsModifiable { get; set; } = false;
     public bool IsAdminModifiable { get; set; } = false;
 }

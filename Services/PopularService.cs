@@ -10,43 +10,25 @@ namespace PicturesAPI.Services;
 
 public class PopularService: IPopularService
 {
-    private readonly IPictureRepo _pictureRepo;
-    private readonly IAccountRepo _accountRepo;
+    private readonly IPopularRepo _popularRepo;
     private readonly IMapper _mapper;
 
     public PopularService(
-        IPictureRepo pictureRepo,
-        IAccountRepo accountRepo,
+        IPopularRepo popularRepo,
         IMapper mapper)
     {
-        _pictureRepo = pictureRepo;
-        _accountRepo = accountRepo;
+        _popularRepo = popularRepo;
         _mapper = mapper;
     }
 
     public PopularContentDto Get()
     {
-        var mostVotedPics =
-            (_pictureRepo.GetAll())
-            .OrderByDescending(p => p.Likes.Count)
-            .Take(5);
-        var mostLikedPics =
-            (_pictureRepo.GetAll())
-            .OrderByDescending(p => p.Likes.Count(l => l.IsLike))
-            .Take(5);
-        var mostCommentedPics =
-            (_pictureRepo.GetAll())
-            .OrderByDescending(p => p.Comments.Count)
-            .Take(5);
+        var mostVotedPics = _popularRepo.GetPicsByVoteCount(5);
+        var mostLikedPics = _popularRepo.GetPicsByLikeCount(5);
+        var mostCommentedPics = _popularRepo.GetPicsByCommentCount(5);
 
-        var mostPostsAccs =
-            (_accountRepo.GetAll())
-            .OrderByDescending(a => a.Pictures.Count)
-            .Take(5);
-        var mostLikedAccs =
-            (_accountRepo.GetAll())
-            .OrderByDescending(CountPicLikes)
-            .Take(5);
+        var mostPostsAccs = _popularRepo.GetAccsByPostCount(5);
+        var mostLikedAccs = _popularRepo.GetAccsByPostLikesCount(5);
 
         var result = new PopularContentDto()
         {
@@ -56,13 +38,6 @@ public class PopularService: IPopularService
             MostPostedAccounts = _mapper.Map<ICollection<AccountDto>>(mostPostsAccs),
             MostLikedAccounts = _mapper.Map<ICollection<AccountDto>>(mostLikedAccs),
         };
-        return result;
-    }
-
-    private int CountPicLikes(Account account)
-    {
-        var result = 0;
-        account.Pictures.ToList().ForEach(a => result += a.Likes.Count);
         return result;
     }
 }

@@ -1,9 +1,6 @@
-﻿using System.Security.Claims;
-using AutoMapper;
-using PicturesAPI.Entities;
+﻿using PicturesAPI.Entities;
 using PicturesAPI.Enums;
 using PicturesAPI.Exceptions;
-using PicturesAPI.Models.Dtos;
 using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services.Interfaces;
 
@@ -12,7 +9,6 @@ namespace PicturesAPI.Services;
 public class PictureLikingService : IPictureLikingService
 {
     private readonly IPictureRepo _pictureRepo;
-    private readonly IMapper _mapper;
     private readonly ITagRepo _tagRepo;
     private readonly ILikeRepo _likeRepo;
     private readonly IAccountRepo _accountRepo;
@@ -22,19 +18,17 @@ public class PictureLikingService : IPictureLikingService
         ILikeRepo likeRepo,
         IAccountRepo accountRepo,
         IPictureRepo pictureRepo,
-        IMapper mapper,
         ITagRepo tagRepo,
         IAccountContextService accountContextService)
     {
         _pictureRepo = pictureRepo;
-        _mapper = mapper;
         _tagRepo = tagRepo;
         _likeRepo = likeRepo;
         _accountRepo = accountRepo;
         _accountContextService = accountContextService;
     }
     
-    public PictureDto Like(int id)
+    public LikeState Like(int id)
     {
         var picture = _pictureRepo.GetById(id);
         var accountId = _accountContextService.GetAccountId();
@@ -57,6 +51,8 @@ public class PictureLikingService : IPictureLikingService
                 {
                     _tagRepo.TryDeleteAccountLikedTag(account, tag);
                 }
+                _likeRepo.Save();
+                return LikeState.Deleted;
             }
             // like exists and (IsLike == false)
             else
@@ -67,6 +63,8 @@ public class PictureLikingService : IPictureLikingService
                 {
                     _tagRepo.TryInsertAccountLikedTag(account, tag);
                 }
+                _likeRepo.Save();
+                return LikeState.Liked;
             }
         }
         // like does not exist
@@ -83,13 +81,13 @@ public class PictureLikingService : IPictureLikingService
             {
                 _tagRepo.TryInsertAccountLikedTag(account, tag);
             }
+            _likeRepo.Save();
+            return LikeState.Liked;
         }
 
-        _likeRepo.Save();
-        return _mapper.Map<PictureDto>(picture);
     }
 
-    public PictureDto DisLike(int id)
+    public LikeState DisLike(int id)
     {
         var picture = _pictureRepo.GetById(id);
         var accountId = _accountContextService.GetAccountId();
@@ -105,6 +103,8 @@ public class PictureLikingService : IPictureLikingService
             if (like.IsLike == false)
             {
                 _likeRepo.DeleteById(like.Id);
+                _likeRepo.Save();
+                return LikeState.Deleted;
             }
             // like exists and (IsLike == true)
             else
@@ -116,6 +116,8 @@ public class PictureLikingService : IPictureLikingService
                 {
                     _tagRepo.TryDeleteAccountLikedTag(account, tag);
                 }
+                _likeRepo.Save();
+                return LikeState.DisLiked;
             }
         }
         // does not exist
@@ -128,10 +130,9 @@ public class PictureLikingService : IPictureLikingService
                     Liker = account,
                     IsLike = false
                 });
+            _likeRepo.Save();
+            return LikeState.DisLiked;
         }
-
-        _likeRepo.Save();
-        return _mapper.Map<PictureDto>(picture);
     }
 
 }

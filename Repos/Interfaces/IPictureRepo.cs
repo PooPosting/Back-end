@@ -6,9 +6,11 @@ namespace PicturesAPI.Repos.Interfaces;
 public interface IPictureRepo
 {
     Picture GetById(int id);
-    List<Picture> GetAll();
-    List<Picture> GetNotSeenByAccountId(int accountId);
-    List<Picture> GetByAccountId(int accountId);
+    IEnumerable<Picture> GetFromAll(int itemsToSkip, int itemsToTake);
+    IEnumerable<Picture> GetNotSeenByAccountId(int accountId, int itemsToTake);
+    IEnumerable<Picture> SearchAll(int itemsToSkip, int itemsToTake, string itemSearchPhrase);
+    IEnumerable<Picture> SearchNewest(int itemsToSkip, int itemsToTake, string itemSearchPhrase);
+    IEnumerable<Picture> SearchMostLikes(int itemsToSkip, int itemsToTake, string itemSearchPhrase);
     int Insert(Picture picture);
     void Update(Picture picture);
     void DeleteById(int id);

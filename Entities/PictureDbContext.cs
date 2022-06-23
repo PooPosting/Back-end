@@ -17,7 +17,7 @@ public class PictureDbContext : DbContext
 
     // many-to-many joins
     public virtual DbSet<PictureTagJoin> PictureTagJoins { get; set; }
-    public virtual DbSet<PictureSeenByAccountJoin> PictureAccountJoins { get; set; }
+    public virtual DbSet<PictureSeenByAccountJoin> PictureSeenByAccountJoins { get; set; }
     public virtual DbSet<AccountLikedTagsJoin> AccountLikedTagJoins { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -35,12 +35,12 @@ public class PictureDbContext : DbContext
         modelBuilder.Entity<PictureSeenByAccountJoin>()
             .HasOne(p => p.Picture)
             .WithMany(a => a.PictureAccountJoins)
-            .HasForeignKey(aid => aid.AccountId);
+            .HasForeignKey(aid => aid.PictureId);
 
         modelBuilder.Entity<PictureSeenByAccountJoin>()
             .HasOne(p => p.Account)
             .WithMany(a => a.PictureAccountJoins)
-            .HasForeignKey(pid => pid.PictureId);
+            .HasForeignKey(pid => pid.AccountId);
 
         modelBuilder.Entity<AccountLikedTagsJoin>()
             .HasOne(a => a.Account)
