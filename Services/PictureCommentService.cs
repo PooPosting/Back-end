@@ -37,7 +37,7 @@ public class PictureCommentService : IPictureCommentService
     public CommentDto Create(int picId, string text)
     {
         var accountId = _accountContextService.GetAccountId();
-        if ((_pictureRepo.GetById(picId)) is null) throw new NotFoundException("picture not found");
+        if ((_pictureRepo.GetById(picId)) is null) throw new NotFoundException();
 
         var comment = new Comment()
         {
@@ -74,7 +74,7 @@ public class PictureCommentService : IPictureCommentService
     private void AuthorizeCommentOperation(int commId, ResourceOperation operation, string message)
     {
         var comment = _commentRepo.GetById(commId);
-        if (comment is null) throw new NotFoundException("comment not found");
+        if (comment is null) throw new NotFoundException();
         var user = _accountContextService.User;
         var authorizationResult = _authorizationService.AuthorizeAsync(user, comment, new CommentOperationRequirement(operation)).Result;
         if (!authorizationResult.Succeeded) throw new ForbidException(message);

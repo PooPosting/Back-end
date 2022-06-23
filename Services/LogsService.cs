@@ -54,7 +54,7 @@ public class LogsService: ILogsService
         }
         catch (IOException)
         {
-            throw new NotFoundException("Log file not found");
+            throw new NotFoundException();
         }
 
         return log;

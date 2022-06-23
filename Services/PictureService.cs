@@ -104,7 +104,7 @@ public class PictureService : IPictureService
         }
 
         var picBuffer = pictures as Picture[] ?? pictures.ToArray();
-        if (!picBuffer.Any()) throw new NotFoundException("pictures not found");
+        if (!picBuffer.Any()) throw new NotFoundException();
 
         var resultCount = picBuffer.Length;
         var pictureDtos = _mapper
@@ -117,7 +117,7 @@ public class PictureService : IPictureService
 
     public  List<LikeDto> GetPicLikes(int id)
     {
-        if (_pictureRepo.GetById(id) is null) throw new NotFoundException("picture not found");
+        if (_pictureRepo.GetById(id) is null) throw new NotFoundException();
         var likes = _likeRepo.GetByLikedId(id);
         var likeDtos = _mapper.Map<List<LikeDto>>(likes);
 
@@ -126,7 +126,7 @@ public class PictureService : IPictureService
     
     public  List<AccountDto> GetPicLikers(int id)
     {
-        if (_pictureRepo.GetById(id) is null) throw new NotFoundException("picture not found");
+        if (_pictureRepo.GetById(id) is null) throw new NotFoundException();
         var likes = _likeRepo.GetByLikedId(id);
         var accounts = likes.Select(like => like.Liker).ToList();
         var result = _mapper.Map<List<AccountDto>>(accounts);
@@ -136,7 +136,7 @@ public class PictureService : IPictureService
     public PictureDto GetById(int id)
     {
         var picture = _pictureRepo.GetById(id);
-        if (picture == null) throw new NotFoundException("picture not found");
+        if (picture == null) throw new NotFoundException();
         var result = _mapper.Map<PictureDto>(picture);
         AllowModifyItems(result);
         return result;
@@ -195,7 +195,7 @@ public class PictureService : IPictureService
     public PictureDto Update(int id, PutPictureDto dto)
     {
         var picture = _pictureRepo.GetById(id);
-        if (picture is null) throw new NotFoundException("picture not found");
+        if (picture is null) throw new NotFoundException();
         
         AuthorizePictureOperation(picture, ResourceOperation.Update,"you cant modify picture you didnt added");
 
@@ -216,7 +216,7 @@ public class PictureService : IPictureService
     public void Delete(int id)
     {
         var picture = _pictureRepo.GetById(id);
-        if (picture is null) throw new NotFoundException("picture not found");
+        if (picture is null) throw new NotFoundException();
         _logger.LogWarning($"Picture with id: {id} DELETE action invoked");
 
         AuthorizePictureOperation(picture, ResourceOperation.Delete ,"you have no rights to delete this picture");

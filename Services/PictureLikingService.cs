@@ -33,7 +33,7 @@ public class PictureLikingService : IPictureLikingService
         var picture = _pictureRepo.GetById(id);
         var accountId = _accountContextService.GetAccountId();
 
-        if (picture is null) throw new NotFoundException("picture not found");
+        if (picture is null) throw new NotFoundException();
 
         // set up like/dislike logic (database liked tags insertion/drop)
         var account = _accountRepo.GetById(accountId);
@@ -94,7 +94,7 @@ public class PictureLikingService : IPictureLikingService
     {
         var picture = _pictureRepo.GetById(id);
         var accountId = _accountContextService.GetAccountId();
-        if (picture is null) throw new NotFoundException("picture not found");
+        if (picture is null) throw new NotFoundException();
 
         // set up like/dislike logic (database liked tags insertion/drop)
         var account = _accountRepo.GetById(accountId);

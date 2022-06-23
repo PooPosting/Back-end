@@ -46,7 +46,7 @@ public class AccountService : IAccountService
     public AccountDto GetById(int id)
     {
         var account = _accountRepo.GetById(id);
-        if (account is null || account.IsDeleted) throw new NotFoundException("account not found");
+        if (account is null || account.IsDeleted) throw new NotFoundException();
         var result = _mapper.Map<AccountDto>(account);
         AllowModifyItems(result);
         return result;
@@ -70,7 +70,7 @@ public class AccountService : IAccountService
 
         #endregion
 
-        if (accounts.Count == 0) throw new NotFoundException("accounts not found");
+        if (accounts.Count == 0) throw new NotFoundException();
         
         var resultCount = 0;
         var accountDtos = _mapper.Map<List<AccountDto>>(accounts).ToList();
@@ -81,7 +81,7 @@ public class AccountService : IAccountService
 
     public List<LikeDto> GetAccLikes(int id)
     {
-        if (_accountRepo.GetById(id) is null) throw new NotFoundException("account not found");
+        if (_accountRepo.GetById(id) is null) throw new NotFoundException();
         
         var likes = _likeRepo.GetByLikerId(id);
         var likeDtos = _mapper.Map<List<LikeDto>>(likes);
@@ -111,7 +111,7 @@ public class AccountService : IAccountService
     public bool Delete(int id)
     {
         var account = _accountRepo.GetById(id);
-        if (account is null || account.IsDeleted) throw new NotFoundException("account not found");
+        if (account is null || account.IsDeleted) throw new NotFoundException();
         _logger.LogWarning($"Account with Nickname: {account.Nickname} DELETE action invoked");
         AuthorizeAccountOperation(account, ResourceOperation.Delete ,"You have no rights to delete this account");
         
@@ -125,7 +125,7 @@ public class AccountService : IAccountService
     public bool DeleteAccPics(int id)
     {
         var account = _accountRepo.GetById(id);
-        if (account is null || account.IsDeleted) throw new NotFoundException("account not found");
+        if (account is null || account.IsDeleted) throw new NotFoundException();
 
         _logger.LogWarning($"Account with Nickname: {account.Nickname} DELETE ALL PICTURES action invoked");
         AuthorizeAccountOperation(account, ResourceOperation.Delete ,"You have no rights to delete this account's pictures");

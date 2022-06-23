@@ -22,7 +22,7 @@ public class RestrictedIpsService: IRestrictedIpsService
     
     public RestrictedIp GetByIp(string ip)
     {
-        return _restrictedIpRepo.GetByIp(ip) ?? throw new NotFoundException("There is no such a restricted ip");
+        return _restrictedIpRepo.GetByIp(ip) ?? throw new NotFoundException();
     }
     
     public void Add(string ip, bool cantGet, bool cantPost)

@@ -50,12 +50,12 @@ public class ErrorHandlingMiddleware : IMiddleware
         catch (NoResultException)
         {
             context.Response.StatusCode = 404;
-            await context.Response.WriteAsync("item not found");
+            await context.Response.WriteAsync("resource not found");
         }
-        catch (NotFoundException notFoundException)
+        catch (NotFoundException)
         {
             context.Response.StatusCode = 404;
-            await context.Response.WriteAsync(notFoundException.Message);
+            await context.Response.WriteAsync("resource not found");
         }
 
         catch (Exception e)
