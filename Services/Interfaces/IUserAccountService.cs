@@ -7,5 +7,5 @@ public interface IUserAccountService
 {
     bool Create(CreateAccountDto dto);
     LoginSuccessResult GenerateJwt(LoginDto dto);
-    LsLoginSuccessResult VerifyJwt(LsLoginDto dto);
+    LoginSuccessResult VerifyJwt(LsLoginDto dto);
 }

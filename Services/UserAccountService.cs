@@ -69,11 +69,9 @@ public class UserAccountService : IUserAccountService
                 new Claim(ClaimTypes.Name, account.Nickname),
                 new Claim(ClaimTypes.Role, account.Role.Id.ToString()),
             };
-
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authenticationSettings.JwtKey));
             var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var expires = DateTime.Now.AddDays(_authenticationSettings.JwtExpireDays);
-
             var token = new JwtSecurityToken(
                 _authenticationSettings.JwtIssuer,
                 _authenticationSettings.JwtIssuer,
@@ -94,7 +92,7 @@ public class UserAccountService : IUserAccountService
     }
 
     //rewrite this whole method
-    public LsLoginSuccessResult VerifyJwt(LsLoginDto dto)
+    public LoginSuccessResult VerifyJwt(LsLoginDto dto)
     {
         var handler = new JwtSecurityTokenHandler();
         JwtSecurityToken jwtToken;
@@ -102,6 +100,31 @@ public class UserAccountService : IUserAccountService
         {
             jwtToken = handler.ReadToken(dto.JwtToken) as JwtSecurityToken;
             if (jwtToken is null) throw new InvalidAuthTokenException();
+            var id = jwtToken.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            var account = _accountRepo.GetById(int.Parse(id));
+            var claims = new List<Claim>()
+            {
+                new Claim(ClaimTypes.NameIdentifier, (account.Id.ToString())),
+                new Claim(ClaimTypes.Name, account.Nickname),
+                new Claim(ClaimTypes.Role, account.Role.Id.ToString()),
+            };
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authenticationSettings.JwtKey));
+            var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var expires = DateTime.Now.AddDays(_authenticationSettings.JwtExpireDays);
+            var token = new JwtSecurityToken(
+                _authenticationSettings.JwtIssuer,
+                _authenticationSettings.JwtIssuer,
+                claims,
+                expires: expires,
+                signingCredentials: cred);
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            var loginSuccessResult = new LoginSuccessResult()
+            {
+                Uid = IdHasher.EncodeAccountId(int.Parse(id)),
+                AuthToken = tokenHandler.WriteToken(token)
+            };
+            return loginSuccessResult;
         }
         catch (Exception)
         {
@@ -109,22 +132,7 @@ public class UserAccountService : IUserAccountService
         }
 
 
-        var id = jwtToken.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-        if (
-            (_accountRepo.GetById(int.Parse(id)) is null)
-        )
-        {
-            throw new UnauthorizedException("please log in");
-        }
 
-        var account = _accountRepo.GetById(int.Parse(id));
 
-        var loginSuccessResult = new LsLoginSuccessResult()
-        {
-            AccountDto = _mapper.Map<AccountDto>(account),
-            Likes = _mapper.Map<List<LikeDto>>(_likeRepo.GetByLikerId(account.Id))
-        };
-
-        return loginSuccessResult;
     }
 }

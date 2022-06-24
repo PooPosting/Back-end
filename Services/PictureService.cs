@@ -43,35 +43,34 @@ public class PictureService : IPictureService
         _likeRepo = likeRepo;
         _tagRepo = tagRepo;
     }
-    
+
+    public List<PictureDto> GetPersonalizedPictures(PictureQueryPersonalized query)
+    {
+        var accId = _accountContextService.GetAccountId();
+        var pictures = _pictureRepo.GetNotSeenByAccountId(accId, query.PageSize);
+
+        var picArray = pictures.ToArray(); // avoiding multiple enumeration
+        foreach (var picture in picArray)
+        {
+            _accountRepo.MarkAsSeen(accId, picture.Id);
+        }
+        if (picArray.Any())
+        {
+            _accountRepo.Save();
+        }
+        var pictureDtos = _mapper.Map<List<PictureDto>>(picArray).ToList();
+        AllowModifyItems(pictureDtos);
+        return pictureDtos;
+    }
+
     public List<PictureDto> GetPictures(PictureQuery query)
     {
-        List<PictureDto> pictureDtos;
-
-        if (_accountContextService.TryGetAccountId() is not null)
-        {
-            var accId = _accountContextService.GetAccountId();
-            var pictures = _pictureRepo.GetNotSeenByAccountId(accId, query.PageSize);
-
-            var picArray = pictures.ToArray();
-            foreach (var picture in picArray)
-            {
-                _accountRepo.MarkAsSeen(accId, picture.Id);
-            }
-            if (picArray.Any())
-            {
-                _accountRepo.Save();
-            }
-            pictureDtos = _mapper.Map<List<PictureDto>>(picArray).ToList();
-        }
-        else
-        {
-            var pictures = _pictureRepo.GetFromAll(
-                query.PageSize * (query.PageNumber - 1),
-                query.PageSize
-            );
-            pictureDtos = _mapper.Map<List<PictureDto>>(pictures).ToList();
-        }
+        var pictures = _pictureRepo.GetFromAll(
+            query.PageSize * (query.PageNumber - 1),
+            query.PageSize
+        );
+        var pictureDtos = _mapper.Map<List<PictureDto>>(pictures).ToList();
+        AllowModifyItems(pictureDtos);
         return pictureDtos;
     }
 
@@ -106,12 +105,11 @@ public class PictureService : IPictureService
         var picBuffer = pictures as Picture[] ?? pictures.ToArray();
         if (!picBuffer.Any()) throw new NotFoundException();
 
-        var resultCount = picBuffer.Length;
         var pictureDtos = _mapper
             .Map<List<PictureDto>>(pictures)
             .ToList();
         AllowModifyItems(pictureDtos);
-        var result = new PagedResult<PictureDto>(pictureDtos, resultCount, query.PageSize, query.PageNumber);
+        var result = new PagedResult<PictureDto>(pictureDtos, query.PageSize, query.PageNumber);
         return result;
     }
 
@@ -183,13 +181,13 @@ public class PictureService : IPictureService
 
     }
 
-    public SafeSearchAnnotation Classify(IFormFile file)
+    public async Task<SafeSearchAnnotation> Classify(IFormFile file, CancellationToken cancellationToken)
     {
         if (file is null) throw new BadRequestException("Invalid file");
         using var ms = new MemoryStream();
-        file.CopyTo(ms);
+        await file.CopyToAsync(ms, cancellationToken);
         var fileBytes = ms.ToArray();
-        return NsfwClassifier.ClassifyAsync(fileBytes).Result;
+        return await NsfwClassifier.ClassifyAsync(fileBytes, cancellationToken);
     }
 
     public PictureDto Update(int id, PutPictureDto dto)

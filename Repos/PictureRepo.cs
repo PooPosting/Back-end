@@ -36,6 +36,7 @@ public class PictureRepo : IPictureRepo
     {
         return _dbContext.Pictures
             .Where(p => !p.IsDeleted)
+            .Include(p => p.Account)
             .Include(p => p.PictureTagJoins)
             .ThenInclude(j => j.Tag)
             .Include(p => p.Likes)
@@ -59,6 +60,7 @@ public class PictureRepo : IPictureRepo
                 .Where(j => j.AccountId == accountId)
                 .AsSplitQuery()
                 .Any(j => j.PictureId == p.Id && j.AccountId == accountId))
+            .Include(p => p.Account)
             .Include(p => p.PictureTagJoins)
             .ThenInclude(j => j.Tag)
             .Include(p => p.Likes)
@@ -80,6 +82,7 @@ public class PictureRepo : IPictureRepo
         return _dbContext.Pictures
             .Where(p => !p.IsDeleted)
             .Where(p => searchPhrase == null || p.Name.ToLower().Contains(searchPhrase.ToLower()))
+            .Include(p => p.Account)
             .Include(p => p.PictureTagJoins)
             .ThenInclude(j => j.Tag)
             .Include(p => p.Likes)
@@ -99,6 +102,7 @@ public class PictureRepo : IPictureRepo
         return _dbContext.Pictures
             .Where(p => !p.IsDeleted)
             .Where(p => searchPhrase == null || p.Name.ToLower().Contains(searchPhrase.ToLower()))
+            .Include(p => p.Account)
             .Include(p => p.PictureTagJoins)
             .ThenInclude(j => j.Tag)
             .Include(p => p.Likes)
@@ -118,6 +122,7 @@ public class PictureRepo : IPictureRepo
         return _dbContext.Pictures
             .Where(p => !p.IsDeleted)
             .Where(p => searchPhrase == null || p.Name.ToLower().Contains(searchPhrase.ToLower()))
+            .Include(p => p.Account)
             .Include(p => p.PictureTagJoins)
             .ThenInclude(j => j.Tag)
             .Include(p => p.Likes)

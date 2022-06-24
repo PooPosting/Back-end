@@ -5,12 +5,9 @@ namespace PicturesAPI.Services.Helpers;
 
 public static class NsfwClassifier
 {
-    public async static Task<SafeSearchAnnotation> ClassifyAsync(byte[] fileBytes)
+    public static async Task<SafeSearchAnnotation> ClassifyAsync(byte[] fileBytes, CancellationToken cancellationToken)
     {
-        Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS",
-            Path.Combine(Environment.CurrentDirectory, "authKey.json"));
-
-        var client = ImageAnnotatorClient.Create();
+        var client = await ImageAnnotatorClient.CreateAsync(cancellationToken);
         var image = Image.FromBytes(fileBytes);
 
         return await client.DetectSafeSearchAsync(image);

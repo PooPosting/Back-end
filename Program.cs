@@ -16,6 +16,7 @@ using PicturesAPI.Authorization;
 using PicturesAPI.Entities;
 using PicturesAPI.Middleware;
 using PicturesAPI.Models;
+using PicturesAPI.Models.Configuration;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Models.Validators;
 using PicturesAPI.Repos;
@@ -36,6 +37,10 @@ builder.Host.UseNLog();
 
 builder.Services.AddControllers().AddFluentValidation()
     .AddOData(options => options.Select().Filter().OrderBy());
+
+var sitemapSettings = new SitemapSettings();
+builder.Configuration.GetSection("SitemapSettings").Bind(sitemapSettings);
+builder.Services.AddSingleton(sitemapSettings);
 
 // Auth
 var authenticationSettings = new AuthenticationSettings();
@@ -107,10 +112,12 @@ builder.Services.AddScoped<IRestrictedIpRepo, RestrictedIpRepo>();
 builder.Services.AddScoped<IRoleRepo, RoleRepo>();
 builder.Services.AddScoped<ITagRepo, TagRepo>();
 builder.Services.AddScoped<IPopularRepo, PopularRepo>();
+builder.Services.AddScoped<ISitemapRepo, SitemapRepo>();
 
 // Other stuff
 builder.Services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
 builder.Services.AddScoped<PictureSeeder>();
+builder.Services.AddScoped<EnvironmentVariableSetter>();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSwaggerGen();
@@ -144,14 +151,15 @@ app.UseFileServer(new FileServerOptions
     RequestPath = "/wwwroot",
     EnableDefaultFiles = true
 }) ;
-
+var scope = app.Services.CreateScope();
 if (app.Environment.IsDevelopment())
 {
-    var scope = app.Services.CreateScope();
     var seeder = scope.ServiceProvider.GetRequiredService<PictureSeeder>();
     seeder.Seed();
     app.UseDeveloperExceptionPage();
 }
+var envSetter = scope.ServiceProvider.GetRequiredService<EnvironmentVariableSetter>();
+envSetter.Set();
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseMiddleware<RequestTimeMiddleware>();

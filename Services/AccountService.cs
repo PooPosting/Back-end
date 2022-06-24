@@ -54,28 +54,15 @@ public class AccountService : IAccountService
 
     public PagedResult<AccountDto> GetAll(AccountQuery query)
     {
-        #region Update this - write repo for this
+        var accounts = _accountRepo
+            .SearchAll(
+                query.PageSize * (query.PageNumber - 1),
+                query.PageSize,
+                query.SearchPhrase);
 
-        var baseQuery = _accountRepo.GetAll()
-            .Where(a => query.SearchPhrase == null || a.Nickname.ToLower().Contains(query.SearchPhrase.ToLower()))
-            .Where(a => !a.IsDeleted)
-            .OrderByDescending(a => a.Pictures.Count)
-            .ThenByDescending(a => a.Pictures.Sum(picture => picture.Likes.Count))
-            .ToList();
-
-        var accounts = baseQuery
-            .Skip(query.PageSize * (query.PageNumber - 1))
-            .Take(query.PageSize)
-            .ToList();
-
-        #endregion
-
-        if (accounts.Count == 0) throw new NotFoundException();
-        
-        var resultCount = 0;
         var accountDtos = _mapper.Map<List<AccountDto>>(accounts).ToList();
         AllowModifyItems(accountDtos);
-        var result = new PagedResult<AccountDto>(accountDtos, resultCount, query.PageSize, query.PageNumber);
+        var result = new PagedResult<AccountDto>(accountDtos, query.PageSize, query.PageNumber);
         return result;
     }
 

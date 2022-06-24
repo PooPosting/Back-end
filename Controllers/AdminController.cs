@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PicturesAPI.ActionFilters;
 using PicturesAPI.Entities;
 using PicturesAPI.Models.Dtos;
+using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Controllers;
@@ -14,13 +15,16 @@ namespace PicturesAPI.Controllers;
 public class AdminController: ControllerBase
 {
     private readonly ILogsService _logsService;
+    private readonly ISitemapRepo _sitemapRepo;
     private readonly IRestrictedIpsService _restrictedIpsService;
 
     public AdminController(
         ILogsService logsService,
+        ISitemapRepo sitemapRepo,
         IRestrictedIpsService restrictedIpsService)
     {
         _logsService = logsService;
+        _sitemapRepo = sitemapRepo;
         _restrictedIpsService = restrictedIpsService;
     }
 
@@ -71,6 +75,14 @@ public class AdminController: ControllerBase
     {
         _restrictedIpsService.UpdateMany(restrictedIp.Ips, restrictedIp.CantGet, restrictedIp.CantPost);
         return NoContent();
+    }
+
+    [HttpGet]
+    [Route("sitemap")]
+    public async Task<IActionResult> UpdateSitemap()
+    {
+        await _sitemapRepo.UpdateAsync();
+        return Ok();
     }
     
 }

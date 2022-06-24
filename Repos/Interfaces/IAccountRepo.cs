@@ -7,7 +7,7 @@ namespace PicturesAPI.Repos.Interfaces;
 
 public interface IAccountRepo
 {
-    List<Account> GetAll();
+    IEnumerable<Account> SearchAll(int itemsToSkip, int itemsToTake, string searchPhrase);
     Account GetById(int id);
     Account GetByNick(string nickname);
     void MarkAsSeen(int accountId, int pictureId);

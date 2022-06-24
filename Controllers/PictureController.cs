@@ -26,9 +26,18 @@ public class PictureController : ControllerBase
     [HttpGet]
     [EnableQuery]
     [AllowAnonymous]
-    public IActionResult GetAllPictures([FromQuery] PictureQuery query)
+    public IActionResult GetPictures([FromQuery] PictureQuery query)
     {
         var pictures = _pictureService.GetPictures(query);
+        return Ok(pictures);
+    }
+
+    [HttpGet]
+    [EnableQuery]
+    [Route("personalized")]
+    public IActionResult GetPersonalizedPictures([FromQuery] PictureQueryPersonalized query)
+    {
+        var pictures = _pictureService.GetPersonalizedPictures(query);
         return Ok(pictures);
     }
     
@@ -72,10 +81,9 @@ public class PictureController : ControllerBase
     [HttpPost]
     [ServiceFilter(typeof(CanPostFilter))]
     [Route("classify")]
-    public IActionResult ClassifyPicture([FromForm] IFormFile file)
+    public async Task<IActionResult> ClassifyPictureAsync([FromForm] IFormFile file, CancellationToken cancellationToken)
     {
-        // change this to async!
-        var result = _pictureService.Classify(file);
+        var result = await _pictureService.Classify(file, cancellationToken);
         return Ok(result);
     }
     
