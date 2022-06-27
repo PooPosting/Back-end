@@ -10,6 +10,7 @@ using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Models.Validators;
 using PicturesAPI.Repos.Interfaces;
+using PicturesAPI.Services.Helpers;
 using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Services;
@@ -91,18 +92,18 @@ public class AccountService : IAccountService
         var rootPath = Directory.GetCurrentDirectory();
         var account = await _accountContextService.GetAccountAsync();
 
-        var randomBgName = $"{Path.GetRandomFileName().Replace('.', '-')}.webp";
-        var fullBgPath = Path.Combine(rootPath, "wwwroot", "accounts", "background_pictures", $"{randomBgName}");
+        var bgName = $"{IdHasher.EncodeAccountId(account.Id)}-bgp.webp";
+        var fullBgPath = Path.Combine(rootPath, "wwwroot", "accounts", "background_pictures", $"{bgName}");
 
-        var randomPicName = $"{Path.GetRandomFileName().Replace('.', '-')}.webp";
-        var fullPicPath = Path.Combine(rootPath, "wwwroot", "accounts", "profile_pictures", $"{randomPicName}");
+        var picName = $"{IdHasher.EncodeAccountId(account.Id)}-pfp.webp";
+        var fullPicPath = Path.Combine(rootPath, "wwwroot", "accounts", "profile_pictures", $"{picName}");
 
         try
         {
             if (dto.BackgroundPic is not null)
             {
                 if (dto.BackgroundPic is not { Length: > 0 }) throw new BadRequestException("invalid picture");
-                account.BackgroundPicUrl = Path.Combine("wwwroot", "accounts", "background_pictures", $"{randomBgName}");
+                account.BackgroundPicUrl = Path.Combine("wwwroot", "accounts", "background_pictures", $"{bgName}");
 
                 await using var stream = new FileStream(fullBgPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
                 await dto.BackgroundPic.CopyToAsync(stream);
@@ -111,7 +112,7 @@ public class AccountService : IAccountService
             if (dto.ProfilePic is not null)
             {
                 if (dto.ProfilePic is not { Length: > 0 }) throw new BadRequestException("invalid picture");
-                account.ProfilePicUrl = Path.Combine("wwwroot", "accounts", "profile_pictures", $"{randomPicName}");
+                account.ProfilePicUrl = Path.Combine("wwwroot", "accounts", "profile_pictures", $"{picName}");
 
                 await using var stream = new FileStream(fullPicPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
                 await dto.ProfilePic.CopyToAsync(stream);

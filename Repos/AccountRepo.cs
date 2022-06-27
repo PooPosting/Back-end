@@ -27,6 +27,7 @@ public class AccountRepo : IAccountRepo
     public async Task<Account?> GetByIdAsync(int id)
     {
         return await _dbContext.Accounts
+            .Include(a => a.Role)
             .Include(a => a.Pictures)
             .ThenInclude(p => p.PictureTagJoins)
             .ThenInclude(j => j.Tag)
@@ -46,6 +47,7 @@ public class AccountRepo : IAccountRepo
     public async Task<Account?> GetByNickAsync(string nickname)
     {
         return await _dbContext.Accounts
+            .Include(a => a.Role)
             .Include(a => a.Pictures)
             .ThenInclude(p => p.PictureTagJoins)
             .ThenInclude(j => j.Tag)
@@ -68,6 +70,7 @@ public class AccountRepo : IAccountRepo
             .Where(a => searchPhrase == string.Empty || a.Nickname.ToLower().Contains(searchPhrase.ToLower()))
             .OrderByDescending(a => a.Pictures.Sum(picture => picture.Likes.Count))
             .ThenByDescending(a => a.Pictures.Count)
+            .Include(a => a.Role)
             .Include(a => a.Pictures)
             .ThenInclude(p => p.PictureTagJoins)
             .ThenInclude(j => j.Tag)

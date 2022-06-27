@@ -31,6 +31,8 @@ public class PictureRepo : IPictureRepo
     {
         return await _dbContext.Pictures
             .Where(p => !p.IsDeleted)
+            .Include(p => p.Account)
+            .ThenInclude(a => a.Role)
             .Include(p => p.PictureTagJoins)
             .ThenInclude(j => j.Tag)
             .Include(p => p.Likes)
@@ -48,6 +50,7 @@ public class PictureRepo : IPictureRepo
         return await _dbContext.Pictures
             .Where(p => !p.IsDeleted)
             .Include(p => p.Account)
+            .ThenInclude(a => a.Role)
             .Include(p => p.PictureTagJoins)
             .ThenInclude(j => j.Tag)
             .Include(p => p.Likes)
@@ -72,6 +75,7 @@ public class PictureRepo : IPictureRepo
                 .AsSplitQuery()
                 .Any(j => j.PictureId == p.Id && j.AccountId == accountId))
             .Include(p => p.Account)
+            .ThenInclude(a => a.Role)
             .Include(p => p.PictureTagJoins)
             .ThenInclude(j => j.Tag)
             .Include(p => p.Likes)
@@ -100,6 +104,7 @@ public class PictureRepo : IPictureRepo
             .Where(p => !p.IsDeleted)
             .Where(p => searchPhrase == string.Empty || p.Name.ToLower().Contains(searchPhrase.ToLower()))
             .Include(p => p.Account)
+            .ThenInclude(a => a.Role)
             .Include(p => p.PictureTagJoins)
             .ThenInclude(j => j.Tag)
             .Include(p => p.Likes)
@@ -121,6 +126,7 @@ public class PictureRepo : IPictureRepo
             .Where(p => !p.IsDeleted)
             .Where(p => searchPhrase == string.Empty || p.Name.ToLower().Contains(searchPhrase.ToLower()))
             .Include(p => p.Account)
+            .ThenInclude(a => a.Role)
             .Include(p => p.PictureTagJoins)
             .ThenInclude(j => j.Tag)
             .Include(p => p.Likes)
@@ -142,6 +148,7 @@ public class PictureRepo : IPictureRepo
             .Where(p => !p.IsDeleted)
             .Where(p => searchPhrase == string.Empty || p.Name.ToLower().Contains(searchPhrase.ToLower()))
             .Include(p => p.Account)
+            .ThenInclude(a => a.Role)
             .Include(p => p.PictureTagJoins)
             .ThenInclude(j => j.Tag)
             .Include(p => p.Likes)
