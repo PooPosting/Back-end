@@ -1,19 +1,17 @@
-﻿using PicturesAPI.Entities;
+﻿#nullable enable
+using PicturesAPI.Entities;
 
 namespace PicturesAPI.Repos.Interfaces;
 
 public interface ITagRepo
 {
-    List<Tag> GetAll();
-    List<Tag> GetByPhrase(string phrase);
-    Tag GetByValue(string value);
-    Tag InsertAndSave(Tag tag);
-    void TryInsertPictureTagJoin(Picture picture, Tag tag);
-    void TryInsertAccountLikedTag(Account account, Tag tag);
-    void TryDeleteAccountLikedTag(Account account, Tag tag);
-    void Delete(Tag tag);
-    void Update(Tag tag);
-    List<Tag> GetTagsByPictureId(int pictureId);
-    List<Tag> GetTagsByAccountId(int accountId);
-    void Save();
+    Task<IEnumerable<Tag>> GetByPhraseAsync(string phrase);
+    Task<IEnumerable<Tag>> GetTagsByPictureIdAsync(int pictureId);
+    Task<IEnumerable<Tag>> GetTagsByAccountIdAsync(int accountId);
+    Task<bool> TryInsertPictureTagJoinAsync(Picture picture, Tag tag);
+    Task<bool> TryInsertAccountLikedTagAsync(Account account, Tag tag);
+    Task<bool> TryDeleteAccountLikedTagAsync(Account account, Tag tag);
+    Task<Tag> InsertAsync(Tag tag);
+    Task<Tag> UpdateAsync(Tag tag);
+    Task<Tag> DeleteAsync(Tag tag);
 }

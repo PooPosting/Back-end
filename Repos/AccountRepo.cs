@@ -15,11 +15,42 @@ public class AccountRepo : IAccountRepo
         _dbContext = dbContext;
     }
 
-    public IEnumerable<Account> SearchAll(int itemsToSkip, int itemsToTake, string searchPhrase)
+    public async Task<Account?> GetByIdAsync(int id)
     {
-        return _dbContext.Accounts
+        return await _dbContext.Accounts
+            .Include(a => a.Pictures)
+            .ThenInclude(p => p.Likes)
+            .ThenInclude(p => p.Liker)
+            .Include(a => a.Pictures)
+            .ThenInclude(p => p.Comments
+                .Where(c => c.IsDeleted == false))
+            .ThenInclude(c => c.Account)
+            .Include(a => a.Likes)
+            .Include(a => a.Role)
+            .AsSplitQuery()
+            .SingleOrDefaultAsync(a => a.Id == id);
+    }
+
+    public async Task<Account?> GetByNickAsync(string nickname)
+    {
+        return await _dbContext.Accounts
+            .Include(a => a.Pictures)
+            .ThenInclude(p => p.Likes)
+            .ThenInclude(p => p.Liker)
+            .Include(a => a.Pictures)
+            .ThenInclude(p => p.Comments)
+            .ThenInclude(c => c.Account)
+            .Include(a => a.Likes)
+            .Include(a => a.Role)
+            .AsSplitQuery()
+            .SingleOrDefaultAsync(a => a.Nickname == nickname);
+    }
+
+    public async Task<IEnumerable<Account>> SearchAllAsync(int itemsToSkip, int itemsToTake, string searchPhrase)
+    {
+        return await _dbContext.Accounts
             .Where(a => !a.IsDeleted)
-            .Where(a => searchPhrase == null || a.Nickname.ToLower().Contains(searchPhrase.ToLower()))
+            .Where(a => searchPhrase == string.Empty || a.Nickname.ToLower().Contains(searchPhrase.ToLower()))
             .OrderByDescending(a => a.Pictures.Sum(picture => picture.Likes.Count))
             .ThenByDescending(a => a.Pictures.Count)
             .Include(p => p.Pictures)
@@ -30,57 +61,36 @@ public class AccountRepo : IAccountRepo
             .Include(a => a.Role)
             .Skip(itemsToSkip)
             .Take(itemsToTake)
-            .AsSplitQuery();
-    }
-
-    public Account GetById(int id)
-    {
-        return _dbContext.Accounts
-            .Include(a => a.Pictures)
-            .ThenInclude(p => p.Likes)
-            .ThenInclude(p => p.Liker)
-            .Include(a => a.Pictures)
-            .ThenInclude(p => p.Comments
-                .Where(c => c.IsDeleted == false))
-            .ThenInclude(c => c.Account)
-            .Include(a => a.Likes)
-            .Include(a => a.Role)
             .AsSplitQuery()
-            .SingleOrDefault(a => a.Id == id)!;
+            .ToListAsync();
     }
 
-    public Account GetByNick(string nickname)
+    public async Task<Account> InsertAsync(Account account)
     {
-        return _dbContext.Accounts
-            .Include(a => a.Pictures)
-            .ThenInclude(p => p.Likes)
-            .ThenInclude(p => p.Liker)
-            .Include(a => a.Pictures)
-            .ThenInclude(p => p.Comments)
-            .ThenInclude(c => c.Account)
-            .Include(a => a.Likes)
-            .Include(a => a.Role)
-            .AsSplitQuery()
-            .SingleOrDefault(a => a.Nickname == nickname)!;
+        await _dbContext.Accounts.AddAsync(account);
+        await _dbContext.SaveChangesAsync();
+        return account;
     }
 
-    public void Insert(Account newAccount)
-    {
-        _dbContext.Accounts.Add(newAccount);
-    }
-
-    public void Update(Account account)
+    public async Task<Account> UpdateAsync(Account account)
     {
         _dbContext.Accounts.Update(account);
+        await _dbContext.SaveChangesAsync();
+        return account;
     }
 
-    public void DeleteById(int id)
+    public async Task<bool> TryDeleteByIdAsync(int id)
     {
-        var accountToRemove = _dbContext.Accounts.SingleOrDefault(a => a.Id == id);
-        accountToRemove!.IsDeleted = true;
+        var account = _dbContext.Accounts.SingleOrDefault(a => a.Id == id);
+        if (account is not null)
+        {
+            account!.IsDeleted = true;
+            return await _dbContext.SaveChangesAsync() > 0;
+        }
+        return false;
     }
 
-    public void MarkAsSeen(int accountId, int pictureId)
+    public async Task<bool> MarkAsSeenAsync(int accountId, int pictureId)
     {
         if (!_dbContext.PictureSeenByAccountJoins
             .Any(j => (j.Account.Id == accountId) && (j.Picture.Id == pictureId)))
@@ -90,11 +100,9 @@ public class AccountRepo : IAccountRepo
                 Account = _dbContext.Accounts.SingleOrDefault(a => a.Id == accountId),
                 Picture = _dbContext.Pictures.SingleOrDefault(p => p.Id == pictureId)
             });
+            return await _dbContext.SaveChangesAsync() > 0;
         }
+        return false;
     }
 
-    public bool Save()
-    {
-        return _dbContext.SaveChanges() > 0;
-    }
 }

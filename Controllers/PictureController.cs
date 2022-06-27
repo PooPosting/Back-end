@@ -26,18 +26,18 @@ public class PictureController : ControllerBase
     [HttpGet]
     [EnableQuery]
     [AllowAnonymous]
-    public IActionResult GetPictures([FromQuery] PictureQuery query)
+    public async Task<IActionResult> GetPictures([FromQuery] PictureQuery query)
     {
-        var pictures = _pictureService.GetPictures(query);
+        var pictures = await _pictureService.GetPictures(query);
         return Ok(pictures);
     }
 
     [HttpGet]
     [EnableQuery]
     [Route("personalized")]
-    public IActionResult GetPersonalizedPictures([FromQuery] PictureQueryPersonalized query)
+    public async Task<IActionResult> GetPersonalizedPictures([FromQuery] PictureQueryPersonalized query)
     {
-        var pictures = _pictureService.GetPersonalizedPictures(query);
+        var pictures = await _pictureService.GetPersonalizedPictures(query);
         return Ok(pictures);
     }
     
@@ -45,36 +45,36 @@ public class PictureController : ControllerBase
     [EnableQuery]
     [AllowAnonymous]
     [Route("search")]
-    public IActionResult SearchAllPictures([FromQuery] SearchQuery query)
+    public async Task<IActionResult> SearchAllPictures([FromQuery] SearchQuery query)
     {
-        var pictures = _pictureService.SearchAll(query);
+        var pictures = await _pictureService.SearchAll(query);
         return Ok(pictures);
     }
 
     [HttpGet]
     [AllowAnonymous]
     [Route("{id}")]
-    public IActionResult GetSinglePictureById([FromRoute] string id)
+    public async Task<IActionResult> GetSinglePictureById([FromRoute] string id)
     {
-        var picture = _pictureService.GetById(IdHasher.DecodePictureId(id));
+        var picture = await _pictureService.GetById(IdHasher.DecodePictureId(id));
         return Ok(picture);
     }
     
     [HttpGet]
     [AllowAnonymous]
     [Route("{id}/likes")]
-    public IActionResult GetPictureLikes([FromRoute] string id)
+    public async Task<IActionResult> GetPictureLikes([FromRoute] string id)
     {
-        var likes = _pictureService.GetPicLikes(IdHasher.DecodePictureId(id));
+        var likes = await _pictureService.GetPicLikes(IdHasher.DecodePictureId(id));
         return Ok(likes);
     }
     
     [HttpGet]
     [AllowAnonymous]
     [Route("{id}/likers")]
-    public IActionResult GetPictureLikers([FromRoute] string id)
+    public async Task<IActionResult> GetPictureLikers([FromRoute] string id)
     {
-        var likes = _pictureService.GetPicLikers(IdHasher.DecodePictureId(id));
+        var likes = await _pictureService.GetPicLikers(IdHasher.DecodePictureId(id));
         return Ok(likes);
     }
 
@@ -90,7 +90,7 @@ public class PictureController : ControllerBase
     [HttpPost]
     [ServiceFilter(typeof(CanPostFilter))]
     [Route("create")]
-    public IActionResult PostPicture(
+    public async Task<IActionResult> PostPicture(
         [FromForm] IFormFile file, 
         [FromForm] string name, 
         [FromForm] string description,
@@ -103,40 +103,40 @@ public class PictureController : ControllerBase
         };
         if (tags is not null) dto.Tags = tags.Split(' ').ToList();
 
-        var pictureId = _pictureService.Create(file, dto);
+        var pictureId = await _pictureService.Create(file, dto);
         return Created($"api/picture/{pictureId}", null);
     }
 
     [HttpPut]
     [ServiceFilter(typeof(CanPostFilter))]
     [Route("{id}")]
-    public IActionResult PutPictureUpdate([FromRoute] string id, [FromBody] PutPictureDto dto)
+    public async Task<IActionResult> PutPictureUpdate([FromRoute] string id, [FromBody] PutPictureDto dto)
     {
-        var result = _pictureService.Update(IdHasher.DecodePictureId(id), dto);
+        var result = await _pictureService.Update(IdHasher.DecodePictureId(id), dto);
         return Ok(result);
     }
 
     [HttpPatch]
     [Route("{id}/voteup")]
-    public IActionResult PatchPictureVoteUp([FromRoute] string id)
+    public async Task<IActionResult> PatchPictureVoteUp([FromRoute] string id)
     {
-        var result = _pictureLikingService.Like(IdHasher.DecodePictureId(id));
+        var result = await _pictureLikingService.Like(IdHasher.DecodePictureId(id));
         return Ok(result);
     }
         
     [HttpPatch]
     [Route("{id}/votedown")]
-    public IActionResult PatchPictureVoteDown([FromRoute] string id)
+    public async Task<IActionResult> PatchPictureVoteDown([FromRoute] string id)
     {
-        var result = _pictureLikingService.DisLike(IdHasher.DecodePictureId(id));
+        var result = await _pictureLikingService.DisLike(IdHasher.DecodePictureId(id));
         return Ok(result);
     }
 
     [HttpDelete]
     [Route("{id}")]
-    public IActionResult DeletePicture([FromRoute] string id)
+    public async Task<IActionResult> DeletePicture([FromRoute] string id)
     {
-        _pictureService.Delete(IdHasher.DecodePictureId(id));
+        await _pictureService.Delete(IdHasher.DecodePictureId(id));
         return NoContent();
     }
 

@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿#nullable enable
+using Microsoft.EntityFrameworkCore;
 using PicturesAPI.Entities;
+using PicturesAPI.Exceptions;
 using PicturesAPI.Repos.Interfaces;
 
 namespace PicturesAPI.Repos;
@@ -13,54 +15,55 @@ public class LikeRepo : ILikeRepo
         _dbContext = dbContext;
     }
 
-    public Like GetById(int id)
+    public async Task<Like?> GetByIdAsync(int id)
     {
-        return _dbContext.Likes.SingleOrDefault(l => l.Id == id);
+        return await _dbContext.Likes.SingleOrDefaultAsync(l => l.Id == id);
     }
 
-    public List<Like> GetByLikerId(int id)
+    public async Task<Like?> GetByLikerIdAndLikedIdAsync(int accountId, int pictureId)
     {
-        return _dbContext.Likes.Where(l => l.Liker.Id == id)
-            .Include(a => a.Liked)
-            .Include(a => a.Liker)
-            .ToList();
-    }
-
-    public List<Like> GetByLikedId(int id)
-    {
-        return _dbContext.Likes.Where(l => l.Liked.Id == id)
-            .Include(a => a.Liked)
-            .Include(a => a.Liker)
-            .ToList();
-    }
-
-    public Like GetByLikerIdAndLikedId(int accountId, int pictureId)
-    {
-        return _dbContext.Likes
+        return await _dbContext.Likes
             .Include(l => l.Liker)
             .Include(l => l.Liked)
-            .FirstOrDefault(l => l.Liker.Id == accountId && l.Liked.Id == pictureId);
+            .FirstOrDefaultAsync(l => l.Liker.Id == accountId && l.Liked.Id == pictureId);
     }
 
-    public void Insert(Like like)
+    public async Task<IEnumerable<Like>> GetByLikerIdAsync(int id)
     {
-        _dbContext.Likes.Add(like);
+        return await _dbContext.Likes.Where(l => l.Liker.Id == id)
+            .Include(a => a.Liked)
+            .Include(a => a.Liker)
+            .ToListAsync();
     }
 
-    public void DeleteById(int id)
+    public async Task<IEnumerable<Like>> GetByLikedIdAsync(int id)
     {
-        var like = _dbContext.Likes.SingleOrDefaultAsync(l => l.Id == id).Result;
+        return await _dbContext.Likes.Where(l => l.Liked.Id == id)
+            .Include(a => a.Liked)
+            .Include(a => a.Liker)
+            .ToListAsync();
+    }
+
+    public async Task<Like> InsertAsync(Like like)
+    {
+        await _dbContext.Likes.AddAsync(like);
+        await _dbContext.SaveChangesAsync();
+        return like;
+    }
+
+    public async Task<Like> DeleteByIdAsync(int id)
+    {
+        var like = await _dbContext.Likes.SingleOrDefaultAsync(l => l.Id == id) ?? throw new NotFoundException();
         _dbContext.Likes.Remove(like!);
+        await _dbContext.SaveChangesAsync();
+        return like;
     }
 
-    public void Update(Like like)
+    public async Task<Like> UpdateAsync(Like like)
     {
         _dbContext.Likes.Update(like);
+        await _dbContext.SaveChangesAsync();
+        return like;
     }
 
-    public bool Save()
-    {
-        return _dbContext.SaveChanges() > 0;
-    }
-    
 }

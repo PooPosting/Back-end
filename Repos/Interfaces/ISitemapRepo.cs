@@ -1,4 +1,5 @@
-﻿namespace PicturesAPI.Repos.Interfaces;
+﻿#nullable enable
+namespace PicturesAPI.Repos.Interfaces;
 
 public interface ISitemapRepo
 {

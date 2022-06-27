@@ -11,12 +11,10 @@ public class PictureLikingService : IPictureLikingService
     private readonly IPictureRepo _pictureRepo;
     private readonly ITagRepo _tagRepo;
     private readonly ILikeRepo _likeRepo;
-    private readonly IAccountRepo _accountRepo;
     private readonly IAccountContextService _accountContextService;
 
     public PictureLikingService(
         ILikeRepo likeRepo,
-        IAccountRepo accountRepo,
         IPictureRepo pictureRepo,
         ITagRepo tagRepo,
         IAccountContextService accountContextService)
@@ -24,55 +22,47 @@ public class PictureLikingService : IPictureLikingService
         _pictureRepo = pictureRepo;
         _tagRepo = tagRepo;
         _likeRepo = likeRepo;
-        _accountRepo = accountRepo;
         _accountContextService = accountContextService;
     }
     
-    public LikeState Like(int id)
+    public async Task<LikeState> Like(int id)
     {
-        var picture = _pictureRepo.GetById(id);
-        var accountId = _accountContextService.GetAccountId();
-
-        if (picture is null) throw new NotFoundException();
-
-        // set up like/dislike logic (database liked tags insertion/drop)
-        var account = _accountRepo.GetById(accountId);
-        var like = _likeRepo.GetByLikerIdAndLikedId(account.Id, picture.Id);
+        var picture = await _pictureRepo.GetByIdAsync(id) ?? throw new NotFoundException();
+        var account = await _accountContextService.GetAccountAsync();
+        var like = await _likeRepo.GetByLikerIdAndLikedIdAsync(account.Id, picture.Id);
 
 
-        var tags = _tagRepo.GetTagsByPictureId(picture.Id);
+        var tags = await _tagRepo.GetTagsByPictureIdAsync(picture.Id);
         if (like is not null)
         {
             // like exists and (IsLike == true)
             if (like.IsLike)
             {
-                _likeRepo.DeleteById(like.Id);
+                await _likeRepo.DeleteByIdAsync(like.Id);
                 foreach (var tag in tags)
                 {
-                    _tagRepo.TryDeleteAccountLikedTag(account, tag);
+                    await _tagRepo.TryDeleteAccountLikedTagAsync(account, tag);
                 }
-                _likeRepo.Save();
-                _pictureRepo.UpdatePicScore(picture);
+                await _pictureRepo.UpdatePicScoreAsync(picture);
                 return LikeState.Deleted;
             }
             // like exists and (IsLike == false)
             else
             {
                 like.IsLike = !like.IsLike;
-                _likeRepo.Update(like);
+                await _likeRepo.UpdateAsync(like);
                 foreach (var tag in tags)
                 {
-                    _tagRepo.TryInsertAccountLikedTag(account, tag);
+                    await _tagRepo.TryInsertAccountLikedTagAsync(account, tag);
                 }
-                _likeRepo.Save();
-                _pictureRepo.UpdatePicScore(picture);
+                await _pictureRepo.UpdatePicScoreAsync(picture);
                 return LikeState.Liked;
             }
         }
         // like does not exist
         else
         {
-            _likeRepo.Insert(
+            await _likeRepo.InsertAsync(
                 new Like()
                 {
                     Liked = picture,
@@ -81,62 +71,54 @@ public class PictureLikingService : IPictureLikingService
                 });
             foreach (var tag in tags)
             {
-                _tagRepo.TryInsertAccountLikedTag(account, tag);
+                await _tagRepo.TryInsertAccountLikedTagAsync(account, tag);
             }
-            _likeRepo.Save();
-            _pictureRepo.UpdatePicScore(picture);
+            await _pictureRepo.UpdatePicScoreAsync(picture);
             return LikeState.Liked;
         }
 
     }
 
-    public LikeState DisLike(int id)
+    public async Task<LikeState> DisLike(int id)
     {
-        var picture = _pictureRepo.GetById(id);
-        var accountId = _accountContextService.GetAccountId();
-        if (picture is null) throw new NotFoundException();
-
-        // set up like/dislike logic (database liked tags insertion/drop)
-        var account = _accountRepo.GetById(accountId);
-        var like = _likeRepo.GetByLikerIdAndLikedId(account.Id, picture.Id);
+        var picture = await _pictureRepo.GetByIdAsync(id) ?? throw new NotFoundException();
+        var account = await _accountContextService.GetAccountAsync();
+        var like = await _likeRepo.GetByLikerIdAndLikedIdAsync(account.Id, picture.Id);
 
         if (like is not null)
         {
             // like exists and (IsLike == false)
             if (like.IsLike == false)
             {
-                _likeRepo.DeleteById(like.Id);
-                _pictureRepo.UpdatePicScore(picture);
-                _likeRepo.Save();
+                await _likeRepo.DeleteByIdAsync(like.Id);
+                await _pictureRepo.UpdatePicScoreAsync(picture);
                 return LikeState.Deleted;
             }
             // like exists and (IsLike == true)
             else
             {
                 like.IsLike = !like.IsLike;
-                _likeRepo.Update(like);
-                var tags = _tagRepo.GetTagsByPictureId(picture.Id);
+                await _likeRepo.UpdateAsync(like);
+                var tags = await _tagRepo.GetTagsByPictureIdAsync(picture.Id);
                 foreach (var tag in tags)
                 {
-                    _tagRepo.TryDeleteAccountLikedTag(account, tag);
+                    await _tagRepo.TryDeleteAccountLikedTagAsync(account, tag);
                 }
-                _pictureRepo.UpdatePicScore(picture);
-                _likeRepo.Save();
+                await _pictureRepo.UpdatePicScoreAsync(picture);
                 return LikeState.DisLiked;
             }
         }
         // does not exist
         else
         {
-            _likeRepo.Insert(
+            await _likeRepo.InsertAsync(
                 new Like()
                 {
                     Liked = picture,
                     Liker = account,
                     IsLike = false
                 });
-            _pictureRepo.UpdatePicScore(picture);
-            _likeRepo.Save();
+            await _pictureRepo.UpdatePicScoreAsync(picture);
             return LikeState.DisLiked;
         }
     }

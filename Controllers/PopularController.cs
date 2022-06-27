@@ -16,8 +16,8 @@ public class PopularController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetPopularContent()
+    public async Task<IActionResult> GetPopularContent()
     {
-        return Ok(_popularService.Get());
+        return Ok(await _popularService.Get());
     }
 }

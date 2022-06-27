@@ -13,7 +13,6 @@ namespace PicturesAPI.Services;
 public class PictureCommentService : IPictureCommentService
 {
     private readonly ICommentRepo _commentRepo;
-    private readonly IAccountRepo _accountRepo;
     private readonly IPictureRepo _pictureRepo;
     private readonly IAuthorizationService _authorizationService;
     private readonly IAccountContextService _accountContextService;
@@ -21,59 +20,53 @@ public class PictureCommentService : IPictureCommentService
 
     public PictureCommentService(
         ICommentRepo commentRepo,
-        IAccountRepo accountRepo,
         IPictureRepo pictureRepo,
         IAuthorizationService authorizationService,
         IAccountContextService accountContextService,
         IMapper mapper)
     {
         _commentRepo = commentRepo;
-        _accountRepo = accountRepo;
         _pictureRepo = pictureRepo;
         _authorizationService = authorizationService;
         _accountContextService = accountContextService;
         _mapper = mapper;
     }
-    public CommentDto Create(int picId, string text)
+    public async Task<CommentDto> Create(int picId, string text)
     {
-        var accountId = _accountContextService.GetAccountId();
-        if ((_pictureRepo.GetById(picId)) is null) throw new NotFoundException();
-
+        if ((await _pictureRepo.GetByIdAsync(picId)) is null) throw new NotFoundException();
         var comment = new Comment()
         {
-            Account = _accountRepo.GetById(accountId),
-            Picture = _pictureRepo.GetById(picId),
+            Account = await _accountContextService.GetAccountAsync(),
+            Picture = await _pictureRepo.GetByIdAsync(picId) ?? throw new NotFoundException(),
             Text = text
         };
-        _commentRepo.Insert(comment);
-        _commentRepo.Save();
+        await _commentRepo.InsertAsync(comment);
         var result = _mapper.Map<CommentDto>(comment);
         result.IsModifiable = true;
         return result;
     }
-    public CommentDto Update(int commId, string text)
+    public async Task<CommentDto> Update(int commId, string text)
     {
-        AuthorizeCommentOperation(commId, ResourceOperation.Update ,"you cant modify a comment you didnt added");
+        await AuthorizeCommentOperation(commId, ResourceOperation.Update ,"you cant modify a comment you didnt added");
 
-        var comment = _commentRepo.GetById(commId);
+        var comment = await _commentRepo.GetByIdAsync(commId) ?? throw new NotFoundException();
         comment.Text = text;
-        _commentRepo.Update(comment);
-        _commentRepo.Save();
+        await _commentRepo.UpdateAsync(comment);
 
         var result = _mapper.Map<CommentDto>(comment);
         result.IsModifiable = true;
         return result;
     }
-    public void Delete(int commId)
+    public async Task<bool> Delete(int commId)
     {
-        AuthorizeCommentOperation(commId, ResourceOperation.Delete,"you have no rights to delete this comment");
-        _commentRepo.DeleteById(commId);
+        await AuthorizeCommentOperation(commId, ResourceOperation.Delete,"you have no rights to delete this comment");
+        return await _commentRepo.TryDeleteByIdAsync(commId);
     }
 
-    // change this
-    private void AuthorizeCommentOperation(int commId, ResourceOperation operation, string message)
+    private async Task AuthorizeCommentOperation(int commId, ResourceOperation operation, string message)
     {
-        var comment = _commentRepo.GetById(commId);
+        var comment = await _commentRepo.GetByIdAsync(commId) ?? throw new NotFoundException();
+
         if (comment is null) throw new NotFoundException();
         var user = _accountContextService.User;
         var authorizationResult = _authorizationService.AuthorizeAsync(user, comment, new CommentOperationRequirement(operation)).Result;

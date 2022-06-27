@@ -44,28 +44,24 @@ public class PictureService : IPictureService
         _tagRepo = tagRepo;
     }
 
-    public List<PictureDto> GetPersonalizedPictures(PictureQueryPersonalized query)
+    public async Task<IEnumerable<PictureDto>> GetPersonalizedPictures(PictureQueryPersonalized query)
     {
         var accId = _accountContextService.GetAccountId();
-        var pictures = _pictureRepo.GetNotSeenByAccountId(accId, query.PageSize);
+        var pictures = await _pictureRepo.GetNotSeenByAccountIdAsync(accId, query.PageSize);
 
         var picArray = pictures.ToArray(); // avoiding multiple enumeration
         foreach (var picture in picArray)
         {
-            _accountRepo.MarkAsSeen(accId, picture.Id);
-        }
-        if (picArray.Any())
-        {
-            _accountRepo.Save();
+            await _accountRepo.MarkAsSeenAsync(accId, picture.Id);
         }
         var pictureDtos = _mapper.Map<List<PictureDto>>(picArray).ToList();
         AllowModifyItems(pictureDtos);
         return pictureDtos;
     }
 
-    public List<PictureDto> GetPictures(PictureQuery query)
+    public async Task<IEnumerable<PictureDto>> GetPictures(PictureQuery query)
     {
-        var pictures = _pictureRepo.GetFromAll(
+        var pictures = await _pictureRepo.GetFromAllAsync(
             query.PageSize * (query.PageNumber - 1),
             query.PageSize
         );
@@ -74,26 +70,26 @@ public class PictureService : IPictureService
         return pictureDtos;
     }
 
-    public PagedResult<PictureDto> SearchAll(SearchQuery query)
+    public async Task<PagedResult<PictureDto>> SearchAll(SearchQuery query)
     {
         IEnumerable<Picture> pictures;
 
         switch (query.SearchBy)
         {
             case SortSearchBy.MostPopular:
-                pictures = _pictureRepo.SearchAll(
+                pictures = await _pictureRepo.SearchAllAsync(
                     query.PageSize * (query.PageNumber - 1),
                     query.PageSize,
                     query.SearchPhrase);
                 break;
             case SortSearchBy.Newest:
-                pictures = _pictureRepo.SearchNewest(
+                pictures = await _pictureRepo.SearchNewestAsync(
                     query.PageSize * (query.PageNumber - 1),
                     query.PageSize,
                     query.SearchPhrase);
                 break;
             case SortSearchBy.MostLikes:
-                pictures = _pictureRepo.SearchMostLikes(
+                pictures = await _pictureRepo.SearchMostLikesAsync(
                     query.PageSize * (query.PageNumber - 1),
                     query.PageSize,
                     query.SearchPhrase);
@@ -113,37 +109,36 @@ public class PictureService : IPictureService
         return result;
     }
 
-    public  List<LikeDto> GetPicLikes(int id)
+    public async Task<IEnumerable<LikeDto>> GetPicLikes(int id)
     {
-        if (_pictureRepo.GetById(id) is null) throw new NotFoundException();
-        var likes = _likeRepo.GetByLikedId(id);
+        if (await _pictureRepo.GetByIdAsync(id) is null) throw new NotFoundException();
+        var likes = await _likeRepo.GetByLikedIdAsync(id);
         var likeDtos = _mapper.Map<List<LikeDto>>(likes);
 
         return likeDtos;
     }
     
-    public  List<AccountDto> GetPicLikers(int id)
+    public async Task<IEnumerable<AccountDto>> GetPicLikers(int id)
     {
-        if (_pictureRepo.GetById(id) is null) throw new NotFoundException();
-        var likes = _likeRepo.GetByLikedId(id);
+        if (await _pictureRepo.GetByIdAsync(id) is null) throw new NotFoundException();
+        var likes = await _likeRepo.GetByLikedIdAsync(id);
         var accounts = likes.Select(like => like.Liker).ToList();
         var result = _mapper.Map<List<AccountDto>>(accounts);
         return result;
     }
     
-    public PictureDto GetById(int id)
+    public async Task<PictureDto> GetById(int id)
     {
-        var picture = _pictureRepo.GetById(id);
+        var picture = await _pictureRepo.GetByIdAsync(id);
         if (picture == null) throw new NotFoundException();
         var result = _mapper.Map<PictureDto>(picture);
         AllowModifyItems(result);
         return result;
     }
     
-    public int Create(IFormFile file, CreatePictureDto dto)
+    public async Task<int> Create(IFormFile file, CreatePictureDto dto)
     {
-        var id = _accountContextService.GetAccountId();
-        var account = _accountRepo.GetById(id);
+        var account = await _accountContextService.GetAccountAsync();
 
         var picture = _mapper.Map<Picture>(dto);
 
@@ -162,23 +157,20 @@ public class PictureService : IPictureService
             file.CopyTo(stream);
             stream.Dispose();
         }
-        _pictureRepo.Insert(picture);
 
+        await _pictureRepo.InsertAsync(picture);
         if (dto.Tags is not null)
         {
             foreach (var tag in dto.Tags.Distinct())
             {
-                _tagRepo.InsertAndSave(new Tag()
+                var insertedTag = await _tagRepo.InsertAsync(new Tag()
                 {
                     Value = tag,
                 });
-                _tagRepo.TryInsertPictureTagJoin(picture, _tagRepo.GetByValue(tag));
+                await _tagRepo.TryInsertPictureTagJoinAsync(picture, insertedTag);
             }
         }
-
-        _pictureRepo.Save();
         return picture.Id;
-
     }
 
     public async Task<SafeSearchAnnotation> Classify(IFormFile file, CancellationToken cancellationToken)
@@ -190,12 +182,12 @@ public class PictureService : IPictureService
         return await NsfwClassifier.ClassifyAsync(fileBytes, cancellationToken);
     }
 
-    public PictureDto Update(int id, PutPictureDto dto)
+    public async Task<PictureDto> Update(int id, PutPictureDto dto)
     {
-        var picture = _pictureRepo.GetById(id);
+        var picture = await _pictureRepo.GetByIdAsync(id);
         if (picture is null) throw new NotFoundException();
         
-        AuthorizePictureOperation(picture, ResourceOperation.Update,"you cant modify picture you didnt added");
+        await AuthorizePictureOperation(picture, ResourceOperation.Update,"you cant modify picture you didnt added");
 
         if (dto.Description is not null)
         {
@@ -205,25 +197,30 @@ public class PictureService : IPictureService
         {
             picture.Name = dto.Name;
         }
-        _pictureRepo.Update(picture);
-        _pictureRepo.Save();
+        await _pictureRepo.UpdateAsync(picture);
         var result = _mapper.Map<PictureDto>(picture);
         return result;
     }
         
-    public void Delete(int id)
+    public async Task<bool> Delete(int id)
     {
-        var picture = _pictureRepo.GetById(id);
-        if (picture is null) throw new NotFoundException();
+        var picture = await _pictureRepo.GetByIdAsync(id) ?? throw new NotFoundException();
         _logger.LogWarning($"Picture with id: {id} DELETE action invoked");
 
-        AuthorizePictureOperation(picture, ResourceOperation.Delete ,"you have no rights to delete this picture");
+        await AuthorizePictureOperation(picture, ResourceOperation.Delete ,"you have no rights to delete this picture");
 
-        _pictureRepo.DeleteById(picture.Id);
-        var fullPath = Path.Combine(Directory.GetCurrentDirectory(), picture.Url);
-        File.Delete(fullPath);
-        _pictureRepo.Save();
-        _logger.LogWarning($"Picture with id: {id} DELETE action success");
+        try
+        {
+            await _pictureRepo.DeleteByIdAsync(picture.Id);
+            var fullPath = Path.Combine(Directory.GetCurrentDirectory(), picture.Url);
+            File.Delete(fullPath);
+            _logger.LogWarning($"Picture with id: {id} DELETE action success");
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
     }
 
     #region Private methods
@@ -303,10 +300,10 @@ public class PictureService : IPictureService
         }
     }
 
-    private void AuthorizePictureOperation(Picture picture, ResourceOperation operation, string message)
+    private async Task AuthorizePictureOperation(Picture picture, ResourceOperation operation, string message)
     {
         var user = _accountContextService.User;
-        var authorizationResult = _authorizationService.AuthorizeAsync(user, picture, new PictureOperationRequirement(operation)).Result;
+        var authorizationResult = await _authorizationService.AuthorizeAsync(user, picture, new PictureOperationRequirement(operation));
         if (!authorizationResult.Succeeded) throw new ForbidException(message);
     }
 

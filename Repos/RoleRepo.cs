@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿#nullable enable
+using Microsoft.EntityFrameworkCore;
 using PicturesAPI.Entities;
 using PicturesAPI.Repos.Interfaces;
 
 namespace PicturesAPI.Repos;
-
 
 public class RoleRepo : IRoleRepo
 {
@@ -14,13 +14,13 @@ public class RoleRepo : IRoleRepo
         _dbContext = dbContext;
     }
 
-    public List<Role> GetAll()
+    public async Task<List<Role>> GetAllAsync()
     {
-        return _dbContext.Roles.ToList();
+        return await _dbContext.Roles.ToListAsync();
     }
 
-    public Role GetById(int id)
+    public async Task<Role?> GetByIdAsync(int id)
     {
-        return _dbContext.Roles.FirstOrDefault(r => r.Id == id);
+        return await _dbContext.Roles.FirstOrDefaultAsync(r => r.Id == id);
     }
 }

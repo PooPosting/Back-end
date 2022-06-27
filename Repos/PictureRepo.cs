@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿#nullable enable
+using Microsoft.EntityFrameworkCore;
 using PicturesAPI.Entities;
+using PicturesAPI.Models.Dtos;
 using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services.Helpers;
 
@@ -16,9 +18,9 @@ public class PictureRepo : IPictureRepo
         _dbContext = dbContext;
     }
 
-    public Picture GetById(int id)
+    public async Task<Picture?> GetByIdAsync(int id)
     {
-        return _dbContext.Pictures
+        return await _dbContext.Pictures
             .Where(p => !p.IsDeleted)
             .Include(p => p.PictureTagJoins)
             .ThenInclude(j => j.Tag)
@@ -29,12 +31,12 @@ public class PictureRepo : IPictureRepo
             .ThenInclude(c => c.Account)
             .Include(p => p.Account)
             .AsSplitQuery()
-            .SingleOrDefault(p => p.Id == id);
+            .SingleOrDefaultAsync(p => p.Id == id);
     }
 
-    public IEnumerable<Picture> GetFromAll(int itemsToSkip, int itemsToTake)
+    public async Task<IEnumerable<Picture>> GetFromAllAsync(int itemsToSkip, int itemsToTake)
     {
-        return _dbContext.Pictures
+        return await _dbContext.Pictures
             .Where(p => !p.IsDeleted)
             .Include(p => p.Account)
             .Include(p => p.PictureTagJoins)
@@ -49,12 +51,12 @@ public class PictureRepo : IPictureRepo
             .Skip(itemsToSkip)
             .Take(itemsToTake)
             .AsSplitQuery()
-            .ToList();
+            .ToListAsync();
     }
 
-    public IEnumerable<Picture> GetNotSeenByAccountId(int accountId, int itemsToTake)
+    public async Task<IEnumerable<Picture>> GetNotSeenByAccountIdAsync(int accountId, int itemsToTake)
     {
-        return _dbContext.Pictures
+        return await _dbContext.Pictures
             .Where(p => !p.IsDeleted)
             .Where(p => !_dbContext.PictureSeenByAccountJoins
                 .Where(j => j.AccountId == accountId)
@@ -69,19 +71,25 @@ public class PictureRepo : IPictureRepo
                 .Where(c => c.IsDeleted == false))
             .ThenInclude(c => c.Account)
             .OrderByDescending(p => p.PopularityScore *
-                                    (p.PictureTagJoins.Select(j =>
-                                         j.Tag.AccountLikedTagJoins.Select(a => a.AccountId == accountId)).Count() *
-                                     2.5)
+                                    (p.PictureTagJoins
+                                         .Select(j =>
+                                         j.Tag.AccountLikedTagJoins
+                                             .OrderByDescending(t => t.Id)
+                                             .Select(a => a.AccountId == accountId)
+                                             .Take(15)
+                                         )
+                                         .Count() * 2.25)
             )
             .Take(itemsToTake)
-            .AsSplitQuery();
+            .AsSplitQuery()
+            .ToListAsync();
     }
 
-    public IEnumerable<Picture> SearchAll(int itemsToSkip, int itemsToTake, string searchPhrase)
+    public async Task<IEnumerable<Picture>> SearchAllAsync(int itemsToSkip, int itemsToTake, string searchPhrase)
     {
-        return _dbContext.Pictures
+        return await _dbContext.Pictures
             .Where(p => !p.IsDeleted)
-            .Where(p => searchPhrase == null || p.Name.ToLower().Contains(searchPhrase.ToLower()))
+            .Where(p => searchPhrase == string.Empty || p.Name.ToLower().Contains(searchPhrase.ToLower()))
             .Include(p => p.Account)
             .Include(p => p.PictureTagJoins)
             .ThenInclude(j => j.Tag)
@@ -94,14 +102,15 @@ public class PictureRepo : IPictureRepo
             .OrderByDescending(p => p.PopularityScore)
             .Skip(itemsToSkip)
             .Take(itemsToTake)
-            .AsSplitQuery();
+            .AsSplitQuery()
+            .ToListAsync();
     }
 
-    public IEnumerable<Picture> SearchNewest(int itemsToSkip, int itemsToTake, string searchPhrase)
+    public async Task<IEnumerable<Picture>> SearchNewestAsync(int itemsToSkip, int itemsToTake, string searchPhrase)
     {
-        return _dbContext.Pictures
+        return await _dbContext.Pictures
             .Where(p => !p.IsDeleted)
-            .Where(p => searchPhrase == null || p.Name.ToLower().Contains(searchPhrase.ToLower()))
+            .Where(p => searchPhrase == string.Empty || p.Name.ToLower().Contains(searchPhrase.ToLower()))
             .Include(p => p.Account)
             .Include(p => p.PictureTagJoins)
             .ThenInclude(j => j.Tag)
@@ -114,14 +123,15 @@ public class PictureRepo : IPictureRepo
             .OrderByDescending(p => p.PictureAdded)
             .Skip(itemsToSkip)
             .Take(itemsToTake)
-            .AsSplitQuery();
+            .AsSplitQuery()
+            .ToListAsync();
     }
 
-    public IEnumerable<Picture> SearchMostLikes(int itemsToSkip, int itemsToTake, string searchPhrase)
+    public async Task<IEnumerable<Picture>> SearchMostLikesAsync(int itemsToSkip, int itemsToTake, string searchPhrase)
     {
-        return _dbContext.Pictures
+        return await _dbContext.Pictures
             .Where(p => !p.IsDeleted)
-            .Where(p => searchPhrase == null || p.Name.ToLower().Contains(searchPhrase.ToLower()))
+            .Where(p => searchPhrase == string.Empty || p.Name.ToLower().Contains(searchPhrase.ToLower()))
             .Include(p => p.Account)
             .Include(p => p.PictureTagJoins)
             .ThenInclude(j => j.Tag)
@@ -134,35 +144,38 @@ public class PictureRepo : IPictureRepo
             .OrderByDescending(p => p.Likes.Count(l => l.IsLike))
             .Skip(itemsToSkip)
             .Take(itemsToTake)
-            .AsSplitQuery();
+            .AsSplitQuery()
+            .ToListAsync();
     }
 
-    public void UpdatePicScore (Picture picture)
+    public async Task<Picture> InsertAsync(Picture picture)
+    {
+        await _dbContext.Pictures.AddAsync(picture);
+        await _dbContext.SaveChangesAsync();
+        return picture;
+    }
+
+    public async Task<Picture> UpdatePicScoreAsync (Picture picture)
+    {
+        _dbContext.Pictures.Update(picture);
+        await _dbContext.SaveChangesAsync();
+        return picture;
+    }
+
+    public async Task<Picture> UpdateAsync(Picture picture)
     {
         picture.PopularityScore = PictureScoreCalculator.CalcPoints(picture);
         _dbContext.Pictures.Update(picture);
-        Save();
+        await _dbContext.SaveChangesAsync();
+        return picture;
     }
 
-    public int Insert(Picture picture)
-    {
-        _dbContext.Pictures.Add(picture);
-        return picture.Id;
-    }
-
-    public void Update(Picture picture)
-    {
-        _dbContext.Pictures.Update(picture);
-    }
-
-    public void DeleteById(int id)
+    public async Task<bool> DeleteByIdAsync(int id)
     {
         var pic = _dbContext.Pictures.SingleOrDefault(p => p.Id == id);
+        if (pic is null) return false;
+
         pic.IsDeleted = true;
-    }
-    
-    public bool Save()
-    {
-        return _dbContext.SaveChanges() > 0;
+        return await _dbContext.SaveChangesAsync() > 0;
     }
 }

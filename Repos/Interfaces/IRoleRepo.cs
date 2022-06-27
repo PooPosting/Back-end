@@ -1,9 +1,10 @@
-﻿using PicturesAPI.Entities;
+﻿#nullable enable
+using PicturesAPI.Entities;
 
 namespace PicturesAPI.Repos.Interfaces;
 
 public interface IRoleRepo
 {
-    List<Role> GetAll();
-    Role GetById(int id);
+    Task<List<Role>> GetAllAsync();
+    Task<Role?> GetByIdAsync(int id);
 }

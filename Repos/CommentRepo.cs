@@ -13,34 +13,38 @@ public class CommentRepo : ICommentRepo
     {
         _dbContext = dbContext;
     }
-    public Comment GetById(int commId)
+    public async Task<Comment?> GetByIdAsync(int commId)
     {
-        return _dbContext.Comments
+        return await _dbContext.Comments
             .Include(c => c.Picture)
             .Include(c => c.Account)
             .AsSplitQuery()
-            .SingleOrDefault(c => c.Id == commId)!;
+            .SingleOrDefaultAsync(c => c.Id == commId);
     }
 
-    public int Insert(Comment comment)
+    public async Task<Comment> InsertAsync(Comment comment)
     {
-        _dbContext.Comments.Add(comment);
-        return comment.Id;
+        await _dbContext.Comments.AddAsync(comment);
+        await _dbContext.SaveChangesAsync();
+        return comment;
     }
 
-    public void Update(Comment comment)
+    public async Task<Comment> UpdateAsync(Comment comment)
     {
         _dbContext.Comments.Update(comment);
+        await _dbContext.SaveChangesAsync();
+        return comment;
     }
 
-    public void DeleteById(int id)
+    public async Task<bool> TryDeleteByIdAsync(int id)
     {
-        var comm =  _dbContext.Comments.SingleOrDefault(c => c.Id == id);
-        comm!.IsDeleted = true;
+        var comment =  _dbContext.Comments.SingleOrDefault(c => c.Id == id);
+        if (comment is not null)
+        {
+            comment.IsDeleted = true;
+            return await _dbContext.SaveChangesAsync() > 0;
+        }
+        return false;
     }
     
-    public bool Save()
-    {
-        return _dbContext.SaveChanges() > 0;
-    }
 }

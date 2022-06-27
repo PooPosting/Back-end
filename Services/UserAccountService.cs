@@ -19,27 +19,18 @@ public class UserAccountService : IUserAccountService
     private readonly IPasswordHasher<Account> _passwordHasher;
     private readonly AuthenticationSettings _authenticationSettings;
     private readonly IAccountRepo _accountRepo;
-    private readonly ILikeRepo _likeRepo;
-    private readonly IMapper _mapper;
-    private readonly string _jwtIssuer;
 
     public UserAccountService(
         IPasswordHasher<Account> passwordHasher, 
         AuthenticationSettings authenticationSettings,
-        IAccountRepo accountRepo,
-        ILikeRepo likeRepo,
-        IMapper mapper,
-        IConfiguration config)
+        IAccountRepo accountRepo)
     {
         _passwordHasher = passwordHasher;
         _authenticationSettings = authenticationSettings;
         _accountRepo = accountRepo;
-        _likeRepo = likeRepo;
-        _mapper = mapper;
-        _jwtIssuer = config.GetValue<string>("Authentication:JwtIssuer");
     }
         
-    public bool Create(CreateAccountDto dto)
+    public async Task<string> Create(CreateAccountDto dto)
     {
         var newAccount = new Account()
         {
@@ -49,13 +40,11 @@ public class UserAccountService : IUserAccountService
 
         var hashedPassword = _passwordHasher.HashPassword(newAccount, dto.Password);
         newAccount.PasswordHash = hashedPassword;
-        _accountRepo.Insert(newAccount);
-
-        return _accountRepo.Save();
+        return IdHasher.EncodeAccountId((await _accountRepo.InsertAsync(newAccount)).Id);
     }
-    public LoginSuccessResult GenerateJwt(LoginDto dto)
+    public async Task<LoginSuccessResult> GenerateJwt(LoginDto dto)
     {
-        var account = _accountRepo.GetByNick(dto.Nickname);
+        var account = await _accountRepo.GetByNickAsync(dto.Nickname);
             if (account is null || account.IsDeleted)
                 throw new BadRequestException("Invalid nickname or password");
 
@@ -90,18 +79,14 @@ public class UserAccountService : IUserAccountService
             return loginSuccessResult;
 
     }
-
-    //rewrite this whole method
-    public LoginSuccessResult VerifyJwt(LsLoginDto dto)
+    public async Task<LoginSuccessResult> VerifyJwt(LsLoginDto dto)
     {
         var handler = new JwtSecurityTokenHandler();
-        JwtSecurityToken jwtToken;
         try
         {
-            jwtToken = handler.ReadToken(dto.JwtToken) as JwtSecurityToken;
-            if (jwtToken is null) throw new InvalidAuthTokenException();
+            var jwtToken = handler.ReadToken(dto.JwtToken) as JwtSecurityToken ?? throw new InvalidAuthTokenException();
             var id = jwtToken.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var account = _accountRepo.GetById(int.Parse(id));
+            var account = await _accountRepo.GetByIdAsync(int.Parse(id)) ?? throw new InvalidAuthTokenException();
             var claims = new List<Claim>()
             {
                 new Claim(ClaimTypes.NameIdentifier, (account.Id.ToString())),

@@ -6,14 +6,14 @@ namespace PicturesAPI.Services.Interfaces;
 
 public interface IPictureService
 {
-    List<PictureDto> GetPictures(PictureQuery query);
-    List<PictureDto> GetPersonalizedPictures(PictureQueryPersonalized query);
-    PagedResult<PictureDto> SearchAll(SearchQuery query);
-    List<LikeDto> GetPicLikes(int id);
-    List<AccountDto> GetPicLikers(int id);
-    PictureDto GetById(int id);
-    int Create(IFormFile file, CreatePictureDto dto);
+    Task<IEnumerable<PictureDto>> GetPersonalizedPictures(PictureQueryPersonalized query);
+    Task<IEnumerable<PictureDto>> GetPictures(PictureQuery query);
+    Task<PagedResult<PictureDto>> SearchAll(SearchQuery query);
+    Task<IEnumerable<LikeDto>> GetPicLikes(int id);
+    Task<IEnumerable<AccountDto>> GetPicLikers(int id);
+    Task<PictureDto> GetById(int id);
+    Task<int> Create(IFormFile file, CreatePictureDto dto);
     Task<SafeSearchAnnotation> Classify(IFormFile file, CancellationToken cancellationToken);
-    PictureDto Update(int id, PutPictureDto dto);
-    void Delete(int id);
+    Task<PictureDto> Update(int id, PutPictureDto dto);
+    Task<bool> Delete(int id);
 }

@@ -1,15 +1,14 @@
-﻿using PicturesAPI.Entities;
-
+﻿#nullable enable
+using PicturesAPI.Entities;
 namespace PicturesAPI.Repos.Interfaces;
 
 public interface ILikeRepo
 {
-    Like GetById(int id);
-    List<Like> GetByLikerId(int id);
-    List<Like> GetByLikedId(int id);
-    Like GetByLikerIdAndLikedId(int accountId, int pictureId);
-    void Insert(Like like);
-    void DeleteById(int id);
-    void Update(Like like);
-    bool Save();
+    Task<Like?> GetByIdAsync(int id);
+    Task<Like?> GetByLikerIdAndLikedIdAsync(int accountId, int pictureId);
+    Task<IEnumerable<Like>> GetByLikerIdAsync(int id);
+    Task<IEnumerable<Like>> GetByLikedIdAsync(int id);
+    Task<Like> InsertAsync(Like like);
+    Task<Like> DeleteByIdAsync(int id);
+    Task<Like> UpdateAsync(Like like);
 }

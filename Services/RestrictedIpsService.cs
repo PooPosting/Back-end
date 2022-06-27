@@ -5,7 +5,7 @@ using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Services;
 
-public class RestrictedIpsService: IRestrictedIpsService
+public class RestrictedIpsService : IRestrictedIpsService
 {
     private readonly IRestrictedIpRepo _restrictedIpRepo;
 
@@ -15,17 +15,17 @@ public class RestrictedIpsService: IRestrictedIpsService
         _restrictedIpRepo = restrictedIpRepo;
     }
     
-    public List<RestrictedIp> GetAll()
+    public async Task<List<RestrictedIp>> GetAll()
     {
-        return _restrictedIpRepo.GetAll();
+        return await _restrictedIpRepo.GetAllAsync();
     }
     
-    public RestrictedIp GetByIp(string ip)
+    public async Task<RestrictedIp> GetByIp(string ip)
     {
-        return _restrictedIpRepo.GetByIp(ip) ?? throw new NotFoundException();
+        return await _restrictedIpRepo.GetByIpAsync(ip) ?? throw new NotFoundException();
     }
     
-    public void Add(string ip, bool cantGet, bool cantPost)
+    public async Task Add(string ip, bool cantGet, bool cantPost)
     {
         var restrictedIp = new RestrictedIp()
         {
@@ -33,30 +33,28 @@ public class RestrictedIpsService: IRestrictedIpsService
             CantGet = cantGet,
             CantPost = cantPost
         };
-        _restrictedIpRepo.Insert(restrictedIp);
-        _restrictedIpRepo.Save();
+        await _restrictedIpRepo.InsertAsync(restrictedIp);
     }
     
-    public void UpdateMany(List<RestrictedIp> ips, bool cantGet, bool cantPost)
+    public async Task UpdateMany(List<RestrictedIp> ips, bool cantGet, bool cantPost)
     {
         foreach (var ip in ips)
         {
             ip.CantGet = cantGet;
             ip.CantPost = cantPost;
-            _restrictedIpRepo.Update(ip);
+            await _restrictedIpRepo.UpdateAsync(ip);
         }
-        RemoveUnnecessaryIps();
-        _restrictedIpRepo.Save();
+        await RemoveUnnecessaryIps();
     }
 
-    private void RemoveUnnecessaryIps()
+    private async Task RemoveUnnecessaryIps()
     {
         var unnecessaryIps =
-            (_restrictedIpRepo.GetAll())
+            (await _restrictedIpRepo.GetAllAsync())
             .Where(r => !r.CantGet && !r.CantPost);
         foreach (var unnecessaryIp in unnecessaryIps)
         {
-            _restrictedIpRepo.Drop(unnecessaryIp);
+            await _restrictedIpRepo.DeleteAsync(unnecessaryIp);
         }
     }
 }

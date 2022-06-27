@@ -8,7 +8,7 @@ using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Services;
 
-public class PopularService: IPopularService
+public class PopularService : IPopularService
 {
     private readonly IPopularRepo _popularRepo;
     private readonly IMapper _mapper;
@@ -21,14 +21,14 @@ public class PopularService: IPopularService
         _mapper = mapper;
     }
 
-    public PopularContentDto Get()
+    public async Task<PopularContentDto> Get()
     {
-        var mostVotedPics = _popularRepo.GetPicsByVoteCount(5);
-        var mostLikedPics = _popularRepo.GetPicsByLikeCount(5);
-        var mostCommentedPics = _popularRepo.GetPicsByCommentCount(5);
+        var mostVotedPics = await _popularRepo.GetPicsByVoteCountAsync(5);
+        var mostLikedPics = await _popularRepo.GetPicsByLikeCountAsync(5);
+        var mostCommentedPics = await _popularRepo.GetPicsByCommentCountAsync(5);
 
-        var mostPostsAccs = _popularRepo.GetAccsByPostCount(5);
-        var mostLikedAccs = _popularRepo.GetAccsByPostLikesCount(5);
+        var mostPostsAccs = await _popularRepo.GetAccsByPostCountAsync(5);
+        var mostLikedAccs = await _popularRepo.GetAccsByPostLikesCountAsync(5);
 
         var result = new PopularContentDto()
         {

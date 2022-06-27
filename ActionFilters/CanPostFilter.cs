@@ -14,11 +14,15 @@ public class CanPostFilter: ActionFilterAttribute
         _restrictedIpRepo = restrictedIpRepo;
     }
 
-    public override void OnActionExecuting(ActionExecutingContext context)
+    public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var remoteIp = context.HttpContext.Connection.RemoteIpAddress!.ToString();
-        var restrictedIp = _restrictedIpRepo.GetByIp(remoteIp);
-        if (restrictedIp is null) return;
-        if (restrictedIp.CantPost) throw new ForbidException("Your ip is restricted");
+        var restrictedIp = await _restrictedIpRepo.GetByIpAsync(remoteIp);
+        if (restrictedIp is null || !restrictedIp.CantPost)
+        {
+            await next.Invoke();
+            return;
+        };
+        throw new ForbidException("Your ip is restricted");
     }
 }

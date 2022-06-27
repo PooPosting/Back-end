@@ -1,4 +1,5 @@
-﻿namespace PicturesAPI.Exceptions;
+﻿#nullable enable
+namespace PicturesAPI.Exceptions;
 
 public class ExpiredJwtException : Exception
 {

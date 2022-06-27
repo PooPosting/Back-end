@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 using PicturesAPI.Entities;
 using PicturesAPI.Exceptions;
 using PicturesAPI.Services.Helpers;
@@ -33,6 +34,13 @@ public class AccountContextService : IAccountContextService
     {
         ValidateJwt();
         return int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+    }
+
+    public async Task<Account> GetAccountAsync()
+    {
+        ValidateJwt();
+        var id = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+        return await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Id == id)  ?? throw new UnauthorizedException("please log in");
     }
 
     public int? TryGetAccountId()

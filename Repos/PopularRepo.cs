@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿#nullable enable
+using Microsoft.EntityFrameworkCore;
 using PicturesAPI.Entities;
 using PicturesAPI.Repos.Interfaces;
 
@@ -14,9 +15,9 @@ public class PopularRepo : IPopularRepo
         _dbContext = dbContext;
     }
 
-    public IEnumerable<Picture> GetPicsByVoteCount(int itemsToTake)
+    public async Task<IEnumerable<Picture>> GetPicsByVoteCountAsync(int itemsToTake)
     {
-        return _dbContext.Pictures
+        return await _dbContext.Pictures
             .Where(p => !p.IsDeleted)
             .OrderByDescending(p => p.Likes.Count)
             .Take(itemsToTake)
@@ -27,12 +28,12 @@ public class PopularRepo : IPopularRepo
                 .Where(c => c.IsDeleted == false))
             .Include(p => p.Account)
             .AsSplitQuery()
-            .ToList();
+            .ToListAsync();
     }
 
-    public IEnumerable<Picture> GetPicsByLikeCount(int itemsToTake)
+    public async Task<IEnumerable<Picture>> GetPicsByLikeCountAsync(int itemsToTake)
     {
-        return _dbContext.Pictures
+        return await _dbContext.Pictures
             .Where(p => !p.IsDeleted)
             .OrderByDescending(p => p.Likes.Count(l => l.IsLike))
             .Take(itemsToTake)
@@ -43,12 +44,12 @@ public class PopularRepo : IPopularRepo
                 .Where(c => c.IsDeleted == false))
             .Include(p => p.Account)
             .AsSplitQuery()
-            .ToList();
+            .ToListAsync();
     }
 
-    public IEnumerable<Picture> GetPicsByCommentCount(int itemsToTake)
+    public async Task<IEnumerable<Picture>> GetPicsByCommentCountAsync(int itemsToTake)
     {
-        return _dbContext.Pictures
+        return await _dbContext.Pictures
             .Where(p => !p.IsDeleted)
             .OrderByDescending(p => p.Comments.Count)
             .Take(itemsToTake)
@@ -59,12 +60,12 @@ public class PopularRepo : IPopularRepo
                 .Where(c => c.IsDeleted == false))
             .Include(p => p.Account)
             .AsSplitQuery()
-            .ToList();
+            .ToListAsync();
     }
 
-    public IEnumerable<Account> GetAccsByPostCount(int itemsToTake)
+    public async Task<IEnumerable<Account>> GetAccsByPostCountAsync(int itemsToTake)
     {
-        return _dbContext.Accounts
+        return await _dbContext.Accounts
             .Where(a => !a.IsDeleted)
             .OrderByDescending(a => a.Pictures.Count)
             .Take(itemsToTake)
@@ -73,12 +74,12 @@ public class PopularRepo : IPopularRepo
                 .Where(c => c.IsDeleted == false))
             .Include(a => a.Pictures)
             .AsSplitQuery()
-            .ToList();
+            .ToListAsync();
     }
 
-    public IEnumerable<Account> GetAccsByPostLikesCount(int itemsToTake)
+    public async Task<IEnumerable<Account>> GetAccsByPostLikesCountAsync(int itemsToTake)
     {
-        return _dbContext.Accounts
+        return await _dbContext.Accounts
             .Where(a => !a.IsDeleted)
             .OrderByDescending(a => a.Pictures.Sum(p => p.Likes.Count))
             .Take(itemsToTake)
@@ -87,6 +88,6 @@ public class PopularRepo : IPopularRepo
                 .Where(c => c.IsDeleted == false))
             .Include(a => a.Pictures)
             .AsSplitQuery()
-            .ToList();
+            .ToListAsync();
     }
 }

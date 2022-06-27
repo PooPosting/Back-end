@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+﻿#nullable enable
 using System.Text;
 using PicturesAPI.Entities;
 using PicturesAPI.Models.Configuration;
@@ -32,10 +32,10 @@ public class SitemapRepo : ISitemapRepo
     public async Task UpdateAsync()
     {
         var sites = "";
-        foreach (var t in _settings.Sites)
+        foreach (var site in _settings.Sites)
         {
             sites += SiteTemplate
-                .Replace("#url#", t)
+                .Replace("#url#", site)
                 .Replace("#origin#", _settings.Origin)
                 .Replace("#timestamp#", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssK"));
         }

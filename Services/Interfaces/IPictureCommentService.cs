@@ -4,7 +4,7 @@ namespace PicturesAPI.Services.Interfaces;
 
 public interface IPictureCommentService
 {
-    CommentDto Create(int picId, string text);
-    CommentDto Update(int commId, string text);
-    void Delete(int commId);
+    Task<CommentDto> Create(int picId, string text);
+    Task<CommentDto> Update(int commId, string text);
+    Task<bool> Delete(int commId);
 }
