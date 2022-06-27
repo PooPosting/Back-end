@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿#nullable enable
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using PicturesAPI.ActionFilters;
@@ -92,26 +93,36 @@ public class PictureController : ControllerBase
     [Route("create")]
     public async Task<IActionResult> PostPicture(
         [FromForm] IFormFile file, 
-        [FromForm] string name, 
-        [FromForm] string description,
-        [FromForm] string tags)
+        [FromForm] string name,
+        [FromForm] string? description,
+        [FromForm] string? tags)
     {
         var dto = new CreatePictureDto()
         {
             Name = name,
             Description = description,
+            Picture = file,
+            Tags = tags?.Split(' ').ToList()
         };
-        if (tags is not null) dto.Tags = tags.Split(' ').ToList();
-
         var pictureId = await _pictureService.Create(file, dto);
         return Created($"api/picture/{pictureId}", null);
     }
 
-    [HttpPut]
+    [HttpPost] // some sensitive data is being sent
     [ServiceFilter(typeof(CanPostFilter))]
     [Route("{id}")]
-    public async Task<IActionResult> PutPictureUpdate([FromRoute] string id, [FromBody] PutPictureDto dto)
+    public async Task<IActionResult> PutPictureUpdate(
+        [FromRoute] string id,
+        [FromForm] string? name,
+        [FromForm] string? description,
+        [FromForm] string? tags)
     {
+        var dto = new UpdatePictureDto()
+        {
+            Name = name,
+            Description = description,
+            Tags = tags?.Split(' ').ToList()
+        };
         var result = await _pictureService.Update(IdHasher.DecodePictureId(id), dto);
         return Ok(result);
     }

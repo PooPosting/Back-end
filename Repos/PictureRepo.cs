@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using PicturesAPI.Entities;
 using PicturesAPI.Models.Dtos;
@@ -16,6 +17,14 @@ public class PictureRepo : IPictureRepo
         )
     {
         _dbContext = dbContext;
+    }
+
+    public async Task<int> CountPicturesAsync(Expression<Func<Picture, bool>> predicate)
+    {
+        return await _dbContext.Pictures
+            .Where(p => !p.IsDeleted)
+            .Where(predicate)
+            .CountAsync();
     }
 
     public async Task<Picture?> GetByIdAsync(int id)

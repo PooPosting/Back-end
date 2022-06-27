@@ -1,11 +1,12 @@
 ﻿#nullable enable
+using System.Linq.Expressions;
 using PicturesAPI.Entities;
-using PicturesAPI.Models.Dtos;
 
 namespace PicturesAPI.Repos.Interfaces;
 
 public interface IPictureRepo
 {
+    Task<int> CountPicturesAsync(Expression<Func<Picture, bool>> predicate);
     Task<Picture?> GetByIdAsync(int id);
     Task<IEnumerable<Picture>> GetFromAllAsync(int itemsToSkip, int itemsToTake);
     Task<IEnumerable<Picture>> GetNotSeenByAccountIdAsync(int accountId, int itemsToTake);

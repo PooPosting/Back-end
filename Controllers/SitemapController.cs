@@ -1,5 +1,4 @@
-﻿using System.Xml;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PicturesAPI.Factories.Interfaces;
 
 namespace PicturesAPI.Controllers;
@@ -11,7 +10,8 @@ public class SitemapController : ControllerBase
     private readonly ISitemapFactory _sitemapFactory;
 
     public SitemapController(
-        ISitemapFactory sitemapFactory)
+        ISitemapFactory sitemapFactory
+        )
     {
         _sitemapFactory = sitemapFactory;
     }
@@ -20,6 +20,7 @@ public class SitemapController : ControllerBase
     [Route("sitemap.xml")]
     public async Task<IActionResult> Get()
     {
+        Response.ContentType = "application/xml";
         return Content((await _sitemapFactory.GenerateSitemap()).ToXml(), "application/xml");
     }
 }

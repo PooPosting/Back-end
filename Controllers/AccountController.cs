@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿#nullable enable
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using PicturesAPI.ActionFilters;
@@ -41,10 +42,27 @@ public class AccountController : ControllerBase
         return Ok(accounts);
     }
 
-    [HttpPut]
-    [Route("{id}")]
-    public async Task<IActionResult> UpdateAccount([FromBody] PutAccountDto dto)
+    // should this be POST or PUT? - wondering cause of sensitive data transfer
+    [HttpPost]
+    [Route("update")]
+    public async Task<IActionResult> UpdateAccount(
+        [FromForm] string? email,
+        [FromForm] string? password,
+        [FromForm] string? confPassword,
+        [FromForm] string? description,
+        [FromForm] IFormFile? profilePic,
+        [FromForm] IFormFile? backgroundPic)
     {
+        var dto = new UpdateAccountDto()
+        {
+            Email = email,
+            Password = password,
+            ConfirmPassword = confPassword,
+            Description = description,
+            ProfilePic = profilePic,
+            BackgroundPic = backgroundPic
+        };
+
         var result = await _accountService.Update(dto);
         return Ok(result);
     }

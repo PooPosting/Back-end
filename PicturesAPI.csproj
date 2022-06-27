@@ -30,7 +30,6 @@
         <Folder Include="Migrations" />
         <Folder Include="wwwroot\pictures" />
         <Folder Include="wwwroot\accounts" />
-        <Folder Include="wwwroot\front-assets" />
     </ItemGroup>
 
 </Project>

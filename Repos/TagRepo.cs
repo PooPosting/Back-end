@@ -104,6 +104,18 @@ public class TagRepo : ITagRepo
         }
         return false;
     }
+    public async Task<bool> TryDeletePictureTagJoinAsync(Picture picture, Tag tag)
+    {
+        var picTag = _dbContext.PictureTagJoins
+            .SingleOrDefault(j => (j.Picture == picture) && (j.Tag == tag));
+
+        if (picTag is not null)
+        {
+            _dbContext.PictureTagJoins.Remove(picTag);
+            return await _dbContext.SaveChangesAsync() > 0;
+        }
+        return false;
+    }
 
     public async Task<Tag> UpdateAsync(Tag tag)
     {

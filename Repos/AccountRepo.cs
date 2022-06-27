@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using PicturesAPI.Entities;
 using PicturesAPI.Entities.Joins;
@@ -15,9 +16,20 @@ public class AccountRepo : IAccountRepo
         _dbContext = dbContext;
     }
 
+    public async Task<int> CountAccountsAsync(Expression<Func<Account, bool>> predicate)
+    {
+        return await _dbContext.Accounts
+            .Where(a => !a.IsDeleted)
+            .Where(predicate)
+            .CountAsync();
+    }
+
     public async Task<Account?> GetByIdAsync(int id)
     {
         return await _dbContext.Accounts
+            .Include(a => a.Pictures)
+            .ThenInclude(p => p.PictureTagJoins)
+            .ThenInclude(j => j.Tag)
             .Include(a => a.Pictures)
             .ThenInclude(p => p.Likes)
             .ThenInclude(p => p.Liker)
@@ -34,6 +46,9 @@ public class AccountRepo : IAccountRepo
     public async Task<Account?> GetByNickAsync(string nickname)
     {
         return await _dbContext.Accounts
+            .Include(a => a.Pictures)
+            .ThenInclude(p => p.PictureTagJoins)
+            .ThenInclude(j => j.Tag)
             .Include(a => a.Pictures)
             .ThenInclude(p => p.Likes)
             .ThenInclude(p => p.Liker)
@@ -53,6 +68,9 @@ public class AccountRepo : IAccountRepo
             .Where(a => searchPhrase == string.Empty || a.Nickname.ToLower().Contains(searchPhrase.ToLower()))
             .OrderByDescending(a => a.Pictures.Sum(picture => picture.Likes.Count))
             .ThenByDescending(a => a.Pictures.Count)
+            .Include(a => a.Pictures)
+            .ThenInclude(p => p.PictureTagJoins)
+            .ThenInclude(j => j.Tag)
             .Include(p => p.Pictures)
             .ThenInclude(p => p.Likes)
             .Include(p => p.Pictures)

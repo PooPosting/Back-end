@@ -1,6 +1,4 @@
-﻿using Google.Protobuf.WellKnownTypes;
-using JetBrains.Annotations;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PicturesAPI.Entities;
 using PicturesAPI.Factories.Interfaces;
 using PicturesAPI.Models.Configuration;
@@ -47,7 +45,7 @@ public class SitemapFactory : ISitemapFactory
         foreach (var account in await _dbContext.Accounts.ToArrayAsync())
         {
             sitemap.Add(CreateUrl(
-                _sitemapSettings.PictureRoute
+                _sitemapSettings.AccountRoute
                     .Replace("#origin#", _sitemapSettings.Origin)
                     .Replace("#accountId#", IdHasher.EncodeAccountId(account.Id)),
                 0.5,

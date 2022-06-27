@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using PicturesAPI.Authorization;
@@ -7,6 +8,7 @@ using PicturesAPI.Enums;
 using PicturesAPI.Exceptions;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
+using PicturesAPI.Models.Validators;
 using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services.Interfaces;
 
@@ -62,7 +64,13 @@ public class AccountService : IAccountService
 
         var accountDtos = _mapper.Map<List<AccountDto>>(accounts).ToList();
         AllowModifyItems(accountDtos);
-        var result = new PagedResult<AccountDto>(accountDtos, query.PageSize, query.PageNumber);
+        var result = new PagedResult<AccountDto>(
+            accountDtos,
+            query.PageSize,
+            query.PageNumber,
+            await _accountRepo.CountAccountsAsync(
+                a => query.SearchPhrase == string.Empty || a.Nickname.ToLower().Contains(query.SearchPhrase.ToLower())
+            ));
         return result;
     }
 
@@ -75,28 +83,58 @@ public class AccountService : IAccountService
         return likeDtos;
     }
 
-    public async Task<AccountDto> Update(PutAccountDto dto)
+    public async Task<AccountDto> Update(UpdateAccountDto dto)
     {
-        // do sth with these updates
+        var validationResult = await StaticValidator.Validate(dto);
+        if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
+
+        var rootPath = Directory.GetCurrentDirectory();
         var account = await _accountContextService.GetAccountAsync();
 
-        if (account is null) throw new NotFoundException();
+        var randomBgName = $"{Path.GetRandomFileName().Replace('.', '-')}.webp";
+        var fullBgPath = Path.Combine(rootPath, "wwwroot", "accounts", "background_pictures", $"{randomBgName}");
 
-        if (dto.Email is not null)
+        var randomPicName = $"{Path.GetRandomFileName().Replace('.', '-')}.webp";
+        var fullPicPath = Path.Combine(rootPath, "wwwroot", "accounts", "profile_pictures", $"{randomPicName}");
+
+        try
         {
-            account.Email = dto.Email;
-        }
+            if (dto.BackgroundPic is not null)
+            {
+                if (dto.BackgroundPic is not { Length: > 0 }) throw new BadRequestException("invalid picture");
+                account.BackgroundPicUrl = Path.Combine("wwwroot", "accounts", "background_pictures", $"{randomBgName}");
 
-        if (dto.Password is not null)
+                await using var stream = new FileStream(fullBgPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+                await dto.BackgroundPic.CopyToAsync(stream);
+                await stream.DisposeAsync();
+            }
+            if (dto.ProfilePic is not null)
+            {
+                if (dto.ProfilePic is not { Length: > 0 }) throw new BadRequestException("invalid picture");
+                account.ProfilePicUrl = Path.Combine("wwwroot", "accounts", "profile_pictures", $"{randomPicName}");
+
+                await using var stream = new FileStream(fullPicPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+                await dto.ProfilePic.CopyToAsync(stream);
+                await stream.DisposeAsync();
+            }
+
+            if (dto.Email is not null) account.Email = dto.Email;
+            if (dto.Password is not null)
+            {
+                if (dto.Password != dto.ConfirmPassword)
+                    throw new BadRequestException("passwords are not the same");
+                account.PasswordHash = _passwordHasher.HashPassword(account, dto.Password);
+            }
+
+            account = await _accountRepo.UpdateAsync(account);
+            return _mapper.Map<AccountDto>(account);
+        }
+        catch (Exception)
         {
-            if (dto.Password != dto.ConfirmPassword)
-                throw new BadRequestException("passwords are not the same");
-
-            account.PasswordHash = _passwordHasher.HashPassword(account, dto.Password);
+            if (File.Exists(fullBgPath)) File.Delete(fullBgPath);
+            if (File.Exists(fullPicPath)) File.Delete(fullPicPath);
+            throw;
         }
-
-        account = await _accountRepo.UpdateAsync(account);
-        return _mapper.Map<AccountDto>(account);
     }
 
     public async Task<bool> Delete(int id)

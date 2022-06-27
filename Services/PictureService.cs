@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using Google.Cloud.Vision.V1;
 using Microsoft.AspNetCore.Authorization;
 using PicturesAPI.Authorization;
@@ -7,6 +8,7 @@ using PicturesAPI.Enums;
 using PicturesAPI.Exceptions;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
+using PicturesAPI.Models.Validators;
 using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services.Helpers;
 using PicturesAPI.Services.Interfaces;
@@ -59,7 +61,7 @@ public class PictureService : IPictureService
         return pictureDtos;
     }
 
-    public async Task<IEnumerable<PictureDto>> GetPictures(PictureQuery query)
+    public async Task<PagedResult<PictureDto>> GetPictures(PictureQuery query)
     {
         var pictures = await _pictureRepo.GetFromAllAsync(
             query.PageSize * (query.PageNumber - 1),
@@ -67,7 +69,12 @@ public class PictureService : IPictureService
         );
         var pictureDtos = _mapper.Map<List<PictureDto>>(pictures).ToList();
         AllowModifyItems(pictureDtos);
-        return pictureDtos;
+        return new PagedResult<PictureDto>(
+            pictureDtos,
+            query.PageSize,
+            query.PageNumber,
+            await _pictureRepo.CountPicturesAsync((p) => true)
+        );
     }
 
     public async Task<PagedResult<PictureDto>> SearchAll(SearchQuery query)
@@ -105,7 +112,13 @@ public class PictureService : IPictureService
             .Map<List<PictureDto>>(pictures)
             .ToList();
         AllowModifyItems(pictureDtos);
-        var result = new PagedResult<PictureDto>(pictureDtos, query.PageSize, query.PageNumber);
+        var result = new PagedResult<PictureDto>(
+            pictureDtos,
+            query.PageSize,
+            query.PageNumber,
+            await _pictureRepo.CountPicturesAsync(
+                p => query.SearchPhrase == string.Empty || p.Name.ToLower().Contains(query.SearchPhrase.ToLower())
+            ));
         return result;
     }
 
@@ -136,10 +149,12 @@ public class PictureService : IPictureService
         return result;
     }
     
-    public async Task<int> Create(IFormFile file, CreatePictureDto dto)
+    public async Task<string> Create(IFormFile file, CreatePictureDto dto)
     {
-        var account = await _accountContextService.GetAccountAsync();
+        var validationResult = await StaticValidator.Validate(dto);
+        if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
+        var account = await _accountContextService.GetAccountAsync();
         var picture = _mapper.Map<Picture>(dto);
 
         picture.Account = account;
@@ -151,26 +166,33 @@ public class PictureService : IPictureService
         var randomName = $"{Path.GetRandomFileName().Replace('.', '-')}.webp";
         var fullPath = Path.Combine(rootPath, "wwwroot", "pictures", $"{randomName}");
         picture.Url = Path.Combine("wwwroot", "pictures", $"{randomName}");
-        
-        using (var stream = new FileStream(fullPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
-        {
-            file.CopyTo(stream);
-            stream.Dispose();
-        }
 
-        await _pictureRepo.InsertAsync(picture);
-        if (dto.Tags is not null)
+        try
         {
-            foreach (var tag in dto.Tags.Distinct())
+            await using (var stream = new FileStream(fullPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
             {
-                var insertedTag = await _tagRepo.InsertAsync(new Tag()
-                {
-                    Value = tag,
-                });
-                await _tagRepo.TryInsertPictureTagJoinAsync(picture, insertedTag);
+                await file.CopyToAsync(stream);
+                await stream.DisposeAsync();
             }
+            await _pictureRepo.InsertAsync(picture);
+            if (dto.Tags is not null)
+            {
+                foreach (var tag in dto.Tags.Distinct())
+                {
+                    var insertedTag = await _tagRepo.InsertAsync(new Tag()
+                    {
+                        Value = tag,
+                    });
+                    await _tagRepo.TryInsertPictureTagJoinAsync(picture, insertedTag);
+                }
+            }
+            return IdHasher.EncodePictureId(picture.Id);
         }
-        return picture.Id;
+        catch (Exception)
+        {
+            if (File.Exists(fullPath)) File.Delete(fullPath);
+            throw;
+        }
     }
 
     public async Task<SafeSearchAnnotation> Classify(IFormFile file)
@@ -182,21 +204,31 @@ public class PictureService : IPictureService
         return await NsfwClassifier.ClassifyAsync(fileBytes, CancellationToken.None);
     }
 
-    public async Task<PictureDto> Update(int id, PutPictureDto dto)
+    public async Task<PictureDto> Update(int id, UpdatePictureDto dto)
     {
+        var validationResult = await StaticValidator.Validate(dto);
+        if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
+
         var picture = await _pictureRepo.GetByIdAsync(id);
         if (picture is null) throw new NotFoundException();
         
         await AuthorizePictureOperation(picture, ResourceOperation.Update,"you cant modify picture you didnt added");
 
-        if (dto.Description is not null)
+        if (dto.Description is not null) picture.Description = dto.Description;
+        if (dto.Name is not null) picture.Name = dto.Name;
+        if (dto.Tags is not null && dto.Tags.Count > 0)
         {
-            picture.Description = dto.Description;
+            foreach (var join in picture.PictureTagJoins)
+            {
+                await _tagRepo.TryDeletePictureTagJoinAsync(join.Picture, join.Tag);
+            }
+            foreach (var tag in dto.Tags)
+            {
+                var insertedTag = await _tagRepo.InsertAsync(new Tag() { Value = tag });
+                await _tagRepo.TryInsertPictureTagJoinAsync(picture, insertedTag);
+            }
         }
-        if (dto.Name is not null)
-        {
-            picture.Name = dto.Name;
-        }
+
         await _pictureRepo.UpdateAsync(picture);
         var result = _mapper.Map<PictureDto>(picture);
         return result;

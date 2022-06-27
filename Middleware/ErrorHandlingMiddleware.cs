@@ -1,4 +1,5 @@
-﻿using HashidsNet;
+﻿using FluentValidation;
+using HashidsNet;
 using PicturesAPI.Exceptions;
 
 namespace PicturesAPI.Middleware;
@@ -24,6 +25,11 @@ public class ErrorHandlingMiddleware : IMiddleware
         {
             context.Response.StatusCode = 400;
             await context.Response.WriteAsync(badRequestException.Message);
+        }
+        catch (ValidationException validationException)
+        {
+            context.Response.StatusCode = 400;
+            await context.Response.WriteAsync(validationException.Message);
         }
 
         catch (InvalidAuthTokenException invalidAuthTokenException)

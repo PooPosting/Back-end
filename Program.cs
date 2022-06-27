@@ -24,6 +24,7 @@ using PicturesAPI.Models.Validators;
 using PicturesAPI.Repos;
 using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services;
+using PicturesAPI.Services.Helpers;
 using PicturesAPI.Services.Interfaces;
 using PicturesAPI.Services.Startup;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
@@ -81,7 +82,8 @@ builder.Services.AddDbContext<PictureDbContext>(options =>
 // Validators
 builder.Services.AddScoped<IValidator<AccountQuery>, AccountQueryValidator>();
 builder.Services.AddScoped<IValidator<PictureQuery>, PictureQueryValidator>();
-builder.Services.AddScoped<IValidator<PutAccountDto>, PutAccountDtoValidator>();
+builder.Services.AddScoped<IValidator<UpdateAccountDto>, UpdateAccountDtoValidator>();
+builder.Services.AddScoped<IValidator<UpdatePictureDto>, UpdatePictureDtoValidator>();
 builder.Services.AddScoped<IValidator<CreateAccountDto>, CreateAccountDtoValidator>();
 builder.Services.AddScoped<IValidator<LsLoginDto>, LsLoginDtoValidator>();
 builder.Services.AddScoped<IValidator<PatchRestrictedIp>, PatchRestrictedIpValidator>();
@@ -146,7 +148,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 // Configure
-
 app.UseCors("FrontEndClient");
 app.UseFileServer(new FileServerOptions
 {
