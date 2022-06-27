@@ -173,13 +173,13 @@ public class PictureService : IPictureService
         return picture.Id;
     }
 
-    public async Task<SafeSearchAnnotation> Classify(IFormFile file, CancellationToken cancellationToken)
+    public async Task<SafeSearchAnnotation> Classify(IFormFile file)
     {
         if (file is null) throw new BadRequestException("Invalid file");
         using var ms = new MemoryStream();
-        await file.CopyToAsync(ms, cancellationToken);
+        await file.CopyToAsync(ms);
         var fileBytes = ms.ToArray();
-        return await NsfwClassifier.ClassifyAsync(fileBytes, cancellationToken);
+        return await NsfwClassifier.ClassifyAsync(fileBytes, CancellationToken.None);
     }
 
     public async Task<PictureDto> Update(int id, PutPictureDto dto)

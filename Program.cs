@@ -14,6 +14,8 @@ using PicturesAPI;
 using PicturesAPI.ActionFilters;
 using PicturesAPI.Authorization;
 using PicturesAPI.Entities;
+using PicturesAPI.Factories;
+using PicturesAPI.Factories.Interfaces;
 using PicturesAPI.Middleware;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Configuration;
@@ -112,7 +114,9 @@ builder.Services.AddScoped<IRestrictedIpRepo, RestrictedIpRepo>();
 builder.Services.AddScoped<IRoleRepo, RoleRepo>();
 builder.Services.AddScoped<ITagRepo, TagRepo>();
 builder.Services.AddScoped<IPopularRepo, PopularRepo>();
-builder.Services.AddScoped<ISitemapRepo, SitemapRepo>();
+
+// Factories
+builder.Services.AddScoped<ISitemapFactory, SitemapFactory>();
 
 // Other stuff
 builder.Services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();

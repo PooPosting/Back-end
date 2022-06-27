@@ -81,9 +81,9 @@ public class PictureController : ControllerBase
     [HttpPost]
     [ServiceFilter(typeof(CanPostFilter))]
     [Route("classify")]
-    public async Task<IActionResult> ClassifyPictureAsync([FromForm] IFormFile file, CancellationToken cancellationToken)
+    public async Task<IActionResult> ClassifyPictureAsync([FromForm] IFormFile file)
     {
-        var result = await _pictureService.Classify(file, cancellationToken);
+        var result = await _pictureService.Classify(file);
         return Ok(result);
     }
     

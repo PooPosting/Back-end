@@ -15,16 +15,13 @@ namespace PicturesAPI.Controllers;
 public class AdminController: ControllerBase
 {
     private readonly ILogsService _logsService;
-    private readonly ISitemapRepo _sitemapRepo;
     private readonly IRestrictedIpsService _restrictedIpsService;
 
     public AdminController(
         ILogsService logsService,
-        ISitemapRepo sitemapRepo,
         IRestrictedIpsService restrictedIpsService)
     {
         _logsService = logsService;
-        _sitemapRepo = sitemapRepo;
         _restrictedIpsService = restrictedIpsService;
     }
 
@@ -77,12 +74,4 @@ public class AdminController: ControllerBase
         return NoContent();
     }
 
-    [HttpGet]
-    [Route("sitemap")]
-    public async Task<IActionResult> UpdateSitemap()
-    {
-        await _sitemapRepo.UpdateAsync();
-        return Ok();
-    }
-    
 }
