@@ -1,7 +1,10 @@
-﻿using PicturesAPI.Entities;
-using PicturesAPI.Enums;
+﻿using AutoMapper;
+using PicturesAPI.Entities;
 using PicturesAPI.Exceptions;
+using PicturesAPI.Models.Dtos;
 using PicturesAPI.Repos.Interfaces;
+using PicturesAPI.Services.Helpers;
+using PicturesAPI.Services.Helpers.Interfaces;
 using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Services;
@@ -9,23 +12,29 @@ namespace PicturesAPI.Services;
 public class PictureLikingService : IPictureLikingService
 {
     private readonly IPictureRepo _pictureRepo;
+    private readonly IModifyAllower _modifyAllower;
     private readonly ITagRepo _tagRepo;
+    private readonly IMapper _mapper;
     private readonly ILikeRepo _likeRepo;
     private readonly IAccountContextService _accountContextService;
 
     public PictureLikingService(
         ILikeRepo likeRepo,
         IPictureRepo pictureRepo,
+        IModifyAllower modifyAllower,
         ITagRepo tagRepo,
+        IMapper mapper,
         IAccountContextService accountContextService)
     {
         _pictureRepo = pictureRepo;
+        _modifyAllower = modifyAllower;
         _tagRepo = tagRepo;
+        _mapper = mapper;
         _likeRepo = likeRepo;
         _accountContextService = accountContextService;
     }
     
-    public async Task<LikeState> Like(int id)
+    public async Task<PictureDto> Like(int id)
     {
         var picture = await _pictureRepo.GetByIdAsync(id) ?? throw new NotFoundException();
         var account = await _accountContextService.GetAccountAsync();
@@ -44,7 +53,10 @@ public class PictureLikingService : IPictureLikingService
                     await _tagRepo.TryDeleteAccountLikedTagAsync(account, tag);
                 }
                 await _pictureRepo.UpdatePicScoreAsync(picture);
-                return LikeState.Deleted;
+
+                var result = _mapper.Map<PictureDto>(picture);
+                _modifyAllower.UpdateItems(result);
+                return result;
             }
             // like exists and (IsLike == false)
             else
@@ -56,7 +68,10 @@ public class PictureLikingService : IPictureLikingService
                     await _tagRepo.TryInsertAccountLikedTagAsync(account, tag);
                 }
                 await _pictureRepo.UpdatePicScoreAsync(picture);
-                return LikeState.Liked;
+
+                var result = _mapper.Map<PictureDto>(picture);
+                _modifyAllower.UpdateItems(result);
+                return result;
             }
         }
         // like does not exist
@@ -74,12 +89,15 @@ public class PictureLikingService : IPictureLikingService
                 await _tagRepo.TryInsertAccountLikedTagAsync(account, tag);
             }
             await _pictureRepo.UpdatePicScoreAsync(picture);
-            return LikeState.Liked;
+
+            var result = _mapper.Map<PictureDto>(picture);
+            _modifyAllower.UpdateItems(result);
+            return result;
         }
 
     }
 
-    public async Task<LikeState> DisLike(int id)
+    public async Task<PictureDto> DisLike(int id)
     {
         var picture = await _pictureRepo.GetByIdAsync(id) ?? throw new NotFoundException();
         var account = await _accountContextService.GetAccountAsync();
@@ -92,7 +110,10 @@ public class PictureLikingService : IPictureLikingService
             {
                 await _likeRepo.DeleteByIdAsync(like.Id);
                 await _pictureRepo.UpdatePicScoreAsync(picture);
-                return LikeState.Deleted;
+
+                var result = _mapper.Map<PictureDto>(picture);
+                _modifyAllower.UpdateItems(result);
+                return result;
             }
             // like exists and (IsLike == true)
             else
@@ -105,7 +126,10 @@ public class PictureLikingService : IPictureLikingService
                     await _tagRepo.TryDeleteAccountLikedTagAsync(account, tag);
                 }
                 await _pictureRepo.UpdatePicScoreAsync(picture);
-                return LikeState.DisLiked;
+
+                var result = _mapper.Map<PictureDto>(picture);
+                _modifyAllower.UpdateItems(result);
+                return result;
             }
         }
         // does not exist
@@ -119,7 +143,10 @@ public class PictureLikingService : IPictureLikingService
                     IsLike = false
                 });
             await _pictureRepo.UpdatePicScoreAsync(picture);
-            return LikeState.DisLiked;
+
+            var result = _mapper.Map<PictureDto>(picture);
+            _modifyAllower.UpdateItems(result);
+            return result;
         }
     }
 

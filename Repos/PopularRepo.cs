@@ -28,7 +28,7 @@ public class PopularRepo : IPopularRepo
                 .Where(c => c.IsDeleted == false))
             .Include(p => p.Account)
             .AsSplitQuery()
-            .ToListAsync();
+            .ToArrayAsync();
     }
 
     public async Task<IEnumerable<Picture>> GetPicsByLikeCountAsync(int itemsToTake)
@@ -44,7 +44,7 @@ public class PopularRepo : IPopularRepo
                 .Where(c => c.IsDeleted == false))
             .Include(p => p.Account)
             .AsSplitQuery()
-            .ToListAsync();
+            .ToArrayAsync();
     }
 
     public async Task<IEnumerable<Picture>> GetPicsByCommentCountAsync(int itemsToTake)
@@ -60,7 +60,7 @@ public class PopularRepo : IPopularRepo
                 .Where(c => c.IsDeleted == false))
             .Include(p => p.Account)
             .AsSplitQuery()
-            .ToListAsync();
+            .ToArrayAsync();
     }
 
     public async Task<IEnumerable<Account>> GetAccsByPostCountAsync(int itemsToTake)
@@ -74,7 +74,7 @@ public class PopularRepo : IPopularRepo
                 .Where(c => c.IsDeleted == false))
             .Include(a => a.Pictures)
             .AsSplitQuery()
-            .ToListAsync();
+            .ToArrayAsync();
     }
 
     public async Task<IEnumerable<Account>> GetAccsByPostLikesCountAsync(int itemsToTake)
@@ -88,6 +88,6 @@ public class PopularRepo : IPopularRepo
                 .Where(c => c.IsDeleted == false))
             .Include(a => a.Pictures)
             .AsSplitQuery()
-            .ToListAsync();
+            .ToArrayAsync();
     }
 }

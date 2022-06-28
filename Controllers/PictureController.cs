@@ -111,7 +111,7 @@ public class PictureController : ControllerBase
     [HttpPost] // some sensitive data is being sent
     [ServiceFilter(typeof(CanPostFilter))]
     [Route("{id}")]
-    public async Task<IActionResult> PutPictureUpdate(
+    public async Task<IActionResult> UpdatePicture(
         [FromRoute] string id,
         [FromForm] string? name,
         [FromForm] string? description,

@@ -15,7 +15,7 @@ public class RestrictedIpsService : IRestrictedIpsService
         _restrictedIpRepo = restrictedIpRepo;
     }
     
-    public async Task<List<RestrictedIp>> GetAll()
+    public async Task<IEnumerable<RestrictedIp>> GetAll()
     {
         return await _restrictedIpRepo.GetAllAsync();
     }
@@ -36,7 +36,7 @@ public class RestrictedIpsService : IRestrictedIpsService
         await _restrictedIpRepo.InsertAsync(restrictedIp);
     }
     
-    public async Task UpdateMany(List<RestrictedIp> ips, bool cantGet, bool cantPost)
+    public async Task UpdateMany(IEnumerable<RestrictedIp> ips, bool cantGet, bool cantPost)
     {
         foreach (var ip in ips)
         {

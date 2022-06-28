@@ -1,9 +1,9 @@
-﻿using PicturesAPI.Enums;
+﻿using PicturesAPI.Models.Dtos;
 
 namespace PicturesAPI.Services.Interfaces;
 
 public interface IPictureLikingService
 {
-    Task<LikeState> Like(int id);
-    Task<LikeState> DisLike(int id);
+    Task<PictureDto> Like(int id);
+    Task<PictureDto> DisLike(int id);
 }

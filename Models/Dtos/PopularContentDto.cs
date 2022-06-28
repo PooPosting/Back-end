@@ -2,10 +2,10 @@
 
 public class PopularContentDto
 {
-    public ICollection<AccountDto> MostPostedAccounts { get; set; }
-    public ICollection<AccountDto> MostLikedAccounts { get; set; }
+    public IEnumerable<AccountDto> MostPostedAccounts { get; set; }
+    public IEnumerable<AccountDto> MostLikedAccounts { get; set; }
 
-    public ICollection<PictureDto> MostLikedPictures { get; set; }
-    public ICollection<PictureDto> MostVotedPictures { get; set; }
-    public ICollection<PictureDto> MostCommentedPictures { get; set; }
+    public IEnumerable<PictureDto> MostLikedPictures { get; set; }
+    public IEnumerable<PictureDto> MostVotedPictures { get; set; }
+    public IEnumerable<PictureDto> MostCommentedPictures { get; set; }
 }

@@ -23,7 +23,16 @@ public class PictureMappingProfile : Profile
             .ForMember(
                 dto => dto.AccountId,
                 opt => opt.MapFrom(
-                    p => p.Account.IsDeleted ? "0" : IdHasher.EncodeAccountId(p.Account.Id)));
+                    p => p.Account.IsDeleted ? "0" : IdHasher.EncodeAccountId(p.Account.Id)))
+            .ForMember(dto => dto.LikeCount,
+                opt => opt.MapFrom(
+                    p => p.Likes.Count(l => l.IsLike)))
+            .ForMember(dto => dto.DislikeCount,
+                opt => opt.MapFrom(
+                    p => p.Likes.Count(l => !l.IsLike)))
+            .ForMember(dto => dto.CommentCount,
+                opt => opt.MapFrom(
+                    p => p.Comments.Count));
 
         CreateMap<PictureDto, Picture>()
             .ForMember(p => p.Id,
@@ -34,17 +43,6 @@ public class PictureMappingProfile : Profile
                     dto => IdHasher.DecodeAccountId(dto.AccountId)));
 
         CreateMap<CreatePictureDto, Picture>();
-    }
-
-    private List<string> GetPictureTags(Picture picture)
-    {
-        List<string> tags;
-
-        tags = picture.PictureTagJoins
-            .Select(p => p.Tag.Value)
-            .ToList();
-
-        return tags;
     }
 
 }

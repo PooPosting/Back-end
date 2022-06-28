@@ -25,6 +25,7 @@ using PicturesAPI.Repos;
 using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services;
 using PicturesAPI.Services.Helpers;
+using PicturesAPI.Services.Helpers.Interfaces;
 using PicturesAPI.Services.Interfaces;
 using PicturesAPI.Services.Startup;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
@@ -106,6 +107,7 @@ builder.Services.AddScoped<IPopularService, PopularService>();
 builder.Services.AddScoped<IUserAccountService, UserAccountService>();
 builder.Services.AddScoped<ILogsService, LogsService>();
 builder.Services.AddScoped<IRestrictedIpsService, RestrictedIpsService>();
+builder.Services.AddScoped<IModifyAllower, ModifyAllower>();
 
 // Repos
 builder.Services.AddScoped<IAccountRepo, AccountRepo>();
@@ -123,6 +125,7 @@ builder.Services.AddScoped<ISitemapFactory, SitemapFactory>();
 // Other stuff
 builder.Services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
 builder.Services.AddScoped<PictureSeeder>();
+builder.Services.AddScoped<PopularityScoreUpdater>();
 builder.Services.AddScoped<EnvironmentVariableSetter>();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddHttpContextAccessor();
@@ -155,16 +158,20 @@ app.UseFileServer(new FileServerOptions
         Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
     RequestPath = "/wwwroot",
     EnableDefaultFiles = true
-}) ;
-var scope = app.Services.CreateScope();
-if (app.Environment.IsDevelopment())
-{
-    var seeder = scope.ServiceProvider.GetRequiredService<PictureSeeder>();
-    seeder.Seed();
-    app.UseDeveloperExceptionPage();
+});
+
+using (var scope = app.Services.CreateScope()) {
+    if (app.Environment.IsDevelopment())
+    {
+        var seeder = scope.ServiceProvider.GetRequiredService<PictureSeeder>();
+        seeder.Seed();
+        app.UseDeveloperExceptionPage();
+    }
+    var envSetter = scope.ServiceProvider.GetRequiredService<EnvironmentVariableSetter>();
+    envSetter.Set();
+    var popUpdater = scope.ServiceProvider.GetRequiredService<PopularityScoreUpdater>();
+    popUpdater.Update();
 }
-var envSetter = scope.ServiceProvider.GetRequiredService<EnvironmentVariableSetter>();
-envSetter.Set();
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseMiddleware<RequestTimeMiddleware>();

@@ -18,7 +18,7 @@ public static class PictureScoreCalculator
 
         if ((DateTime.Now - picture.PictureAdded).TotalMinutes < 180)
         {
-            result += CalcPicPoints(likePoints, time) * 1.75;
+            result += CalcPicPoints(likePoints, time) * 1.5;
         }
         else if (picture.PictureAdded > date)
         {
@@ -26,7 +26,7 @@ public static class PictureScoreCalculator
         }
         else
         {
-            result += Math.Log(likePoints + 10) * 10;
+            result += CalcPicPoints(likePoints, time)*0.35;
         }
         return (long)result;
     }

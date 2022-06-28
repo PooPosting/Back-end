@@ -18,9 +18,9 @@ public class RestrictedIpRepo : IRestrictedIpRepo
     {
         return await _dbContext.RestrictedIps.FirstOrDefaultAsync(i => i.IpAddress == ip);
     }
-    public async Task<List<RestrictedIp>> GetAllAsync()
+    public async Task<IEnumerable<RestrictedIp>> GetAllAsync()
     {
-        return await _dbContext.RestrictedIps.ToListAsync();
+        return await _dbContext.RestrictedIps.ToArrayAsync();
     }
 
     public async Task<RestrictedIp> InsertAsync(RestrictedIp restrictedIp)

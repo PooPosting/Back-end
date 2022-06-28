@@ -11,6 +11,7 @@ using PicturesAPI.Models.Dtos;
 using PicturesAPI.Models.Validators;
 using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services.Helpers;
+using PicturesAPI.Services.Helpers.Interfaces;
 using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Services;
@@ -20,6 +21,7 @@ public class AccountService : IAccountService
     private readonly IMapper _mapper;
     private readonly ILogger<AccountService> _logger;
     private readonly IAccountContextService _accountContextService;
+    private readonly IModifyAllower _modifyAllower;
     private readonly IAccountRepo _accountRepo;
     private readonly IPictureRepo _pictureRepo;
     private readonly ILikeRepo _likeRepo;
@@ -30,6 +32,7 @@ public class AccountService : IAccountService
         IMapper mapper,
         ILogger<AccountService> logger,
         IAccountContextService accountContextService,
+        IModifyAllower modifyAllower,
         IAccountRepo accountRepo,
         IPictureRepo pictureRepo,
         ILikeRepo likeRepo,
@@ -39,6 +42,7 @@ public class AccountService : IAccountService
         _mapper = mapper;
         _logger = logger;
         _accountContextService = accountContextService;
+        _modifyAllower = modifyAllower;
         _accountRepo = accountRepo;
         _pictureRepo = pictureRepo;
         _likeRepo = likeRepo;
@@ -51,7 +55,7 @@ public class AccountService : IAccountService
         var account = await _accountRepo.GetByIdAsync(id);
         if (account is null || account.IsDeleted) throw new NotFoundException();
         var result = _mapper.Map<AccountDto>(account);
-        AllowModifyItems(result);
+        _modifyAllower.UpdateItems(result);
         return result;
     }
 
@@ -64,13 +68,13 @@ public class AccountService : IAccountService
                 query.SearchPhrase);
 
         var accountDtos = _mapper.Map<List<AccountDto>>(accounts).ToList();
-        AllowModifyItems(accountDtos);
+        _modifyAllower.UpdateItems(accountDtos);
         var result = new PagedResult<AccountDto>(
             accountDtos,
             query.PageSize,
             query.PageNumber,
             await _accountRepo.CountAccountsAsync(
-                a => query.SearchPhrase == string.Empty || a.Nickname.ToLower().Contains(query.SearchPhrase.ToLower())
+                a => string.IsNullOrEmpty(query.SearchPhrase) || a.Nickname.ToLower().Contains(query.SearchPhrase.ToLower())
             ));
         return result;
     }
@@ -128,7 +132,10 @@ public class AccountService : IAccountService
             }
 
             account = await _accountRepo.UpdateAsync(account);
-            return _mapper.Map<AccountDto>(account);
+
+            var accountDto = _mapper.Map<AccountDto>(account);
+            _modifyAllower.UpdateItems(accountDto);
+            return accountDto;
         }
         catch (Exception)
         {
@@ -167,92 +174,13 @@ public class AccountService : IAccountService
         }
         _logger.LogWarning($"Account with Nickname: {account.Nickname}, Id: {account.Id} DELETE (HIDE) ALL PICTURES action succeed");
         
-        return _mapper.Map<List<PictureDto>>(pictures);
+        var pictureDtos = _mapper.Map<List<PictureDto>>(pictures);
+        _modifyAllower.UpdateItems(pictureDtos);
+        return pictureDtos;
     }
 
 
     #region Private methods
-
-    private void AllowModifyItems(List<AccountDto> accounts)
-    {
-        if (_accountContextService.TryGetAccountId() is null) return;
-        var accountRole = _accountContextService.GetAccountRole();
-        var accountId = _accountContextService.GetEncodedAccountId();
-        foreach (var account in accounts)
-        {
-            foreach (var item in account.Pictures)
-            {
-                if (item.AccountId == accountId)
-                {
-                    item.IsModifiable = true;
-                }
-                else if (accountRole == 3)
-                {
-                    item.IsAdminModifiable = true;
-                }
-
-                foreach (var comment in item.Comments)
-                {
-                    if (comment.AccountId == accountId)
-                    {
-                        comment.IsModifiable = true;
-                    }
-                    else if (accountRole == 3)
-                    {
-                        item.IsAdminModifiable = true;
-                    }
-                }
-
-                if (item.Likes.Any(l => (l.AccountId == accountId && l.IsLike)))
-                {
-                    item.LikeState = LikeState.Liked;
-                }
-                if (item.Likes.Any(l => (l.AccountId == accountId && !l.IsLike)))
-                {
-                    item.LikeState = LikeState.DisLiked;
-                }
-            }
-        }
-    }
-
-    private void AllowModifyItems(AccountDto account)
-    {
-        if (_accountContextService.TryGetAccountId() is null) return;
-        var accountRole = _accountContextService.GetAccountRole();
-        var accountId = _accountContextService.GetEncodedAccountId();
-        foreach (var item in account.Pictures)
-        {
-            if (item.AccountId == accountId)
-            {
-                item.IsModifiable = true;
-            }
-            else if (accountRole == 3)
-            {
-                item.IsAdminModifiable = true;
-            }
-
-            foreach (var comment in item.Comments)
-            {
-                if (comment.AccountId == accountId)
-                {
-                    comment.IsModifiable = true;
-                }
-                else if (accountRole == 3)
-                {
-                    item.IsAdminModifiable = true;
-                }
-            }
-
-            if (item.Likes.Any(l => (l.AccountId == accountId && l.IsLike)))
-            {
-                item.LikeState = LikeState.Liked;
-            }
-            if (item.Likes.Any(l => (l.AccountId == accountId && !l.IsLike)))
-            {
-                item.LikeState = LikeState.DisLiked;
-            }
-        }
-    }
 
     private async Task AuthorizeAccountOperation(Account account, ResourceOperation operation, string message)
     {

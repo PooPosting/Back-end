@@ -5,6 +5,7 @@ using PicturesAPI.Entities;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services.Helpers;
+using PicturesAPI.Services.Startup;
 
 namespace PicturesAPI.Repos;
 
@@ -63,16 +64,15 @@ public class PictureRepo : IPictureRepo
             .Skip(itemsToSkip)
             .Take(itemsToTake)
             .AsSplitQuery()
-            .ToListAsync();
+            .ToArrayAsync();
     }
 
     public async Task<IEnumerable<Picture>> GetNotSeenByAccountIdAsync(int accountId, int itemsToTake)
     {
-        return await _dbContext.Pictures
+        return (await _dbContext.Pictures
             .Where(p => !p.IsDeleted)
             .Where(p => !_dbContext.PictureSeenByAccountJoins
                 .Where(j => j.AccountId == accountId)
-                .AsSplitQuery()
                 .Any(j => j.PictureId == p.Id && j.AccountId == accountId))
             .Include(p => p.Account)
             .ThenInclude(a => a.Role)
@@ -83,19 +83,18 @@ public class PictureRepo : IPictureRepo
             .Include(p => p.Comments
                 .Where(c => c.IsDeleted == false))
             .ThenInclude(c => c.Account)
-            .OrderByDescending(p => p.PopularityScore *
-                                    (p.PictureTagJoins
-                                         .Select(j =>
-                                         j.Tag.AccountLikedTagJoins
-                                             .OrderByDescending(t => t.Id)
-                                             .Select(a => a.AccountId == accountId)
-                                             .Take(15)
-                                         )
-                                         .Count() * 2.25)
-            )
-            .Take(itemsToTake)
+            .Include(p => p.Account)
             .AsSplitQuery()
-            .ToListAsync();
+            .OrderByDescending(p =>
+                p.PopularityScore *
+                    (p.PictureTagJoins.Select(j =>
+                            j.Tag.AccountLikedTagJoins
+                                .OrderByDescending(t => t.Id)
+                                .Select(a => a.AccountId == accountId)
+                                .Take(15)
+                        ).Count() * 2.25))
+            .ToArrayAsync())
+            .Take(itemsToTake);
     }
 
     public async Task<IEnumerable<Picture>> SearchAllAsync(int itemsToSkip, int itemsToTake, string searchPhrase)
@@ -117,7 +116,7 @@ public class PictureRepo : IPictureRepo
             .Skip(itemsToSkip)
             .Take(itemsToTake)
             .AsSplitQuery()
-            .ToListAsync();
+            .ToArrayAsync();
     }
 
     public async Task<IEnumerable<Picture>> SearchNewestAsync(int itemsToSkip, int itemsToTake, string searchPhrase)
@@ -139,7 +138,7 @@ public class PictureRepo : IPictureRepo
             .Skip(itemsToSkip)
             .Take(itemsToTake)
             .AsSplitQuery()
-            .ToListAsync();
+            .ToArrayAsync();
     }
 
     public async Task<IEnumerable<Picture>> SearchMostLikesAsync(int itemsToSkip, int itemsToTake, string searchPhrase)
@@ -161,7 +160,7 @@ public class PictureRepo : IPictureRepo
             .Skip(itemsToSkip)
             .Take(itemsToTake)
             .AsSplitQuery()
-            .ToListAsync();
+            .ToArrayAsync();
     }
 
     public async Task<Picture> InsertAsync(Picture picture)
@@ -173,6 +172,7 @@ public class PictureRepo : IPictureRepo
 
     public async Task<Picture> UpdatePicScoreAsync (Picture picture)
     {
+        picture.PopularityScore = PictureScoreCalculator.CalcPoints(picture);
         _dbContext.Pictures.Update(picture);
         await _dbContext.SaveChangesAsync();
         return picture;
@@ -180,7 +180,6 @@ public class PictureRepo : IPictureRepo
 
     public async Task<Picture> UpdateAsync(Picture picture)
     {
-        picture.PopularityScore = PictureScoreCalculator.CalcPoints(picture);
         _dbContext.Pictures.Update(picture);
         await _dbContext.SaveChangesAsync();
         return picture;

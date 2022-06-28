@@ -24,6 +24,8 @@ public class UpdatePictureDtoValidator : AbstractValidator<UpdatePictureDto>
         RuleFor(x => x.Tags)
             .Custom((tags, context) =>
             {
+                if (tags is null) return;
+
                 if (tags.Count > 4) context.AddFailure("maximum tag count is 4");
                 foreach (var tag in tags)
                 {

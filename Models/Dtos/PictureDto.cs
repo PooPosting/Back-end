@@ -19,6 +19,10 @@ public class PictureDto
     public IEnumerable<LikeDto> Likes { get; set; }
     public IEnumerable<CommentDto> Comments { get; set; }
 
+    public int LikeCount { get; set; }
+    public int DislikeCount { get; set; }
+    public int CommentCount { get; set; }
+
     public LikeState LikeState { get; set; } = LikeState.Deleted;
     public bool IsModifiable { get; set; } = false;
     public bool IsAdminModifiable { get; set; } = false;

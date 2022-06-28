@@ -63,11 +63,11 @@ public class AccountRepo : IAccountRepo
             .SingleOrDefaultAsync(a => a.Nickname == nickname);
     }
 
-    public async Task<IEnumerable<Account>> SearchAllAsync(int itemsToSkip, int itemsToTake, string searchPhrase)
+    public async Task<IEnumerable<Account>> SearchAllAsync(int itemsToSkip, int itemsToTake, string? searchPhrase)
     {
         return await _dbContext.Accounts
             .Where(a => !a.IsDeleted)
-            .Where(a => searchPhrase == string.Empty || a.Nickname.ToLower().Contains(searchPhrase.ToLower()))
+            .Where(a => string.IsNullOrEmpty(searchPhrase) || a.Nickname.ToLower().Contains(searchPhrase.ToLower()))
             .OrderByDescending(a => a.Pictures.Sum(picture => picture.Likes.Count))
             .ThenByDescending(a => a.Pictures.Count)
             .Include(a => a.Role)
@@ -83,7 +83,7 @@ public class AccountRepo : IAccountRepo
             .Skip(itemsToSkip)
             .Take(itemsToTake)
             .AsSplitQuery()
-            .ToListAsync();
+            .ToArrayAsync();
     }
 
     public async Task<Account> InsertAsync(Account account)

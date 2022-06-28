@@ -33,7 +33,7 @@ public class LikeRepo : ILikeRepo
         return await _dbContext.Likes.Where(l => l.Liker.Id == id)
             .Include(a => a.Liked)
             .Include(a => a.Liker)
-            .ToListAsync();
+            .ToArrayAsync();
     }
 
     public async Task<IEnumerable<Like>> GetByLikedIdAsync(int id)
@@ -41,7 +41,7 @@ public class LikeRepo : ILikeRepo
         return await _dbContext.Likes.Where(l => l.Liked.Id == id)
             .Include(a => a.Liked)
             .Include(a => a.Liker)
-            .ToListAsync();
+            .ToArrayAsync();
     }
 
     public async Task<Like> InsertAsync(Like like)
