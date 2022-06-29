@@ -2,10 +2,8 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using PicturesAPI.Entities;
-using PicturesAPI.Models.Dtos;
 using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services.Helpers;
-using PicturesAPI.Services.Startup;
 
 namespace PicturesAPI.Repos;
 
@@ -48,23 +46,23 @@ public class PictureRepo : IPictureRepo
 
     public async Task<IEnumerable<Picture>> GetFromAllAsync(int itemsToSkip, int itemsToTake)
     {
-        return await _dbContext.Pictures
-            .Where(p => !p.IsDeleted)
-            .Include(p => p.Account)
-            .ThenInclude(a => a.Role)
-            .Include(p => p.PictureTagJoins)
-            .ThenInclude(j => j.Tag)
-            .Include(p => p.Likes)
-            .ThenInclude(l => l.Liker)
-            .Include(p => p.Comments
-                .Where(c => c.IsDeleted == false))
-            .ThenInclude(c => c.Account)
-            .Include(p => p.Account)
-            .OrderByDescending(p => p.PopularityScore)
+        return (await _dbContext.Pictures
+                .Where(p => !p.IsDeleted)
+                .Include(p => p.Account)
+                .ThenInclude(a => a.Role)
+                .Include(p => p.PictureTagJoins)
+                .ThenInclude(j => j.Tag)
+                .Include(p => p.Likes)
+                .ThenInclude(l => l.Liker)
+                .Include(p => p.Comments
+                    .Where(c => c.IsDeleted == false))
+                .ThenInclude(c => c.Account)
+                .Include(p => p.Account)
+                .OrderByDescending(p => p.PopularityScore)
+                .AsSplitQuery()
+                .ToArrayAsync())
             .Skip(itemsToSkip)
-            .Take(itemsToTake)
-            .AsSplitQuery()
-            .ToArrayAsync();
+            .Take(itemsToTake);
     }
 
     public async Task<IEnumerable<Picture>> GetNotSeenByAccountIdAsync(int accountId, int itemsToTake)
@@ -99,7 +97,7 @@ public class PictureRepo : IPictureRepo
 
     public async Task<IEnumerable<Picture>> SearchAllAsync(int itemsToSkip, int itemsToTake, string searchPhrase)
     {
-        return await _dbContext.Pictures
+        return (await _dbContext.Pictures
             .Where(p => !p.IsDeleted)
             .Where(p => searchPhrase == string.Empty || p.Name.ToLower().Contains(searchPhrase.ToLower()))
             .Include(p => p.Account)
@@ -113,15 +111,15 @@ public class PictureRepo : IPictureRepo
             .ThenInclude(c => c.Account)
             .Include(p => p.Account)
             .OrderByDescending(p => p.PopularityScore)
-            .Skip(itemsToSkip)
-            .Take(itemsToTake)
             .AsSplitQuery()
-            .ToArrayAsync();
+            .ToArrayAsync())
+            .Skip(itemsToSkip)
+            .Take(itemsToTake);
     }
 
     public async Task<IEnumerable<Picture>> SearchNewestAsync(int itemsToSkip, int itemsToTake, string searchPhrase)
     {
-        return await _dbContext.Pictures
+        return (await _dbContext.Pictures
             .Where(p => !p.IsDeleted)
             .Where(p => searchPhrase == string.Empty || p.Name.ToLower().Contains(searchPhrase.ToLower()))
             .Include(p => p.Account)
@@ -135,15 +133,15 @@ public class PictureRepo : IPictureRepo
             .ThenInclude(c => c.Account)
             .Include(p => p.Account)
             .OrderByDescending(p => p.PictureAdded)
-            .Skip(itemsToSkip)
-            .Take(itemsToTake)
             .AsSplitQuery()
-            .ToArrayAsync();
+            .ToArrayAsync())
+            .Skip(itemsToSkip)
+            .Take(itemsToTake);
     }
 
     public async Task<IEnumerable<Picture>> SearchMostLikesAsync(int itemsToSkip, int itemsToTake, string searchPhrase)
     {
-        return await _dbContext.Pictures
+        return (await _dbContext.Pictures
             .Where(p => !p.IsDeleted)
             .Where(p => searchPhrase == string.Empty || p.Name.ToLower().Contains(searchPhrase.ToLower()))
             .Include(p => p.Account)
@@ -157,10 +155,10 @@ public class PictureRepo : IPictureRepo
             .ThenInclude(c => c.Account)
             .Include(p => p.Account)
             .OrderByDescending(p => p.Likes.Count(l => l.IsLike))
-            .Skip(itemsToSkip)
-            .Take(itemsToTake)
             .AsSplitQuery()
-            .ToArrayAsync();
+            .ToArrayAsync())
+            .Skip(itemsToSkip)
+            .Take(itemsToTake);
     }
 
     public async Task<Picture> InsertAsync(Picture picture)

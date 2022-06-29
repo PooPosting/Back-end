@@ -20,7 +20,7 @@ public class TagRepo : ITagRepo
         return await _dbContext.Tags
             .Where(t => t.Value.Contains(phrase))
             .Take(5)
-            .ToListAsync();
+            .ToArrayAsync();
     }
 
     public async Task<IEnumerable<Tag>> GetTagsByPictureIdAsync(int pictureId)
@@ -28,7 +28,7 @@ public class TagRepo : ITagRepo
         return await _dbContext.PictureTagJoins
             .Where(p => p.PictureId == pictureId)
             .Select(p => p.Tag)
-            .ToListAsync();
+            .ToArrayAsync();
     }
 
     public async Task<IEnumerable<Tag>> GetTagsByAccountIdAsync(int accountId)
@@ -36,7 +36,7 @@ public class TagRepo : ITagRepo
         return await _dbContext.AccountLikedTagJoins
             .Where(a => a.AccountId == accountId)
             .Select(t => t.Tag)
-            .ToListAsync();
+            .ToArrayAsync();
     }
 
     public async Task<Tag> InsertAsync(Tag tag)
