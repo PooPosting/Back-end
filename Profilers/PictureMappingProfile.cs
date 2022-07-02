@@ -12,7 +12,7 @@ public class PictureMappingProfile : Profile
         CreateMap<Picture, PictureDto>()
             .ForMember(dto => dto.Tags,
                 opt => opt.MapFrom(
-                    p => p.PictureTagJoins.Select(p => p.Tag.Value)))
+                    p => p.PictureTags.Select(p => p.Tag.Value)))
             .ForMember(
                 dto => dto.AccountNickname,
                 opt => opt.MapFrom(
@@ -32,7 +32,7 @@ public class PictureMappingProfile : Profile
                     p => p.Likes.Count(l => !l.IsLike)))
             .ForMember(dto => dto.CommentCount,
                 opt => opt.MapFrom(
-                    p => p.Comments.Count));
+                    p => p.Comments.Count()));
 
         CreateMap<PictureDto, Picture>()
             .ForMember(p => p.Id,

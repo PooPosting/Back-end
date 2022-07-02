@@ -1,5 +1,4 @@
 ﻿using PicturesAPI.Enums;
-using PicturesAPI.Models.Interfaces;
 
 namespace PicturesAPI.Models.Dtos;
 

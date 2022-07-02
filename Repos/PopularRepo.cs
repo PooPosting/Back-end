@@ -19,9 +19,9 @@ public class PopularRepo : IPopularRepo
     {
         return await _dbContext.Pictures
             .Where(p => !p.IsDeleted)
-            .OrderByDescending(p => p.Likes.Count)
+            .OrderByDescending(p => p.Likes.Count())
             .Take(itemsToTake)
-            .Include(p => p.PictureTagJoins)
+            .Include(p => p.PictureTags)
             .ThenInclude(j => j.Tag)
             .Include(p => p.Likes)
             .Include(p => p.Comments
@@ -37,7 +37,7 @@ public class PopularRepo : IPopularRepo
             .Where(p => !p.IsDeleted)
             .OrderByDescending(p => p.Likes.Count(l => l.IsLike))
             .Take(itemsToTake)
-            .Include(p => p.PictureTagJoins)
+            .Include(p => p.PictureTags)
             .ThenInclude(j => j.Tag)
             .Include(p => p.Likes)
             .Include(p => p.Comments
@@ -51,9 +51,9 @@ public class PopularRepo : IPopularRepo
     {
         return await _dbContext.Pictures
             .Where(p => !p.IsDeleted)
-            .OrderByDescending(p => p.Comments.Count)
+            .OrderByDescending(p => p.Comments.Count())
             .Take(itemsToTake)
-            .Include(p => p.PictureTagJoins)
+            .Include(p => p.PictureTags)
             .ThenInclude(j => j.Tag)
             .Include(p => p.Likes)
             .Include(p => p.Comments
@@ -67,7 +67,7 @@ public class PopularRepo : IPopularRepo
     {
         return await _dbContext.Accounts
             .Where(a => !a.IsDeleted)
-            .OrderByDescending(a => a.Pictures.Count)
+            .OrderByDescending(a => a.Pictures.Count())
             .Take(itemsToTake)
             .Include(a => a.Likes)
             .Include(a => a.Comments
@@ -81,7 +81,7 @@ public class PopularRepo : IPopularRepo
     {
         return await _dbContext.Accounts
             .Where(a => !a.IsDeleted)
-            .OrderByDescending(a => a.Pictures.Sum(p => p.Likes.Count))
+            .OrderByDescending(a => a.Pictures.Sum(p => p.Likes.Count()))
             .Take(itemsToTake)
             .Include(a => a.Likes)
             .Include(a => a.Comments

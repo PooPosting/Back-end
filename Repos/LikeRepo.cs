@@ -23,24 +23,24 @@ public class LikeRepo : ILikeRepo
     public async Task<Like?> GetByLikerIdAndLikedIdAsync(int accountId, int pictureId)
     {
         return await _dbContext.Likes
-            .Include(l => l.Liker)
-            .Include(l => l.Liked)
-            .FirstOrDefaultAsync(l => l.Liker.Id == accountId && l.Liked.Id == pictureId);
+            .Include(l => l.Account)
+            .Include(l => l.Picture)
+            .FirstOrDefaultAsync(l => l.AccountId == accountId && l.PictureId == pictureId);
     }
 
     public async Task<IEnumerable<Like>> GetByLikerIdAsync(int id)
     {
-        return await _dbContext.Likes.Where(l => l.Liker.Id == id)
-            .Include(a => a.Liked)
-            .Include(a => a.Liker)
+        return await _dbContext.Likes.Where(l => l.AccountId == id)
+            .Include(a => a.Picture)
+            .Include(a => a.Account)
             .ToArrayAsync();
     }
 
     public async Task<IEnumerable<Like>> GetByLikedIdAsync(int id)
     {
-        return await _dbContext.Likes.Where(l => l.Liked.Id == id)
-            .Include(a => a.Liked)
-            .Include(a => a.Liker)
+        return await _dbContext.Likes.Where(l => l.PictureId == id)
+            .Include(a => a.Picture)
+            .Include(a => a.Account)
             .ToArrayAsync();
     }
 

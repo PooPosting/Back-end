@@ -1,41 +1,22 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics.CodeAnalysis;
-using Microsoft.EntityFrameworkCore;
-using PicturesAPI.Entities.Joins;
-using PicturesAPI.Models.Interfaces;
+﻿using PicturesAPI.Entities.Joins;
 
 namespace PicturesAPI.Entities;
 
-public class Picture: IDeletable
+public class Picture
 {
-    [Key]
     public int Id { get; set; }
-    public int AccountId { get; set; }
-        
-    [Required] [MinLength(4)] [MaxLength(40)]
     public string Name { get; set; }
-        
-    [MaxLength(500)]
     public string Description { get; set; }
-        
-    [Required] [MaxLength(250)]
     public string Url { get; set; }
-    public DateTime PictureAdded { get; set; } = DateTime.Now;
-    public bool IsDeleted { get; set; } = false;
-
-    [Required]
+    public DateTime PictureAdded { get; set; }
+    public bool IsDeleted { get; set; }
     public long PopularityScore { get; set; } = 36500;
 
     // navigation props
-        
-    public virtual ICollection<Like> Likes { get; set; }
-    
-    public virtual ICollection<Comment> Comments { get; set; }
-    
-    [Required]
+    public int AccountId { get; set; }
     public virtual Account Account { get; set; }
-
-    public ICollection<PictureTagJoin> PictureTagJoins { get; set; }
-    public ICollection<PictureSeenByAccountJoin> PictureAccountJoins { get; set; }
+    public virtual IEnumerable<Like> Likes { get; set; }
+    public virtual IEnumerable<Comment> Comments { get; set; }
+    public IEnumerable<PictureTag> PictureTags { get; set; }
+    public IEnumerable<PictureSeenByAccount> SeenByAccount { get; set; }
 }

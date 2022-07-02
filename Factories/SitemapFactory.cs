@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Text;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Primitives;
 using PicturesAPI.Entities;
 using PicturesAPI.Factories.Interfaces;
 using PicturesAPI.Models.Configuration;
@@ -21,60 +23,54 @@ public class SitemapFactory : ISitemapFactory
         _sitemapSettings = sitemapSettings;
     }
 
-    public async Task<Sitemap> GenerateSitemap()
+    public async Task GenerateSitemap()
     {
         var sitemap = new Sitemap();
-
         foreach (var site in _sitemapSettings.Sites)
         {
-            sitemap.Add(CreateUrl(site.Replace("#origin#", _sitemapSettings.Origin), 1)
-            );
+            sitemap.Add(CreateUrl(site.Replace("#origin#", _sitemapSettings.Origin)));
         }
-
         foreach (var picture in await _dbContext.Pictures.ToArrayAsync())
         {
             sitemap.Add(CreateUrl(
                 _sitemapSettings.PictureRoute
                     .Replace("#origin#", _sitemapSettings.Origin)
                     .Replace("#pictureId#", IdHasher.EncodePictureId(picture.Id)),
-                0.5,
                 picture.PictureAdded)
             );
         }
-
         foreach (var account in await _dbContext.Accounts.ToArrayAsync())
         {
             sitemap.Add(CreateUrl(
                 _sitemapSettings.AccountRoute
                     .Replace("#origin#", _sitemapSettings.Origin)
                     .Replace("#accountId#", IdHasher.EncodeAccountId(account.Id)),
-                0.5,
                 account.AccountCreated)
             );
         }
-
-        return sitemap;
+        await File.WriteAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "sitemap.xml"),
+            sitemap.ToXml(), Encoding.UTF8);
     }
 
-    private static Url CreateUrl(string url, double priority)
+    private static Url CreateUrl(string url)
     {
         return new Url
         {
-            ChangeFrequency = ChangeFrequency.Weekly,
+            ChangeFrequency = ChangeFrequency.Never,
             Location = url,
-            Priority = priority,
-            TimeStamp = DateTime.Now
+            TimeStamp = DateTime.Now,
+            Priority = 0.5
         };
     }
 
-    private static Url CreateUrl(string url, double priority, DateTime siteCreated)
+    private static Url CreateUrl(string url, DateTime siteCreated)
     {
         return new Url
         {
             ChangeFrequency = ChangeFrequency.Daily,
             Location = url,
-            Priority = priority,
-            TimeStamp = siteCreated
+            TimeStamp = siteCreated,
+            Priority = 0.5
         };
     }
 }

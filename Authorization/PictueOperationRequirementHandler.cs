@@ -21,7 +21,7 @@ public class PictureOperationRequirementHandler : AuthorizationHandler<PictureOp
         var userId = context.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
         var userRole = context.User.FindFirst(c => c.Type == ClaimTypes.Role)!.Value;
         
-        if (resource.AccountId.ToString() == userId)
+        if (resource.Account.Id.ToString() == userId)
         {
             context.Succeed(requirement);
         }

@@ -25,16 +25,16 @@ public class TagRepo : ITagRepo
 
     public async Task<IEnumerable<Tag>> GetTagsByPictureIdAsync(int pictureId)
     {
-        return await _dbContext.PictureTagJoins
-            .Where(p => p.PictureId == pictureId)
+        return await _dbContext.PictureTags
+            .Where(p => p.Picture.Id == pictureId)
             .Select(p => p.Tag)
             .ToArrayAsync();
     }
 
     public async Task<IEnumerable<Tag>> GetTagsByAccountIdAsync(int accountId)
     {
-        return await _dbContext.AccountLikedTagJoins
-            .Where(a => a.AccountId == accountId)
+        return await _dbContext.AccountsLikedTags
+            .Where(a => a.Account.Id == accountId)
             .Select(t => t.Tag)
             .ToArrayAsync();
     }
@@ -48,32 +48,30 @@ public class TagRepo : ITagRepo
         await _dbContext.SaveChangesAsync();
         return tag;
     }
-
-    public async Task<bool> TryInsertPictureTagJoinAsync(Picture picture, Tag tag)
+    public async Task<bool> TryInsertPictureTagJoinAsync(int pictureId, Tag tag)
     {
-        if (!_dbContext.PictureTagJoins
-                .Any(j => (j.Picture == picture) && (j.Tag == tag))
+        if (!_dbContext.PictureTags
+                .Any(j => (j.Picture.Id == pictureId) && (j.Tag.Id == tag.Id))
            )
         {
             if (!_dbContext.Tags.Any(t => t.Value == tag.Value))
             {
                 await _dbContext.Tags.AddAsync(tag);
             }
-            _dbContext.PictureTagJoins.Add(new PictureTagJoin()
+            _dbContext.PictureTags.Add(new PictureTag()
             {
-                Picture = picture,
-                Tag = tag
+                PictureId = pictureId,
+                TagId = tag.Id
             });
             return await _dbContext.SaveChangesAsync() > 0;
         }
 
         return false;
     }
-
-    public async Task<bool> TryInsertAccountLikedTagAsync(Account account, Tag tag)
+    public async Task<bool> TryInsertAccountLikedTagAsync(int accountId, Tag tag)
     {
-        if (!_dbContext.AccountLikedTagJoins
-            .Any(j => (j.Account == account) && j.Tag == tag)
+        if (!_dbContext.AccountsLikedTags
+            .Any(j => (j.Account.Id == accountId) && j.Tag.Id == tag.Id)
             )
         {
             if (!_dbContext.Tags.Any(t => t.Value == tag.Value))
@@ -81,37 +79,36 @@ public class TagRepo : ITagRepo
                 await _dbContext.Tags.AddAsync(tag);
             }
 
-            _dbContext.AccountLikedTagJoins.Add(new AccountLikedTagsJoin()
+            _dbContext.AccountsLikedTags.Add(new AccountLikedTags()
             {
-                Account = account,
-                Tag = tag
+                AccountId = accountId,
+                TagId = tag.Id
             });
             return await _dbContext.SaveChangesAsync() > 0;
         }
 
         return false;
     }
-
-    public async Task<bool> TryDeleteAccountLikedTagAsync(Account account, Tag tag)
+    public async Task<bool> TryDeleteAccountLikedTagAsync(int accountId, int tagId)
     {
-        var accLikedTag = _dbContext.AccountLikedTagJoins
-            .SingleOrDefault(j => (j.Account == account) && (j.Tag == tag));
+        var accLikedTag = _dbContext.AccountsLikedTags
+            .SingleOrDefault(j => (j.Account.Id == accountId) && (j.Tag.Id == tagId));
 
         if (accLikedTag is not null)
         {
-            _dbContext.AccountLikedTagJoins.Remove(accLikedTag);
+            _dbContext.AccountsLikedTags.Remove(accLikedTag);
             return await _dbContext.SaveChangesAsync() > 0;
         }
         return false;
     }
-    public async Task<bool> TryDeletePictureTagJoinAsync(Picture picture, Tag tag)
+    public async Task<bool> TryDeletePictureTagJoinAsync(int pictureId, int tagId)
     {
-        var picTag = _dbContext.PictureTagJoins
-            .SingleOrDefault(j => (j.Picture == picture) && (j.Tag == tag));
+        var picTag = _dbContext.PictureTags
+            .SingleOrDefault(j => (j.Picture.Id == pictureId) && (j.Tag.Id == tagId));
 
         if (picTag is not null)
         {
-            _dbContext.PictureTagJoins.Remove(picTag);
+            _dbContext.PictureTags.Remove(picTag);
             return await _dbContext.SaveChangesAsync() > 0;
         }
         return false;
@@ -123,12 +120,10 @@ public class TagRepo : ITagRepo
         await _dbContext.SaveChangesAsync();
         return tag;
     }
-
     public async Task<Tag> DeleteAsync(Tag tag)
     {
         _dbContext.Tags.Remove(tag);
         await _dbContext.SaveChangesAsync();
         return tag;
     }
-
 }

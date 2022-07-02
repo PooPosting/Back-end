@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using PicturesAPI.Models.Interfaces;
 
 namespace PicturesAPI.Models.Dtos;
 

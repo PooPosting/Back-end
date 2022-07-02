@@ -69,7 +69,7 @@ public class PictureSeeder
                     }
                 },
                 AccountCreated = DateTime.Now,
-                Role = _dbContext.Roles.SingleOrDefault(r => r.Id == 3)
+                RoleId = 3
             },
             new Account()
             {
@@ -90,7 +90,7 @@ public class PictureSeeder
                     }
                 },
                 AccountCreated = DateTime.Now,
-                Role = _dbContext.Roles.SingleOrDefault(r => r.Id == 2)
+                RoleId = 3
 
             },
             new Account()
@@ -120,7 +120,7 @@ public class PictureSeeder
                     }
                 },
                 AccountCreated = DateTime.Now,
-                Role = _dbContext.Roles.SingleOrDefault(r => r.Id == 1)
+                RoleId = 1
 
             }
                 
@@ -154,8 +154,8 @@ public class PictureSeeder
         {
             new Like()
             {
-                Liked = GetAccounts().ToList()[0].Pictures.ToList()[0],
-                Liker = GetAccounts().ToList()[0]
+                PictureId = GetAccounts().ToList()[0].Pictures.ToList()[0].Id,
+                AccountId = GetAccounts().ToList()[0].Id
             }
         };
         return likes;

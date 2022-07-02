@@ -34,14 +34,13 @@ public class PictureLikingService : IPictureLikingService
         _accountContextService = accountContextService;
     }
     
-    public async Task<PictureDto> Like(int id)
+    public async Task<PictureDto> Like(int pictureId)
     {
-        var picture = await _pictureRepo.GetByIdAsync(id) ?? throw new NotFoundException();
-        var account = await _accountContextService.GetAccountAsync();
-        var like = await _likeRepo.GetByLikerIdAndLikedIdAsync(account.Id, picture.Id);
+        var picture = (await _pictureRepo.GetByIdAsync(pictureId)) ?? throw new NotFoundException();
+        var accountId = _accountContextService.GetAccountId();
+        var like = await _likeRepo.GetByLikerIdAndLikedIdAsync(accountId, pictureId);
 
-
-        var tags = await _tagRepo.GetTagsByPictureIdAsync(picture.Id);
+        var tags = await _tagRepo.GetTagsByPictureIdAsync(pictureId);
         if (like is not null)
         {
             // like exists and (IsLike == true)
@@ -50,7 +49,7 @@ public class PictureLikingService : IPictureLikingService
                 await _likeRepo.DeleteByIdAsync(like.Id);
                 foreach (var tag in tags)
                 {
-                    await _tagRepo.TryDeleteAccountLikedTagAsync(account, tag);
+                    await _tagRepo.TryDeleteAccountLikedTagAsync(accountId, tag.Id);
                 }
                 await _pictureRepo.UpdatePicScoreAsync(picture);
 
@@ -65,7 +64,7 @@ public class PictureLikingService : IPictureLikingService
                 await _likeRepo.UpdateAsync(like);
                 foreach (var tag in tags)
                 {
-                    await _tagRepo.TryInsertAccountLikedTagAsync(account, tag);
+                    await _tagRepo.TryInsertAccountLikedTagAsync(accountId, tag);
                 }
                 await _pictureRepo.UpdatePicScoreAsync(picture);
 
@@ -80,13 +79,13 @@ public class PictureLikingService : IPictureLikingService
             await _likeRepo.InsertAsync(
                 new Like()
                 {
-                    Liked = picture,
-                    Liker = account,
+                    PictureId = picture.Id,
+                    AccountId = accountId,
                     IsLike = true
                 });
             foreach (var tag in tags)
             {
-                await _tagRepo.TryInsertAccountLikedTagAsync(account, tag);
+                await _tagRepo.TryInsertAccountLikedTagAsync(accountId, tag);
             }
             await _pictureRepo.UpdatePicScoreAsync(picture);
 
@@ -97,11 +96,11 @@ public class PictureLikingService : IPictureLikingService
 
     }
 
-    public async Task<PictureDto> DisLike(int id)
+    public async Task<PictureDto> DisLike(int pictureId)
     {
-        var picture = await _pictureRepo.GetByIdAsync(id) ?? throw new NotFoundException();
-        var account = await _accountContextService.GetAccountAsync();
-        var like = await _likeRepo.GetByLikerIdAndLikedIdAsync(account.Id, picture.Id);
+        var picture = (await _pictureRepo.GetByIdAsync(pictureId)) ?? throw new NotFoundException();
+        var accountId = _accountContextService.GetAccountId();
+        var like = await _likeRepo.GetByLikerIdAndLikedIdAsync(accountId, pictureId);
 
         if (like is not null)
         {
@@ -123,7 +122,7 @@ public class PictureLikingService : IPictureLikingService
                 var tags = await _tagRepo.GetTagsByPictureIdAsync(picture.Id);
                 foreach (var tag in tags)
                 {
-                    await _tagRepo.TryDeleteAccountLikedTagAsync(account, tag);
+                    await _tagRepo.TryDeleteAccountLikedTagAsync(accountId, tag.Id);
                 }
                 await _pictureRepo.UpdatePicScoreAsync(picture);
 
@@ -138,8 +137,8 @@ public class PictureLikingService : IPictureLikingService
             await _likeRepo.InsertAsync(
                 new Like()
                 {
-                    Liked = picture,
-                    Liker = account,
+                    PictureId = picture.Id,
+                    AccountId = accountId,
                     IsLike = false
                 });
             await _pictureRepo.UpdatePicScoreAsync(picture);

@@ -4,10 +4,10 @@ namespace PicturesAPI.Entities;
 
 public class Like
 {
-    [Key]
     public int Id { get; set; }
-    public Account Liker { get; set; }
-    public Picture Liked { get; set; }
-
-    [Required] public bool IsLike { get; set; } = true;
+    public bool IsLike { get; set; }
+    public int AccountId { get; set; }
+    public int PictureId { get; set; }
+    public Account Account { get; set; }
+    public Picture Picture { get; set; }
 }

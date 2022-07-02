@@ -77,7 +77,9 @@ builder.Services.AddScoped<IAuthorizationHandler, CommentOperationRequirementHan
 builder.Services.AddDbContext<PictureDbContext>(options =>
 {
     var connString = builder.Configuration.GetConnectionString("PictureDbConnection");
-    options.UseMySql(connString, ServerVersion.Create(1, 0, 0, ServerType.MariaDb));
+    options
+        .UseMySql(connString, ServerVersion.AutoDetect(connString))
+        .UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
 });
 
 // Validators
@@ -125,7 +127,6 @@ builder.Services.AddScoped<ISitemapFactory, SitemapFactory>();
 // Other stuff
 builder.Services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
 builder.Services.AddScoped<PictureSeeder>();
-builder.Services.AddScoped<PopularityScoreUpdater>();
 builder.Services.AddScoped<EnvironmentVariableSetter>();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddHttpContextAccessor();
@@ -165,12 +166,11 @@ using (var scope = app.Services.CreateScope()) {
     {
         var seeder = scope.ServiceProvider.GetRequiredService<PictureSeeder>();
         seeder.Seed();
+
         app.UseDeveloperExceptionPage();
     }
     var envSetter = scope.ServiceProvider.GetRequiredService<EnvironmentVariableSetter>();
     envSetter.Set();
-    var popUpdater = scope.ServiceProvider.GetRequiredService<PopularityScoreUpdater>();
-    popUpdater.Update();
 }
 
 app.UseMiddleware<ErrorHandlingMiddleware>();

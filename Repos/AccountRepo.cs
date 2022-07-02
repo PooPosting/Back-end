@@ -27,20 +27,34 @@ public class AccountRepo : IAccountRepo
     public async Task<Account?> GetByIdAsync(int id)
     {
         return await _dbContext.Accounts
-            .Include(a => a.Role)
-            .Include(a => a.Pictures)
-            .ThenInclude(p => p.PictureTagJoins)
-            .ThenInclude(j => j.Tag)
-            .Include(a => a.Pictures)
-            .ThenInclude(p => p.Likes)
-            .ThenInclude(p => p.Liker)
-            .Include(a => a.Pictures)
-            .ThenInclude(p => p.Comments
-                .Where(c => c.IsDeleted == false))
-            .ThenInclude(c => c.Account)
-            .Include(a => a.Likes)
-            .Include(a => a.Role)
-            .AsSplitQuery()
+            .Select(a => new Account()
+            {
+                Id = a.Id,
+                Nickname = a.Nickname,
+                Email = a.Email,
+                Verified = a.Verified,
+                ProfilePicUrl = a.ProfilePicUrl,
+                BackgroundPicUrl = a.BackgroundPicUrl,
+                AccountDescription = a.AccountDescription,
+                AccountCreated = a.AccountCreated,
+                Role = a.Role,
+                Pictures = a.Pictures.Select(p => new Picture()
+                {
+                    Id = p.Id,
+                    AccountId = p.AccountId,
+                    Name = p.Name,
+                    Url = p.Url,
+                    PictureAdded = p.PictureAdded,
+                    Comments = p.Comments.Select(c => new Comment()
+                    {
+                        Id = c.Id
+                    }).AsEnumerable(),
+                    Likes = p.Likes.Select(l => new Like()
+                    {
+                        Id = l.Id,
+                    }).AsEnumerable(),
+                }).OrderByDescending(p => p.PictureAdded).AsEnumerable(),
+            })
             .SingleOrDefaultAsync(a => a.Id == id);
     }
 
@@ -49,11 +63,11 @@ public class AccountRepo : IAccountRepo
         return await _dbContext.Accounts
             .Include(a => a.Role)
             .Include(a => a.Pictures)
-            .ThenInclude(p => p.PictureTagJoins)
+            .ThenInclude(p => p.PictureTags)
             .ThenInclude(j => j.Tag)
             .Include(a => a.Pictures)
             .ThenInclude(p => p.Likes)
-            .ThenInclude(p => p.Liker)
+            .ThenInclude(p => p.Account)
             .Include(a => a.Pictures)
             .ThenInclude(p => p.Comments)
             .ThenInclude(c => c.Account)
@@ -65,25 +79,30 @@ public class AccountRepo : IAccountRepo
 
     public async Task<IEnumerable<Account>> SearchAllAsync(int itemsToSkip, int itemsToTake, string? searchPhrase)
     {
-        return (await _dbContext.Accounts
+        var result = await _dbContext.Accounts
             .Where(a => !a.IsDeleted)
             .Where(a => string.IsNullOrEmpty(searchPhrase) || a.Nickname.ToLower().Contains(searchPhrase.ToLower()))
-            .OrderByDescending(a => a.Pictures.Sum(picture => picture.Likes.Count))
-            .ThenByDescending(a => a.Pictures.Count)
+            .OrderByDescending(a => a.Pictures.Sum(picture => picture.Likes.Count()))
+            .ThenByDescending(a => a.Pictures.Count())
             .Include(a => a.Role)
-            .Include(a => a.Pictures)
-            .ThenInclude(p => p.PictureTagJoins)
-            .ThenInclude(j => j.Tag)
-            .Include(p => p.Pictures)
-            .ThenInclude(p => p.Likes)
-            .Include(p => p.Pictures)
-            .ThenInclude(p => p.Comments
-                .Where(c => c.IsDeleted == false))
-            .Include(a => a.Role)
-            .AsSplitQuery()
-            .ToArrayAsync())
             .Skip(itemsToSkip)
-            .Take(itemsToTake);
+            .Take(itemsToTake)
+            .AsSplitQuery()
+            .ToArrayAsync();
+        return result;
+
+        // return await _dbContext.Accounts
+        //     .Where(a => string.IsNullOrEmpty(searchPhrase) || a.Nickname.ToLower().Contains(searchPhrase.ToLower()))
+        //     .OrderByDescending(a => a.Pictures.Sum(picture => picture.Likes.Count))
+        //     .ThenByDescending(a => a.Pictures.Count)
+        //     .Select(a => new Account()
+        //     {
+        //         Pictures = a.Pictures,
+        //
+        //
+        //     })
+        //     .AsSplitQuery()
+        //     .ToArrayAsync();
     }
 
     public async Task<Account> InsertAsync(Account account)
@@ -113,13 +132,13 @@ public class AccountRepo : IAccountRepo
 
     public async Task<bool> MarkAsSeenAsync(int accountId, int pictureId)
     {
-        if (!_dbContext.PictureSeenByAccountJoins
+        if (!_dbContext.PicturesSeenByAccounts
             .Any(j => (j.Account.Id == accountId) && (j.Picture.Id == pictureId)))
         {
-            _dbContext.PictureSeenByAccountJoins.Add(new PictureSeenByAccountJoin()
+            _dbContext.PicturesSeenByAccounts.Add(new PictureSeenByAccount()
             {
-                Account = _dbContext.Accounts.SingleOrDefault(a => a.Id == accountId),
-                Picture = _dbContext.Pictures.SingleOrDefault(p => p.Id == pictureId)
+                AccountId = accountId,
+                PictureId = pictureId
             });
             return await _dbContext.SaveChangesAsync() > 0;
         }

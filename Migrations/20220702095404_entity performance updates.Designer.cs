@@ -11,8 +11,8 @@ using PicturesAPI.Entities;
 namespace PicturesAPI.Migrations
 {
     [DbContext(typeof(PictureDbContext))]
-    [Migration("20220623183955_fixed-pictureseenbyaccount-foreign-keys")]
-    partial class fixedpictureseenbyaccountforeignkeys
+    [Migration("20220702095404_entity performance updates")]
+    partial class entityperformanceupdates
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -28,23 +28,27 @@ namespace PicturesAPI.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("AccountCreated")
-                        .HasColumnType("datetime");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasDefaultValue(new DateTime(2022, 7, 2, 11, 54, 4, 10, DateTimeKind.Local).AddTicks(410));
 
                     b.Property<string>("AccountDescription")
                         .HasMaxLength(500)
                         .HasColumnType("varchar(500)");
 
                     b.Property<string>("BackgroundPicUrl")
-                        .HasMaxLength(250)
-                        .HasColumnType("varchar(250)");
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)");
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Nickname")
                         .IsRequired()
@@ -53,20 +57,26 @@ namespace PicturesAPI.Migrations
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("ProfilePicUrl")
-                        .HasMaxLength(250)
-                        .HasColumnType("varchar(250)");
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("RoleId")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
 
                     b.Property<bool>("Verified")
-                        .HasColumnType("tinyint(1)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false);
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Nickname");
 
                     b.HasIndex("RoleId");
 
@@ -83,10 +93,14 @@ namespace PicturesAPI.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CommentAdded")
-                        .HasColumnType("datetime");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasDefaultValue(new DateTime(2022, 7, 2, 11, 54, 4, 10, DateTimeKind.Local).AddTicks(1376));
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false);
 
                     b.Property<int>("PictureId")
                         .HasColumnType("int");
@@ -111,10 +125,10 @@ namespace PicturesAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("AccountId")
+                    b.Property<int?>("AccountId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TagId")
+                    b.Property<int?>("TagId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -123,7 +137,7 @@ namespace PicturesAPI.Migrations
 
                     b.HasIndex("TagId");
 
-                    b.ToTable("AccountLikedTagJoins");
+                    b.ToTable("AccountsLikedTags");
                 });
 
             modelBuilder.Entity("PicturesAPI.Entities.Joins.PictureSeenByAccountJoin", b =>
@@ -132,10 +146,10 @@ namespace PicturesAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("AccountId")
+                    b.Property<int?>("AccountId")
                         .HasColumnType("int");
 
-                    b.Property<int>("PictureId")
+                    b.Property<int?>("PictureId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -144,7 +158,7 @@ namespace PicturesAPI.Migrations
 
                     b.HasIndex("PictureId");
 
-                    b.ToTable("PictureSeenByAccountJoins");
+                    b.ToTable("PicturesSeenByAccounts");
                 });
 
             modelBuilder.Entity("PicturesAPI.Entities.Joins.PictureTagJoin", b =>
@@ -153,10 +167,10 @@ namespace PicturesAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("PictureId")
+                    b.Property<int?>("PictureId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TagId")
+                    b.Property<int?>("TagId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -165,7 +179,7 @@ namespace PicturesAPI.Migrations
 
                     b.HasIndex("TagId");
 
-                    b.ToTable("PictureTagJoins");
+                    b.ToTable("PictureTags");
                 });
 
             modelBuilder.Entity("PicturesAPI.Entities.Like", b =>
@@ -198,7 +212,7 @@ namespace PicturesAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("AccountId")
+                    b.Property<int?>("AccountId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
@@ -206,7 +220,9 @@ namespace PicturesAPI.Migrations
                         .HasColumnType("varchar(500)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -214,10 +230,14 @@ namespace PicturesAPI.Migrations
                         .HasColumnType("varchar(40)");
 
                     b.Property<DateTime>("PictureAdded")
-                        .HasColumnType("datetime");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasDefaultValue(new DateTime(2022, 7, 2, 11, 54, 4, 10, DateTimeKind.Local).AddTicks(2412));
 
                     b.Property<long>("PopularityScore")
-                        .HasColumnType("bigint");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValue(36500L);
 
                     b.Property<string>("Url")
                         .IsRequired()
@@ -227,6 +247,8 @@ namespace PicturesAPI.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AccountId");
+
+                    b.HasIndex("Name");
 
                     b.ToTable("Pictures");
                 });
@@ -244,8 +266,9 @@ namespace PicturesAPI.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("IpAddress")
-                        .HasMaxLength(128)
-                        .HasColumnType("varchar(128)");
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
 
                     b.HasKey("Id");
 
@@ -259,6 +282,7 @@ namespace PicturesAPI.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasMaxLength(16)
                         .HasColumnType("varchar(16)");
 
@@ -315,16 +339,12 @@ namespace PicturesAPI.Migrations
             modelBuilder.Entity("PicturesAPI.Entities.Joins.AccountLikedTagsJoin", b =>
                 {
                     b.HasOne("PicturesAPI.Entities.Account", "Account")
-                        .WithMany("AccountLikedTagJoins")
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("LikedTags")
+                        .HasForeignKey("AccountId");
 
                     b.HasOne("PicturesAPI.Entities.Tag", "Tag")
-                        .WithMany("AccountLikedTagJoins")
-                        .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("AccountLikedTags")
+                        .HasForeignKey("TagId");
 
                     b.Navigation("Account");
 
@@ -334,16 +354,12 @@ namespace PicturesAPI.Migrations
             modelBuilder.Entity("PicturesAPI.Entities.Joins.PictureSeenByAccountJoin", b =>
                 {
                     b.HasOne("PicturesAPI.Entities.Account", "Account")
-                        .WithMany("PictureAccountJoins")
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("PicturesSeen")
+                        .HasForeignKey("AccountId");
 
                     b.HasOne("PicturesAPI.Entities.Picture", "Picture")
-                        .WithMany("PictureAccountJoins")
-                        .HasForeignKey("PictureId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("SeenByAccount")
+                        .HasForeignKey("PictureId");
 
                     b.Navigation("Account");
 
@@ -353,16 +369,12 @@ namespace PicturesAPI.Migrations
             modelBuilder.Entity("PicturesAPI.Entities.Joins.PictureTagJoin", b =>
                 {
                     b.HasOne("PicturesAPI.Entities.Picture", "Picture")
-                        .WithMany("PictureTagJoins")
-                        .HasForeignKey("PictureId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("PictureTags")
+                        .HasForeignKey("PictureId");
 
                     b.HasOne("PicturesAPI.Entities.Tag", "Tag")
-                        .WithMany("PictureTagJoins")
-                        .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("PictureTags")
+                        .HasForeignKey("TagId");
 
                     b.Navigation("Picture");
 
@@ -388,24 +400,22 @@ namespace PicturesAPI.Migrations
                 {
                     b.HasOne("PicturesAPI.Entities.Account", "Account")
                         .WithMany("Pictures")
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AccountId");
 
                     b.Navigation("Account");
                 });
 
             modelBuilder.Entity("PicturesAPI.Entities.Account", b =>
                 {
-                    b.Navigation("AccountLikedTagJoins");
-
                     b.Navigation("Comments");
+
+                    b.Navigation("LikedTags");
 
                     b.Navigation("Likes");
 
-                    b.Navigation("PictureAccountJoins");
-
                     b.Navigation("Pictures");
+
+                    b.Navigation("PicturesSeen");
                 });
 
             modelBuilder.Entity("PicturesAPI.Entities.Picture", b =>
@@ -414,16 +424,16 @@ namespace PicturesAPI.Migrations
 
                     b.Navigation("Likes");
 
-                    b.Navigation("PictureAccountJoins");
+                    b.Navigation("PictureTags");
 
-                    b.Navigation("PictureTagJoins");
+                    b.Navigation("SeenByAccount");
                 });
 
             modelBuilder.Entity("PicturesAPI.Entities.Tag", b =>
                 {
-                    b.Navigation("AccountLikedTagJoins");
+                    b.Navigation("AccountLikedTags");
 
-                    b.Navigation("PictureTagJoins");
+                    b.Navigation("PictureTags");
                 });
 #pragma warning restore 612, 618
         }

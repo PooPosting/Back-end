@@ -14,7 +14,7 @@ public interface IPictureRepo
     Task<IEnumerable<Picture>> SearchNewestAsync(int itemsToSkip, int itemsToTake, string searchPhrase);
     Task<IEnumerable<Picture>> SearchMostLikesAsync(int itemsToSkip, int itemsToTake, string searchPhrase);
     Task<Picture> InsertAsync(Picture picture);
-    Task<Picture> UpdatePicScoreAsync (Picture picture);
+    Task UpdatePicScoreAsync (Picture picture);
     Task<Picture> UpdateAsync(Picture picture);
     Task<bool> DeleteByIdAsync(int id);
 }

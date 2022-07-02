@@ -1,8 +1,6 @@
-﻿using X.Web.Sitemap;
-
-namespace PicturesAPI.Factories.Interfaces;
+﻿namespace PicturesAPI.Factories.Interfaces;
 
 public interface ISitemapFactory
 {
-    Task<Sitemap> GenerateSitemap();
+    Task GenerateSitemap();
 }

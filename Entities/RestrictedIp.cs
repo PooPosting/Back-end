@@ -5,10 +5,7 @@ namespace PicturesAPI.Entities;
 
 public class RestrictedIp
 {
-    [Key]
     public int Id { get; set; }
-
-    [MaxLength(128)]
     public string IpAddress { get; set; }
 
     public bool CantGet { get; set; }

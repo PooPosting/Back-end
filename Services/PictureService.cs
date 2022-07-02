@@ -139,7 +139,7 @@ public class PictureService : IPictureService
     {
         if (await _pictureRepo.GetByIdAsync(id) is null) throw new NotFoundException();
         var likes = await _likeRepo.GetByLikedIdAsync(id);
-        var accounts = likes.Select(like => like.Liker).ToList();
+        var accounts = likes.Select(like => like.Account).ToList();
         var accountDtos = _mapper.Map<List<AccountDto>>(accounts);
         _modifyAllower.UpdateItems(accountDtos);
         return accountDtos;
@@ -158,11 +158,10 @@ public class PictureService : IPictureService
     {
         var validationResult = await StaticValidator.Validate(dto);
         if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
-
-        var account = await _accountContextService.GetAccountAsync();
+        var accountId = _accountContextService.GetAccountId();
         var picture = _mapper.Map<Picture>(dto);
 
-        picture.Account = account;
+        picture.AccountId = accountId;
 
         if (file is not { Length: > 0 }) throw new BadRequestException("invalid picture");
         
@@ -188,7 +187,7 @@ public class PictureService : IPictureService
                     {
                         Value = tag,
                     });
-                    await _tagRepo.TryInsertPictureTagJoinAsync(picture, insertedTag);
+                    await _tagRepo.TryInsertPictureTagJoinAsync(picture.Id, insertedTag);
                 }
             }
             return IdHasher.EncodePictureId(picture.Id);
@@ -223,14 +222,14 @@ public class PictureService : IPictureService
         if (dto.Name is not null) picture.Name = dto.Name;
         if (dto.Tags is not null && dto.Tags.Count > 0)
         {
-            foreach (var join in picture.PictureTagJoins)
+            foreach (var join in picture.PictureTags)
             {
-                await _tagRepo.TryDeletePictureTagJoinAsync(join.Picture, join.Tag);
+                await _tagRepo.TryDeletePictureTagJoinAsync(join.Picture.Id, join.Tag.Id);
             }
             foreach (var tag in dto.Tags)
             {
                 var insertedTag = await _tagRepo.InsertAsync(new Tag() { Value = tag });
-                await _tagRepo.TryInsertPictureTagJoinAsync(picture, insertedTag);
+                await _tagRepo.TryInsertPictureTagJoinAsync(picture.Id, insertedTag);
             }
         }
 

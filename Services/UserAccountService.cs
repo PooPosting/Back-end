@@ -40,6 +40,13 @@ public class UserAccountService : IUserAccountService
 
         var hashedPassword = _passwordHasher.HashPassword(newAccount, dto.Password);
         newAccount.PasswordHash = hashedPassword;
+
+        newAccount.BackgroundPicUrl =
+            Path.Combine("wwwroot", "accounts", "background_pictures", $"default{new Random().Next(0, 5)}-bgp.webp");
+
+        newAccount.ProfilePicUrl =
+            Path.Combine("wwwroot", "accounts", "profile_pictures", $"default{new Random().Next(0, 5)}-pfp.webp");
+
         return IdHasher.EncodeAccountId((await _accountRepo.InsertAsync(newAccount)).Id);
     }
     public async Task<LoginSuccessResult> GenerateJwt(LoginDto dto)

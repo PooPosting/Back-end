@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PicturesAPI.Entities;
 
@@ -10,9 +11,10 @@ using PicturesAPI.Entities;
 namespace PicturesAPI.Migrations
 {
     [DbContext(typeof(PictureDbContext))]
-    partial class PictureDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220702095720_renamed entities")]
+    partial class renamedentities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -28,7 +30,7 @@ namespace PicturesAPI.Migrations
                     b.Property<DateTime>("AccountCreated")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2022, 7, 2, 15, 11, 26, 378, DateTimeKind.Local).AddTicks(8997));
+                        .HasDefaultValue(new DateTime(2022, 7, 2, 11, 57, 20, 87, DateTimeKind.Local).AddTicks(6321));
 
                     b.Property<string>("AccountDescription")
                         .HasMaxLength(500)
@@ -93,7 +95,7 @@ namespace PicturesAPI.Migrations
                     b.Property<DateTime>("CommentAdded")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2022, 7, 2, 15, 11, 26, 378, DateTimeKind.Local).AddTicks(9767));
+                        .HasDefaultValue(new DateTime(2022, 7, 2, 11, 57, 20, 87, DateTimeKind.Local).AddTicks(7173));
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -123,10 +125,10 @@ namespace PicturesAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("AccountId")
+                    b.Property<int?>("AccountId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TagId")
+                    b.Property<int?>("TagId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -144,10 +146,10 @@ namespace PicturesAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("AccountId")
+                    b.Property<int?>("AccountId")
                         .HasColumnType("int");
 
-                    b.Property<int>("PictureId")
+                    b.Property<int?>("PictureId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -165,10 +167,10 @@ namespace PicturesAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("PictureId")
+                    b.Property<int?>("PictureId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TagId")
+                    b.Property<int?>("TagId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -186,20 +188,20 @@ namespace PicturesAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("AccountId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsLike")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<int>("PictureId")
+                    b.Property<int?>("LikedId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("LikerId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountId");
+                    b.HasIndex("LikedId");
 
-                    b.HasIndex("PictureId");
+                    b.HasIndex("LikerId");
 
                     b.ToTable("Likes");
                 });
@@ -210,7 +212,7 @@ namespace PicturesAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("AccountId")
+                    b.Property<int?>("AccountId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
@@ -230,7 +232,7 @@ namespace PicturesAPI.Migrations
                     b.Property<DateTime>("PictureAdded")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2022, 7, 2, 15, 11, 26, 379, DateTimeKind.Local).AddTicks(788));
+                        .HasDefaultValue(new DateTime(2022, 7, 2, 11, 57, 20, 87, DateTimeKind.Local).AddTicks(8138));
 
                     b.Property<long>("PopularityScore")
                         .ValueGeneratedOnAdd()
@@ -338,15 +340,11 @@ namespace PicturesAPI.Migrations
                 {
                     b.HasOne("PicturesAPI.Entities.Account", "Account")
                         .WithMany("LikedTags")
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AccountId");
 
                     b.HasOne("PicturesAPI.Entities.Tag", "Tag")
                         .WithMany("AccountLikedTags")
-                        .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TagId");
 
                     b.Navigation("Account");
 
@@ -357,15 +355,11 @@ namespace PicturesAPI.Migrations
                 {
                     b.HasOne("PicturesAPI.Entities.Account", "Account")
                         .WithMany("PicturesSeen")
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AccountId");
 
                     b.HasOne("PicturesAPI.Entities.Picture", "Picture")
                         .WithMany("SeenByAccount")
-                        .HasForeignKey("PictureId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PictureId");
 
                     b.Navigation("Account");
 
@@ -376,15 +370,11 @@ namespace PicturesAPI.Migrations
                 {
                     b.HasOne("PicturesAPI.Entities.Picture", "Picture")
                         .WithMany("PictureTags")
-                        .HasForeignKey("PictureId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PictureId");
 
                     b.HasOne("PicturesAPI.Entities.Tag", "Tag")
                         .WithMany("PictureTags")
-                        .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TagId");
 
                     b.Navigation("Picture");
 
@@ -393,30 +383,24 @@ namespace PicturesAPI.Migrations
 
             modelBuilder.Entity("PicturesAPI.Entities.Like", b =>
                 {
-                    b.HasOne("PicturesAPI.Entities.Account", "Account")
+                    b.HasOne("PicturesAPI.Entities.Picture", "Liked")
                         .WithMany("Likes")
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("LikedId");
 
-                    b.HasOne("PicturesAPI.Entities.Picture", "Picture")
+                    b.HasOne("PicturesAPI.Entities.Account", "Liker")
                         .WithMany("Likes")
-                        .HasForeignKey("PictureId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("LikerId");
 
-                    b.Navigation("Account");
+                    b.Navigation("Liked");
 
-                    b.Navigation("Picture");
+                    b.Navigation("Liker");
                 });
 
             modelBuilder.Entity("PicturesAPI.Entities.Picture", b =>
                 {
                     b.HasOne("PicturesAPI.Entities.Account", "Account")
                         .WithMany("Pictures")
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AccountId");
 
                     b.Navigation("Account");
                 });
