@@ -17,10 +17,10 @@ public class SitemapController : ControllerBase
     }
 
     [Route("sitemap.xml")]
+    [HttpGet]
     public async Task<IActionResult> Get()
     {
-        await _sitemapFactory.GenerateSitemap();
-        var xml = System.IO.File.OpenRead(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "sitemap.xml"));
-        return File(xml, "text/xml");
+        var sitemap = await _sitemapFactory.GenerateSitemap();
+        return File(sitemap.ToXml(), "application/xml");
     }
 }

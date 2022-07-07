@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using PicturesAPI.Entities.Joins;
 
 namespace PicturesAPI.Entities;
@@ -23,5 +22,5 @@ public class Account
     [AllowNull] public virtual IEnumerable<Like> Likes { get; set; }
     [AllowNull] public virtual IEnumerable<Comment> Comments { get; set; }
     [AllowNull] public virtual IEnumerable<PictureSeenByAccount> PicturesSeen { get; set; }
-    [AllowNull] public virtual IEnumerable<AccountLikedTags> LikedTags { get; set; }
+    [AllowNull] public virtual IEnumerable<AccountLikedTag> LikedTags { get; set; }
 }

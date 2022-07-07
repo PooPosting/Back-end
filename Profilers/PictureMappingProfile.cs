@@ -23,7 +23,7 @@ public class PictureMappingProfile : Profile
             .ForMember(
                 dto => dto.AccountId,
                 opt => opt.MapFrom(
-                    p => p.Account.IsDeleted ? "0" : IdHasher.EncodeAccountId(p.Account.Id)))
+                    p => p.Account.IsDeleted ? "0" : IdHasher.EncodeAccountId(p.AccountId)))
             .ForMember(dto => dto.LikeCount,
                 opt => opt.MapFrom(
                     p => p.Likes.Count(l => l.IsLike)))

@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using PicturesAPI.Entities;
+using PicturesAPI.Entities.Joins;
 using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services.Helpers;
 
@@ -21,7 +22,6 @@ public class PictureRepo : IPictureRepo
     public async Task<int> CountPicturesAsync(Expression<Func<Picture, bool>> predicate)
     {
         return await _dbContext.Pictures
-            .Where(p => !p.IsDeleted)
             .Where(predicate)
             .CountAsync();
     }
@@ -29,6 +29,7 @@ public class PictureRepo : IPictureRepo
     public async Task<Picture?> GetByIdAsync(int id)
     {
         return await _dbContext.Pictures
+            .AsNoTracking()
             .Where(p => !p.IsDeleted)
             .Include(p => p.Account)
             .ThenInclude(a => a.Role)
@@ -36,170 +37,172 @@ public class PictureRepo : IPictureRepo
             .ThenInclude(j => j.Tag)
             .Include(p => p.Likes)
             .ThenInclude(l => l.Account)
-            .Include(p => p.Comments
-                .Where(c => c.IsDeleted == false))
+            .Include(p => p.Comments)
             .ThenInclude(c => c.Account)
-            .Include(p => p.Account)
             .AsSplitQuery()
             .SingleOrDefaultAsync(p => p.Id == id);
     }
 
-    public async Task<IEnumerable<Picture>> GetFromAllAsync(int itemsToSkip, int itemsToTake)
-    {
-        var found = await _dbContext.Pictures
-            .Where(p => !p.IsDeleted)
-            .OrderByDescending(p => p.PopularityScore)
-            .Skip(itemsToSkip)
-            .Take(itemsToTake)
-            .ToArrayAsync();
-
-        var result = new List<Picture>();
-        for (var i = 0; i < found.Length; i++)
-        {
-            var foundPicture = found[i];
-            result.Add(await _dbContext.Pictures
-                .Include(p => p.Account)
-                .Include(p => p.PictureTags)
-                .ThenInclude(j => j.Tag)
-                .Include(p => p.Likes)
-                .ThenInclude(l => l.Account)
-                .Include(p => p.Comments
-                    .Where(c => c.IsDeleted == false))
-                .ThenInclude(c => c.Account)
-                .AsSplitQuery()
-                .SingleAsync(p => p == foundPicture)
-            );
-        }
-
-        return result;
-    }
-
     public async Task<IEnumerable<Picture>> GetNotSeenByAccountIdAsync(int accountId, int itemsToTake)
     {
-        var found = await _dbContext.Pictures
-            .Where(p => !p.IsDeleted)
+        return await _dbContext.Pictures
+            .AsNoTracking()
+            .OrderByDescending(p => (p.PictureTags
+                .Select(t => t.Tag)
+                .SelectMany(t => t.AccountLikedTags)
+                .Select(alt => alt.AccountId == accountId).Count() + 1) * p.PopularityScore)
+            .ThenByDescending(p => p.Id)
             .Where(p => !_dbContext.PicturesSeenByAccounts
                 .Where(j => j.Account.Id == accountId)
                 .Any(j => j.Picture.Id == p.Id && j.Account.Id == accountId))
-            .OrderByDescending(p =>
-                p.PopularityScore *
-                (p.PictureTags.Select(j =>
-                    j.Tag.AccountLikedTags
-                        .OrderByDescending(t => t.Id)
-                        .Select(a => a.Account.Id == accountId)
-                        .Take(15)
-                ).Count() * 2.25))
+            .Select(p => new Picture()
+            {
+                Id = p.Id,
+                Url = p.Url,
+                Name = p.Name,
+                Description = p.Description,
+                PictureAdded = p.PictureAdded,
+                Account = new Account()
+                {
+                    Id = p.Account.Id,
+                    Nickname = p.Account.Nickname,
+                    ProfilePicUrl = p.Account.ProfilePicUrl
+                },
+                PictureTags = p.PictureTags.Select(t => new PictureTag()
+                {
+                    Id = t.Id,
+                    Tag = new Tag()
+                    {
+                        Id = t.Tag.Id,
+                        Value = t.Tag.Value,
+                        AccountLikedTags = t.Tag.AccountLikedTags.Select(at => new AccountLikedTag()
+                        {
+                            Id = at.Id,
+                            Account = new Account()
+                            {
+                                Id = at.Account.Id
+                            },
+                        }).AsEnumerable()
+                    },
+                }).AsEnumerable(),
+                Likes = p.Likes.Select(l => new Like()
+                {
+                    Id = l.Id,
+                    Account = new Account()
+                    {
+                        Id = l.Account.Id,
+                        Nickname = l.Account.Nickname,
+                    },
+                    Picture = new Picture()
+                    {
+                        Id = l.Picture.Id
+                    },
+                    IsLike = l.IsLike
+                }).AsEnumerable(),
+                Comments = p.Comments.Select(c => new Comment()
+                {
+                    Id = c.Id,
+                    CommentAdded = c.CommentAdded,
+                    Account = new Account()
+                    {
+                        Id = c.Account.Id,
+                        Nickname = c.Account.Nickname,
+                    },
+                    Picture = new Picture()
+                    {
+                        Id = c.Picture.Id
+                    },
+                    Text = c.Text
+                }).AsEnumerable()
+            })
             .Take(itemsToTake)
-            .ToArrayAsync();
-
-        var result = new List<Picture>();
-        for (var i = 0; i < found.Length; i++)
-        {
-            var foundPicture = found[i];
-            result.Add(await _dbContext.Pictures
-                .Include(p => p.Account)
-                .Include(p => p.PictureTags)
-                .ThenInclude(j => j.Tag)
-                .Include(p => p.Likes)
-                .ThenInclude(l => l.Account)
-                .Include(p => p.Comments
-                    .Where(c => c.IsDeleted == false))
-                .ThenInclude(c => c.Account)
-                .AsSplitQuery()
-                .SingleAsync(p => p == foundPicture)
-            );
-        }
-        return result;
+            .ToListAsync();
     }
 
-    public async Task<IEnumerable<Picture>> SearchAllAsync(int itemsToSkip, int itemsToTake, string searchPhrase)
+    public async Task<IEnumerable<Picture>> SearchAllAsync(
+        int itemsToSkip, int itemsToTake,
+        Expression<Func<Picture, long>>? orderExp,
+        Expression<Func<Picture, bool>>? filterExp)
     {
-        var found = await _dbContext.Pictures
-            .Where(p => !p.IsDeleted)
-            .Where(p => searchPhrase == string.Empty || p.Name.ToLower().Contains(searchPhrase.ToLower()))
-            .OrderByDescending(p => p.PopularityScore)
+        var query = _dbContext.Pictures
+            .AsNoTracking()
+            .Select(p => new Picture()
+            {
+                Id = p.Id,
+                Url = p.Url,
+                Name = p.Name,
+                Description = p.Description,
+                PictureAdded = p.PictureAdded,
+                PopularityScore = p.PopularityScore,
+                Account = new Account()
+                {
+                    Id = p.Account.Id,
+                    Nickname = p.Account.Nickname,
+                    ProfilePicUrl = p.Account.ProfilePicUrl
+                },
+                PictureTags = p.PictureTags.Select(t => new PictureTag()
+                {
+                    Id = t.Id,
+                    Tag = new Tag()
+                    {
+                        Id = t.Tag.Id,
+                        Value = t.Tag.Value,
+                        AccountLikedTags = t.Tag.AccountLikedTags.Select(at => new AccountLikedTag()
+                        {
+                            Id = at.Id,
+                            Account = new Account()
+                            {
+                                Id = at.Account.Id
+                            },
+                        }).AsEnumerable()
+                    },
+                }).AsEnumerable(),
+                Likes = p.Likes.Select(l => new Like()
+                {
+                    Id = l.Id,
+                    Account = new Account()
+                    {
+                        Id = l.Account.Id,
+                        Nickname = l.Account.Nickname,
+                    },
+                    Picture = new Picture()
+                    {
+                        Id = l.Picture.Id
+                    },
+                    IsLike = l.IsLike
+                }).AsEnumerable(),
+                Comments = p.Comments.Select(c => new Comment()
+                {
+                    Id = c.Id,
+                    CommentAdded = c.CommentAdded,
+                    Account = new Account()
+                    {
+                        Id = c.Account.Id,
+                        Nickname = c.Account.Nickname,
+                    },
+                    Picture = new Picture()
+                    {
+                        Id = c.Picture.Id
+                    },
+                    Text = c.Text
+                }).AsEnumerable()
+            });
+
+        if (orderExp is not null)
+        {
+            query = query.OrderByDescending(orderExp)
+                .ThenByDescending(p => p.Id);
+        }
+
+        if (filterExp is not null)
+        {
+            query = query.Where(filterExp);
+        }
+
+        return await query
             .Skip(itemsToSkip)
             .Take(itemsToTake)
-            .ToArrayAsync();
-
-        var result = new List<Picture>();
-        for (var i = 0; i < found.Length; i++)
-        {
-            var foundPicture = found[i];
-            result.Add(await _dbContext.Pictures
-                .Include(p => p.Account)
-                .Include(p => p.PictureTags)
-                .ThenInclude(j => j.Tag)
-                .Include(p => p.Likes)
-                .ThenInclude(l => l.Account)
-                .Include(p => p.Comments
-                    .Where(c => c.IsDeleted == false))
-                .ThenInclude(c => c.Account)
-                .AsSplitQuery()
-                .SingleAsync(p => p == foundPicture)
-            );
-        }
-        return result;
-    }
-
-    public async Task<IEnumerable<Picture>> SearchNewestAsync(int itemsToSkip, int itemsToTake, string searchPhrase)
-    {
-        var found = await _dbContext.Pictures
-            .Where(p => !p.IsDeleted)
-            .Where(p => searchPhrase == string.Empty || p.Name.ToLower().Contains(searchPhrase.ToLower()))
-            .OrderByDescending(p => p.PictureAdded)
-            .Skip(itemsToSkip)
-            .Take(itemsToTake)
-            .ToArrayAsync();
-
-        var result = new List<Picture>();
-        for (var i = 0; i < found.Length; i++)
-        {
-            var foundPicture = found[i];
-            result.Add(await _dbContext.Pictures
-                .Include(p => p.Account)
-                .Include(p => p.PictureTags)
-                .ThenInclude(j => j.Tag)
-                .Include(p => p.Likes)
-                .ThenInclude(l => l.Account)
-                .Include(p => p.Comments
-                    .Where(c => c.IsDeleted == false))
-                .ThenInclude(c => c.Account)
-                .AsSplitQuery()
-                .SingleAsync(p => p == foundPicture)
-            );
-        }
-        return result;
-    }
-
-    public async Task<IEnumerable<Picture>> SearchMostLikesAsync(int itemsToSkip, int itemsToTake, string searchPhrase)
-    {
-        var found = await _dbContext.Pictures
-            .Where(p => !p.IsDeleted)
-            .Where(p => searchPhrase == string.Empty || p.Name.ToLower().Contains(searchPhrase.ToLower()))
-            .OrderByDescending(p => p.Likes.Count(l => l.IsLike))
-            .Skip(itemsToSkip)
-            .Take(itemsToTake)
-            .ToArrayAsync();
-
-        var result = new List<Picture>();
-        for (var i = 0; i < found.Length; i++)
-        {
-            var foundPicture = found[i];
-            result.Add(await _dbContext.Pictures
-                .Include(p => p.Account)
-                .Include(p => p.PictureTags)
-                .ThenInclude(j => j.Tag)
-                .Include(p => p.Likes)
-                .ThenInclude(l => l.Account)
-                .Include(p => p.Comments
-                    .Where(c => c.IsDeleted == false))
-                .ThenInclude(c => c.Account)
-                .AsSplitQuery()
-                .SingleAsync(p => p == foundPicture)
-            );
-        }
-        return result;
+            .ToListAsync();
     }
 
     public async Task<Picture> InsertAsync(Picture picture)
@@ -208,13 +211,6 @@ public class PictureRepo : IPictureRepo
 
         await _dbContext.SaveChangesAsync();
         return picture;
-    }
-
-    public async Task UpdatePicScoreAsync (Picture picture)
-    {
-        picture.PopularityScore = PictureScoreCalculator.CalcPoints(picture);
-        _dbContext.Pictures.Update(picture);
-        await _dbContext.SaveChangesAsync();
     }
 
     public async Task<Picture> UpdateAsync(Picture picture)

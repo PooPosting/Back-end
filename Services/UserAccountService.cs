@@ -51,39 +51,40 @@ public class UserAccountService : IUserAccountService
     }
     public async Task<LoginSuccessResult> GenerateJwt(LoginDto dto)
     {
-        var account = await _accountRepo.GetByNickAsync(dto.Nickname);
-            if (account is null || account.IsDeleted)
-                throw new BadRequestException("Invalid nickname or password");
+        var account = await _accountRepo.GetByNickAsync(dto.Nickname, a => a.Role);
 
-            var result = _passwordHasher.VerifyHashedPassword(account, account.PasswordHash, dto.Password);
-            if (result == PasswordVerificationResult.Failed)
-                throw new BadRequestException("Invalid nickname or password");
+        if (account is null || account.IsDeleted)
+            throw new BadRequestException("Invalid nickname or password");
 
-            var claims = new List<Claim>()
-            {
-                new Claim(ClaimTypes.NameIdentifier, (account.Id.ToString())),
-                new Claim(ClaimTypes.Name, account.Nickname),
-                new Claim(ClaimTypes.Role, account.Role.Id.ToString()),
-            };
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authenticationSettings.JwtKey));
-            var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expires = DateTime.Now.AddDays(_authenticationSettings.JwtExpireDays);
-            var token = new JwtSecurityToken(
-                _authenticationSettings.JwtIssuer,
-                _authenticationSettings.JwtIssuer,
-                claims,
-                expires: expires,
-                signingCredentials: cred);
+        var result = _passwordHasher.VerifyHashedPassword(account, account.PasswordHash, dto.Password);
+        if (result == PasswordVerificationResult.Failed)
+            throw new BadRequestException("Invalid nickname or password");
 
-            var tokenHandler = new JwtSecurityTokenHandler();
+        var claims = new List<Claim>()
+        {
+            new Claim(ClaimTypes.NameIdentifier, (account.Id.ToString())),
+            new Claim(ClaimTypes.Name, account.Nickname),
+            new Claim(ClaimTypes.Role, account.Role.Id.ToString()),
+        };
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authenticationSettings.JwtKey));
+        var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var expires = DateTime.Now.AddDays(_authenticationSettings.JwtExpireDays);
+        var token = new JwtSecurityToken(
+            _authenticationSettings.JwtIssuer,
+            _authenticationSettings.JwtIssuer,
+            claims,
+            expires: expires,
+            signingCredentials: cred);
 
-            var loginSuccessResult = new LoginSuccessResult()
-            {
-                AuthToken = tokenHandler.WriteToken(token),
-                Uid = IdHasher.EncodeAccountId(account.Id)
-            };
+        var tokenHandler = new JwtSecurityTokenHandler();
 
-            return loginSuccessResult;
+        var loginSuccessResult = new LoginSuccessResult()
+        {
+            AuthToken = tokenHandler.WriteToken(token),
+            Uid = IdHasher.EncodeAccountId(account.Id)
+        };
+
+        return loginSuccessResult;
 
     }
     public async Task<LoginSuccessResult> VerifyJwt(LsLoginDto dto)

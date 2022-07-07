@@ -78,7 +78,11 @@ builder.Services.AddDbContext<PictureDbContext>(options =>
 {
     var connString = builder.Configuration.GetConnectionString("PictureDbConnection");
     options
-        .UseMySql(connString, ServerVersion.AutoDetect(connString))
+        .UseMySql(connString, ServerVersion.AutoDetect(connString),
+            (optionBuilder) =>
+            {
+                optionBuilder.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+            })
         .UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
 });
 

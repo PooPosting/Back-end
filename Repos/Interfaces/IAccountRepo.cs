@@ -6,10 +6,20 @@ namespace PicturesAPI.Repos.Interfaces;
 
 public interface IAccountRepo
 {
-    Task<int> CountAccountsAsync(Expression<Func<Account, bool>> predicate);
+    Task<int> CountAccountsAsync(
+        Expression<Func<Account, bool>> filterExp);
     Task<Account?> GetByIdAsync(int id);
-    Task<Account?> GetByNickAsync(string nickname);
-    Task<IEnumerable<Account>> SearchAllAsync(int itemsToSkip, int itemsToTake, string? searchPhrase);
+    Task<Account?> GetByIdAsync(int id,
+        params Expression<Func<Account, object>>[] includes);
+    Task<Account?> GetByNickAsync(
+        string nickname,
+        params Expression<Func<Account, object>>[] includes);
+    Task<IEnumerable<Account>> SearchAllAsync(
+        int itemsToSkip,
+        int itemsToTake,
+        string? searchPhrase,
+        params Expression<Func<Account, object>>[] includes);
+
     Task<Account> InsertAsync(Account account);
     Task<Account> UpdateAsync(Account account);
     Task<bool> TryDeleteByIdAsync(int id);

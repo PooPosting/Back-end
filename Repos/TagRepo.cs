@@ -48,10 +48,10 @@ public class TagRepo : ITagRepo
         await _dbContext.SaveChangesAsync();
         return tag;
     }
-    public async Task<bool> TryInsertPictureTagJoinAsync(int pictureId, Tag tag)
+    public async Task<bool> TryInsertPictureTagJoinAsync(Picture picture, Tag tag)
     {
         if (!_dbContext.PictureTags
-                .Any(j => (j.Picture.Id == pictureId) && (j.Tag.Id == tag.Id))
+                .Any(j => (j.Picture == picture) && (j.Tag.Id == tag.Id))
            )
         {
             if (!_dbContext.Tags.Any(t => t.Value == tag.Value))
@@ -60,7 +60,7 @@ public class TagRepo : ITagRepo
             }
             _dbContext.PictureTags.Add(new PictureTag()
             {
-                PictureId = pictureId,
+                PictureId = picture.Id,
                 TagId = tag.Id
             });
             return await _dbContext.SaveChangesAsync() > 0;
@@ -68,10 +68,10 @@ public class TagRepo : ITagRepo
 
         return false;
     }
-    public async Task<bool> TryInsertAccountLikedTagAsync(int accountId, Tag tag)
+    public async Task<bool> TryInsertAccountLikedTagAsync(Account account, Tag tag)
     {
         if (!_dbContext.AccountsLikedTags
-            .Any(j => (j.Account.Id == accountId) && j.Tag.Id == tag.Id)
+            .Any(j => (j.Account == account) && j.Tag.Id == tag.Id)
             )
         {
             if (!_dbContext.Tags.Any(t => t.Value == tag.Value))
@@ -79,9 +79,9 @@ public class TagRepo : ITagRepo
                 await _dbContext.Tags.AddAsync(tag);
             }
 
-            _dbContext.AccountsLikedTags.Add(new AccountLikedTags()
+            _dbContext.AccountsLikedTags.Add(new AccountLikedTag()
             {
-                AccountId = accountId,
+                AccountId = account.Id,
                 TagId = tag.Id
             });
             return await _dbContext.SaveChangesAsync() > 0;
@@ -89,10 +89,10 @@ public class TagRepo : ITagRepo
 
         return false;
     }
-    public async Task<bool> TryDeleteAccountLikedTagAsync(int accountId, int tagId)
+    public async Task<bool> TryDeleteAccountLikedTagAsync(Account account, Tag tag)
     {
         var accLikedTag = _dbContext.AccountsLikedTags
-            .SingleOrDefault(j => (j.Account.Id == accountId) && (j.Tag.Id == tagId));
+            .SingleOrDefault(j => (j.Account.Id == account.Id) && (j.Tag.Id == tag.Id));
 
         if (accLikedTag is not null)
         {
@@ -101,10 +101,10 @@ public class TagRepo : ITagRepo
         }
         return false;
     }
-    public async Task<bool> TryDeletePictureTagJoinAsync(int pictureId, int tagId)
+    public async Task<bool> TryDeletePictureTagJoinAsync(Picture picture, Tag tag)
     {
         var picTag = _dbContext.PictureTags
-            .SingleOrDefault(j => (j.Picture.Id == pictureId) && (j.Tag.Id == tagId));
+            .SingleOrDefault(j => (j.Picture.Id == picture.Id) && (j.Tag.Id == tag.Id));
 
         if (picTag is not null)
         {

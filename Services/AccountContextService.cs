@@ -40,7 +40,9 @@ public class AccountContextService : IAccountContextService
     {
         ValidateJwt();
         var id = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
-        return await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Id == id)  ?? throw new UnauthorizedException("please log in");
+        return await _dbContext.Accounts
+            .AsNoTracking()
+            .FirstOrDefaultAsync(a => a.Id == id)  ?? throw new UnauthorizedException("please log in");
     }
 
     public int? TryGetAccountId()

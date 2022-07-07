@@ -16,17 +16,18 @@ public class AccountRepo : IAccountRepo
         _dbContext = dbContext;
     }
 
-    public async Task<int> CountAccountsAsync(Expression<Func<Account, bool>> predicate)
+    public async Task<int> CountAccountsAsync(Expression<Func<Account, bool>> filterExp)
     {
         return await _dbContext.Accounts
             .Where(a => !a.IsDeleted)
-            .Where(predicate)
+            .Where(filterExp)
             .CountAsync();
     }
 
     public async Task<Account?> GetByIdAsync(int id)
     {
         return await _dbContext.Accounts
+            .AsNoTracking()
             .Select(a => new Account()
             {
                 Id = a.Id,
@@ -48,7 +49,7 @@ public class AccountRepo : IAccountRepo
                     Comments = p.Comments.Select(c => new Comment()
                     {
                         Id = c.Id
-                    }).AsEnumerable(),
+                    }),
                     Likes = p.Likes.Select(l => new Like()
                     {
                         Id = l.Id,
@@ -58,51 +59,58 @@ public class AccountRepo : IAccountRepo
             .SingleOrDefaultAsync(a => a.Id == id);
     }
 
-    public async Task<Account?> GetByNickAsync(string nickname)
+    public async Task<Account?> GetByIdAsync(int id,
+        params Expression<Func<Account, object>>[] includes)
     {
-        return await _dbContext.Accounts
-            .Include(a => a.Role)
-            .Include(a => a.Pictures)
-            .ThenInclude(p => p.PictureTags)
-            .ThenInclude(j => j.Tag)
-            .Include(a => a.Pictures)
-            .ThenInclude(p => p.Likes)
-            .ThenInclude(p => p.Account)
-            .Include(a => a.Pictures)
-            .ThenInclude(p => p.Comments)
-            .ThenInclude(c => c.Account)
-            .Include(a => a.Likes)
-            .Include(a => a.Role)
-            .AsSplitQuery()
-            .SingleOrDefaultAsync(a => a.Nickname == nickname);
+        var query = _dbContext.Accounts.AsQueryable();
+
+        if (includes.Any())
+        {
+            foreach (var include in includes)
+            {
+                query.Include(include);
+            }
+        }
+
+        return await query.SingleOrDefaultAsync(a => a.Id == id);
     }
 
-    public async Task<IEnumerable<Account>> SearchAllAsync(int itemsToSkip, int itemsToTake, string? searchPhrase)
+    public async Task<Account?> GetByNickAsync(string nickname,
+        params Expression<Func<Account, object>>[] includes)
     {
-        var result = await _dbContext.Accounts
-            .Where(a => !a.IsDeleted)
+        var query = _dbContext.Accounts.AsQueryable();
+        if (includes.Any())
+        {
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+        }
+        return await query.SingleOrDefaultAsync(a => a.Nickname == nickname);
+    }
+
+    public async Task<IEnumerable<Account>> SearchAllAsync(
+        int itemsToSkip, int itemsToTake, string? searchPhrase,
+        params Expression<Func<Account, object>>[] includes)
+    {
+        var query = _dbContext.Accounts
+            .AsNoTracking()
             .Where(a => string.IsNullOrEmpty(searchPhrase) || a.Nickname.ToLower().Contains(searchPhrase.ToLower()))
             .OrderByDescending(a => a.Pictures.Sum(picture => picture.Likes.Count()))
             .ThenByDescending(a => a.Pictures.Count())
-            .Include(a => a.Role)
             .Skip(itemsToSkip)
             .Take(itemsToTake)
-            .AsSplitQuery()
-            .ToArrayAsync();
-        return result;
+            .AsSplitQuery();
 
-        // return await _dbContext.Accounts
-        //     .Where(a => string.IsNullOrEmpty(searchPhrase) || a.Nickname.ToLower().Contains(searchPhrase.ToLower()))
-        //     .OrderByDescending(a => a.Pictures.Sum(picture => picture.Likes.Count))
-        //     .ThenByDescending(a => a.Pictures.Count)
-        //     .Select(a => new Account()
-        //     {
-        //         Pictures = a.Pictures,
-        //
-        //
-        //     })
-        //     .AsSplitQuery()
-        //     .ToArrayAsync();
+        if (includes.Any())
+        {
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+        }
+
+        return await query.ToListAsync();
     }
 
     public async Task<Account> InsertAsync(Account account)

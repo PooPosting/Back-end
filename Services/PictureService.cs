@@ -55,7 +55,7 @@ public class PictureService : IPictureService
         var accId = _accountContextService.GetAccountId();
         var pictures = await _pictureRepo.GetNotSeenByAccountIdAsync(accId, query.PageSize);
 
-        var picArray = pictures.ToArray(); // avoiding multiple enumeration
+        var picArray = pictures.ToList(); // avoiding multiple enumeration
         foreach (var picture in picArray)
         {
             await _accountRepo.MarkAsSeenAsync(accId, picture.Id);
@@ -67,9 +67,11 @@ public class PictureService : IPictureService
 
     public async Task<PagedResult<PictureDto>> GetPictures(PictureQuery query)
     {
-        var pictures = await _pictureRepo.GetFromAllAsync(
+        var pictures = await _pictureRepo.SearchAllAsync(
             query.PageSize * (query.PageNumber - 1),
-            query.PageSize
+            query.PageSize,
+            p => p.PopularityScore,
+            null
         );
         var pictureDtos = _mapper.Map<List<PictureDto>>(pictures);
         _modifyAllower.UpdateItems(pictureDtos);
@@ -91,25 +93,28 @@ public class PictureService : IPictureService
                 pictures = await _pictureRepo.SearchAllAsync(
                     query.PageSize * (query.PageNumber - 1),
                     query.PageSize,
-                    query.SearchPhrase);
+                    p => p.PopularityScore,
+                    p => query.SearchPhrase == string.Empty || p.Name.ToLower().Contains(query.SearchPhrase.ToLower()));
                 break;
             case SortSearchBy.Newest:
-                pictures = await _pictureRepo.SearchNewestAsync(
+                pictures = await _pictureRepo.SearchAllAsync(
                     query.PageSize * (query.PageNumber - 1),
                     query.PageSize,
-                    query.SearchPhrase);
+                    p => p.PictureAdded.Ticks,
+                    p => query.SearchPhrase == string.Empty || p.Name.ToLower().Contains(query.SearchPhrase.ToLower()));
                 break;
             case SortSearchBy.MostLikes:
-                pictures = await _pictureRepo.SearchMostLikesAsync(
+                pictures = await _pictureRepo.SearchAllAsync(
                     query.PageSize * (query.PageNumber - 1),
                     query.PageSize,
-                    query.SearchPhrase);
+                    p => p.Likes.Count(l => l.IsLike),
+                    p => query.SearchPhrase == string.Empty || p.Name.ToLower().Contains(query.SearchPhrase.ToLower()));
                 break;
             default:
                 throw new BadRequestException("Invalid 'search by' option");
         }
 
-        var picBuffer = pictures as Picture[] ?? pictures.ToArray();
+        var picBuffer = pictures as List<Picture> ?? pictures.ToList();
         if (!picBuffer.Any()) throw new NotFoundException();
 
         var pictureDtos = _mapper
@@ -187,7 +192,7 @@ public class PictureService : IPictureService
                     {
                         Value = tag,
                     });
-                    await _tagRepo.TryInsertPictureTagJoinAsync(picture.Id, insertedTag);
+                    await _tagRepo.TryInsertPictureTagJoinAsync(picture, insertedTag);
                 }
             }
             return IdHasher.EncodePictureId(picture.Id);
@@ -224,12 +229,12 @@ public class PictureService : IPictureService
         {
             foreach (var join in picture.PictureTags)
             {
-                await _tagRepo.TryDeletePictureTagJoinAsync(join.Picture.Id, join.Tag.Id);
+                await _tagRepo.TryDeletePictureTagJoinAsync(join.Picture, join.Tag);
             }
             foreach (var tag in dto.Tags)
             {
                 var insertedTag = await _tagRepo.InsertAsync(new Tag() { Value = tag });
-                await _tagRepo.TryInsertPictureTagJoinAsync(picture.Id, insertedTag);
+                await _tagRepo.TryInsertPictureTagJoinAsync(picture, insertedTag);
             }
         }
 

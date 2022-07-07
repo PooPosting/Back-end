@@ -15,9 +15,9 @@ public class LikeMappingProfile : Profile
                     l => l.Account.Nickname))
             .ForMember(dto => dto.AccountId,
                 opt => opt.MapFrom(
-                    l => IdHasher.EncodeAccountId(l.AccountId)))
+                    l => IdHasher.EncodeAccountId(l.Account.Id)))
             .ForMember(dto => dto.PictureId,
                 opt => opt.MapFrom(
-                    l => IdHasher.EncodePictureId(l.PictureId)));
+                    l => IdHasher.EncodePictureId(l.Picture.Id)));
     }
 }

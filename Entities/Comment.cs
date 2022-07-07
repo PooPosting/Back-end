@@ -9,6 +9,9 @@ public class Comment
     public DateTime CommentAdded { get; set; }
     public bool IsDeleted { get; set; }
 
+    public int PictureId { get; set; }
+    public int AccountId { get; set; }
+
     // navigation props
     [Required] public Account Account { get; set; }
     [Required] public Picture Picture { get; set; }

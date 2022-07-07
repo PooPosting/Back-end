@@ -1,8 +1,9 @@
 ﻿#nullable enable
 using Microsoft.EntityFrameworkCore;
 using PicturesAPI.Entities;
-using PicturesAPI.Exceptions;
+using PicturesAPI.Entities.Joins;
 using PicturesAPI.Repos.Interfaces;
+using PicturesAPI.Services.Helpers;
 
 namespace PicturesAPI.Repos;
 
@@ -44,26 +45,128 @@ public class LikeRepo : ILikeRepo
             .ToArrayAsync();
     }
 
-    public async Task<Like> InsertAsync(Like like)
+    public async Task<Picture> LikeAsync(int pictureId, int accountId)
     {
-        await _dbContext.Likes.AddAsync(like);
-        await _dbContext.SaveChangesAsync();
-        return like;
+        var account = _dbContext.Accounts
+            .Include(a => a.LikedTags)
+            .SingleOrDefault(a => a.Id == accountId)!;
+
+        var picture = _dbContext.Pictures
+            .Include(p => p.Account)
+            .Include(p => p.Likes)
+            .ThenInclude(l => l.Account)
+            .Include(p => p.PictureTags)
+            .ThenInclude(pt => pt.Tag)
+            .SingleOrDefault(p => p.Id == pictureId)!;
+
+        var like = picture.Likes.SingleOrDefault(l => l.AccountId == accountId);
+
+        List<AccountLikedTag> accLikedTags = account.LikedTags.ToList();
+        List<Like> picLikes = picture.Likes.ToList();
+
+        if (like is null)
+        {
+            accLikedTags.AddRange(picture.PictureTags
+                .Select(pictureTag => new AccountLikedTag()
+                {
+                    AccountId = accountId, TagId = pictureTag.TagId
+                }));
+            picLikes.Add(new Like()
+            {
+                AccountId = accountId,
+                PictureId = pictureId,
+                IsLike = true,
+            });
+            picture.PopularityScore = PictureScoreCalculator.CalcPoints(picture);
+            account.LikedTags = accLikedTags;
+            picture.Likes = picLikes;
+            await _dbContext.SaveChangesAsync();
+            return picture;
+        }
+        else
+        {
+            if (like.IsLike)
+            {
+                foreach (var pictureTag in picture.PictureTags)
+                {
+                    accLikedTags = accLikedTags
+                        .Where(alt => alt.TagId != pictureTag.TagId)
+                        .ToList();
+                }
+                picLikes.Remove(like);
+            }
+            else
+            {
+                like.IsLike = !like.IsLike;
+                accLikedTags.AddRange(picture.PictureTags
+                    .Select(pictureTag => new AccountLikedTag()
+                    {
+                        AccountId = accountId, TagId = pictureTag.TagId
+                    }));
+            }
+            picture.PopularityScore = PictureScoreCalculator.CalcPoints(picture);
+            account.LikedTags = accLikedTags;
+            picture.Likes = picLikes;
+            await _dbContext.SaveChangesAsync();
+            return picture;
+        }
     }
 
-    public async Task<Like> DeleteByIdAsync(int id)
+    public async Task<Picture> DislikeAsync(int pictureId, int accountId)
     {
-        var like = await _dbContext.Likes.SingleOrDefaultAsync(l => l.Id == id) ?? throw new NotFoundException();
-        _dbContext.Likes.Remove(like!);
-        await _dbContext.SaveChangesAsync();
-        return like;
-    }
+        var account = _dbContext.Accounts
+            .Include(a => a.LikedTags)
+            .SingleOrDefault(a => a.Id == accountId)!;
 
-    public async Task<Like> UpdateAsync(Like like)
-    {
-        _dbContext.Likes.Update(like);
-        await _dbContext.SaveChangesAsync();
-        return like;
+        var picture = _dbContext.Pictures
+            .Include(p => p.Account)
+            .Include(p => p.Likes)
+            .ThenInclude(l => l.Account)
+            .Include(p => p.PictureTags)
+            .ThenInclude(pt => pt.Tag)
+            .SingleOrDefault(p => p.Id == pictureId)!;
+
+        var like = picture.Likes.SingleOrDefault(l => l.AccountId == accountId);
+
+        List<AccountLikedTag> accLikedTags = account.LikedTags.ToList();
+        List<Like> picLikes = picture.Likes.ToList();
+
+        if (like is null)
+        {
+            picLikes.Add(new Like()
+            {
+                AccountId = accountId,
+                PictureId = pictureId,
+                IsLike = false,
+            });
+            picture.PopularityScore = PictureScoreCalculator.CalcPoints(picture);
+            account.LikedTags = accLikedTags;
+            picture.Likes = picLikes;
+            await _dbContext.SaveChangesAsync();
+            return picture;
+        }
+        else
+        {
+            if (like.IsLike)
+            {
+                like.IsLike = !like.IsLike;
+                foreach (var pictureTag in picture.PictureTags)
+                {
+                    accLikedTags = accLikedTags
+                        .Where(alt => alt.TagId != pictureTag.TagId)
+                        .ToList();
+                }
+            }
+            else
+            {
+                picLikes.Remove(like);
+            }
+            picture.PopularityScore = PictureScoreCalculator.CalcPoints(picture);
+            account.LikedTags = accLikedTags;
+            picture.Likes = picLikes;
+            await _dbContext.SaveChangesAsync();
+            return picture;
+        }
     }
 
 }
