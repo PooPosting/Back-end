@@ -1,10 +1,6 @@
 ﻿using AutoMapper;
-using PicturesAPI.Entities;
-using PicturesAPI.Enums;
-using PicturesAPI.Exceptions;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Repos.Interfaces;
-using PicturesAPI.Services.Helpers.Interfaces;
 using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Services;
@@ -13,16 +9,13 @@ public class PopularService : IPopularService
 {
     private readonly IPopularRepo _popularRepo;
     private readonly IMapper _mapper;
-    private readonly IModifyAllower _modifyAllower;
 
     public PopularService(
         IPopularRepo popularRepo,
-        IMapper mapper,
-        IModifyAllower modifyAllower)
+        IMapper mapper)
     {
         _popularRepo = popularRepo;
         _mapper = mapper;
-        _modifyAllower = modifyAllower;
     }
 
     public async Task<PopularContentDto> Get()
@@ -42,11 +35,6 @@ public class PopularService : IPopularService
             MostPostedAccounts = _mapper.Map<IEnumerable<AccountDto>>(mostPostsAccs),
             MostLikedAccounts = _mapper.Map<IEnumerable<AccountDto>>(mostLikedAccs),
         };
-        _modifyAllower.UpdateItems(result.MostVotedPictures);
-        _modifyAllower.UpdateItems(result.MostLikedPictures);
-        _modifyAllower.UpdateItems(result.MostCommentedPictures);
-        _modifyAllower.UpdateItems(result.MostPostedAccounts);
-        _modifyAllower.UpdateItems(result.MostLikedAccounts);
         return result;
     }
 }

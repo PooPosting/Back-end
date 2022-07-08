@@ -24,11 +24,8 @@ using PicturesAPI.Models.Validators;
 using PicturesAPI.Repos;
 using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services;
-using PicturesAPI.Services.Helpers;
-using PicturesAPI.Services.Helpers.Interfaces;
 using PicturesAPI.Services.Interfaces;
 using PicturesAPI.Services.Startup;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 var builder = WebApplication.CreateBuilder();
 
@@ -113,7 +110,7 @@ builder.Services.AddScoped<IPopularService, PopularService>();
 builder.Services.AddScoped<IUserAccountService, UserAccountService>();
 builder.Services.AddScoped<ILogsService, LogsService>();
 builder.Services.AddScoped<IRestrictedIpsService, RestrictedIpsService>();
-builder.Services.AddScoped<IModifyAllower, ModifyAllower>();
+// builder.Services.AddScoped<IModifyAllower, ModifyAllower>();
 
 // Repos
 builder.Services.AddScoped<IAccountRepo, AccountRepo>();

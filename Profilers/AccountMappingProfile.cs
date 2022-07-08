@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using PicturesAPI.Entities;
 using PicturesAPI.Models.Dtos;
+using PicturesAPI.Profilers.ValueResolvers;
 using PicturesAPI.Services.Helpers;
 
 namespace PicturesAPI.Profilers;
@@ -10,6 +11,14 @@ public class AccountMappingProfile: Profile
     public AccountMappingProfile()
     {
         CreateMap<Account, AccountDto>()
+            .ForMember(dto => dto.ProfilePicUrl,
+                opt => opt.MapFrom<PfPicUrlResolver>())
+            .ForMember(dto => dto.BackgroundPicUrl,
+                opt => opt.MapFrom<BgPicUrlResolver>())
+            .ForMember(dto => dto.IsModifiable,
+                opt => opt.MapFrom<ModifiableResolver>())
+            .ForMember(dto => dto.IsAdminModifiable,
+                opt => opt.MapFrom<AdminModifiableResolver>())
             .ForMember(dto => dto.Email,
                 opt => opt.MapFrom(
                     a => a.IsDeleted ? string.Empty : a.Email))
@@ -27,6 +36,8 @@ public class AccountMappingProfile: Profile
                     acc => acc.Role.Id));
 
         CreateMap<Account, AccountPreviewDto>()
+            .ForMember(dto => dto.ProfilePicUrl,
+                opt => opt.MapFrom<PfPicUrlResolver>())
             .ForMember(dto => dto.Id,
                 opt => opt.MapFrom(
                     a => IdHasher.EncodeAccountId(a.Id)));

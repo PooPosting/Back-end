@@ -11,7 +11,6 @@ using PicturesAPI.Models.Dtos;
 using PicturesAPI.Models.Validators;
 using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services.Helpers;
-using PicturesAPI.Services.Helpers.Interfaces;
 using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Services;
@@ -22,7 +21,6 @@ public class PictureService : IPictureService
     private readonly IMapper _mapper;
     private readonly IAuthorizationService _authorizationService;
     private readonly IAccountContextService _accountContextService;
-    private readonly IModifyAllower _modifyAllower;
     private readonly IPictureRepo _pictureRepo;
     private readonly IAccountRepo _accountRepo;
     private readonly ILikeRepo _likeRepo;
@@ -32,7 +30,6 @@ public class PictureService : IPictureService
         ILogger<PictureService> logger, 
         IAuthorizationService authorizationService, 
         IAccountContextService accountContextService,
-        IModifyAllower modifyAllower,
         IPictureRepo pictureRepo,
         IAccountRepo accountRepo,
         ILikeRepo likeRepo,
@@ -43,7 +40,6 @@ public class PictureService : IPictureService
         _mapper = mapper;
         _authorizationService = authorizationService;
         _accountContextService = accountContextService;
-        _modifyAllower = modifyAllower;
         _pictureRepo = pictureRepo;
         _accountRepo = accountRepo;
         _likeRepo = likeRepo;
@@ -61,7 +57,6 @@ public class PictureService : IPictureService
             await _accountRepo.MarkAsSeenAsync(accId, picture.Id);
         }
         var pictureDtos = _mapper.Map<List<PictureDto>>(picArray).ToList();
-        _modifyAllower.UpdateItems(pictureDtos);
         return pictureDtos;
     }
 
@@ -74,7 +69,6 @@ public class PictureService : IPictureService
             null
         );
         var pictureDtos = _mapper.Map<List<PictureDto>>(pictures);
-        _modifyAllower.UpdateItems(pictureDtos);
         return new PagedResult<PictureDto>(
             pictureDtos,
             query.PageSize,
@@ -120,7 +114,6 @@ public class PictureService : IPictureService
         var pictureDtos = _mapper
             .Map<List<PictureDto>>(pictures)
             .ToList();
-        _modifyAllower.UpdateItems(pictureDtos);
         var result = new PagedResult<PictureDto>(
             pictureDtos,
             query.PageSize,
@@ -146,7 +139,6 @@ public class PictureService : IPictureService
         var likes = await _likeRepo.GetByLikedIdAsync(id);
         var accounts = likes.Select(like => like.Account).ToList();
         var accountDtos = _mapper.Map<List<AccountDto>>(accounts);
-        _modifyAllower.UpdateItems(accountDtos);
         return accountDtos;
     }
     
@@ -155,7 +147,6 @@ public class PictureService : IPictureService
         var picture = await _pictureRepo.GetByIdAsync(id);
         if (picture == null) throw new NotFoundException();
         var pictureDtos = _mapper.Map<PictureDto>(picture);
-        _modifyAllower.UpdateItems(pictureDtos);
         return pictureDtos;
     }
     
@@ -240,7 +231,6 @@ public class PictureService : IPictureService
 
         await _pictureRepo.UpdateAsync(picture);
         var pictureDto = _mapper.Map<PictureDto>(picture);
-        _modifyAllower.UpdateItems(pictureDto);
         return pictureDto;
     }
         

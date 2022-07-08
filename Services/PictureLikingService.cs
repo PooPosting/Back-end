@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
-using PicturesAPI.Entities;
 using PicturesAPI.Exceptions;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Repos.Interfaces;
-using PicturesAPI.Services.Helpers.Interfaces;
 using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Services;
@@ -11,8 +9,6 @@ namespace PicturesAPI.Services;
 public class PictureLikingService : IPictureLikingService
 {
     private readonly IPictureRepo _pictureRepo;
-    private readonly IModifyAllower _modifyAllower;
-    private readonly ITagRepo _tagRepo;
     private readonly IMapper _mapper;
     private readonly ILikeRepo _likeRepo;
     private readonly IAccountContextService _accountContextService;
@@ -20,14 +16,11 @@ public class PictureLikingService : IPictureLikingService
     public PictureLikingService(
         ILikeRepo likeRepo,
         IPictureRepo pictureRepo,
-        IModifyAllower modifyAllower,
         ITagRepo tagRepo,
         IMapper mapper,
         IAccountContextService accountContextService)
     {
         _pictureRepo = pictureRepo;
-        _modifyAllower = modifyAllower;
-        _tagRepo = tagRepo;
         _mapper = mapper;
         _likeRepo = likeRepo;
         _accountContextService = accountContextService;
@@ -40,7 +33,6 @@ public class PictureLikingService : IPictureLikingService
 
         var pictureResult = await _likeRepo.LikeAsync(pictureId, accountId);
         var mappedResult = _mapper.Map<PictureDto>(pictureResult);
-        _modifyAllower.UpdateItems(mappedResult);
         return mappedResult;
     }
 
@@ -51,7 +43,6 @@ public class PictureLikingService : IPictureLikingService
 
         var pictureResult = await _likeRepo.DislikeAsync(pictureId, accountId);
         var mappedResult = _mapper.Map<PictureDto>(pictureResult);
-        _modifyAllower.UpdateItems(mappedResult);
         return mappedResult;
     }
 
