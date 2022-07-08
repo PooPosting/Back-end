@@ -26,7 +26,23 @@ public class CommentRepo : ICommentRepo
     {
         await _dbContext.Comments.AddAsync(comment);
         await _dbContext.SaveChangesAsync();
-        return comment;
+
+        return _dbContext.Comments
+            .Select(c => new Comment()
+            {
+                Id = c.Id,
+                Text = c.Text,
+                CommentAdded = c.CommentAdded,
+                Account = new Account()
+                {
+                    Id = c.Account.Id,
+                    Nickname = c.Account.Nickname
+                },
+                Picture = new Picture()
+                {
+                    Id = c.Picture.Id
+                },
+            }).SingleOrDefault(c => c.Id == comment.Id)!;
     }
 
     public async Task<Comment> UpdateAsync(Comment comment)

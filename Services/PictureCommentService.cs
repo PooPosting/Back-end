@@ -6,6 +6,7 @@ using PicturesAPI.Enums;
 using PicturesAPI.Exceptions;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Repos.Interfaces;
+using PicturesAPI.Services.Helpers;
 using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Services;
@@ -36,12 +37,11 @@ public class PictureCommentService : IPictureCommentService
         if ((await _pictureRepo.GetByIdAsync(picId)) is null) throw new NotFoundException();
         var comment = new Comment()
         {
-            Account = await _accountContextService.GetAccountAsync(),
-            Picture = await _pictureRepo.GetByIdAsync(picId) ?? throw new NotFoundException(),
+            AccountId = _accountContextService.GetAccountId(),
+            PictureId = picId,
             Text = text
         };
-        await _commentRepo.InsertAsync(comment);
-        var result = _mapper.Map<CommentDto>(comment);
+        var result = _mapper.Map<CommentDto>(await _commentRepo.InsertAsync(comment));
         result.IsModifiable = true;
         return result;
     }

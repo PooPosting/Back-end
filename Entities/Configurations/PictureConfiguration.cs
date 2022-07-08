@@ -25,7 +25,7 @@ public class PictureConfiguration: IEntityTypeConfiguration<Picture>
             .IsRequired();
         builder
             .Property(p => p.PictureAdded)
-            .HasDefaultValue(DateTime.Now)
+            .HasDefaultValueSql("now()")
             .IsRequired();
         builder
             .Property(p => p.IsDeleted)

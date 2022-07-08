@@ -10,12 +10,6 @@ public class LikeMappingProfile : Profile
     public LikeMappingProfile()
     {
         CreateMap<Like, LikeDto>()
-            .ForMember(dto => dto.AccountNickname,
-                opt => opt.MapFrom(
-                    l => l.Account.Nickname))
-            .ForMember(dto => dto.AccountId,
-                opt => opt.MapFrom(
-                    l => IdHasher.EncodeAccountId(l.Account.Id)))
             .ForMember(dto => dto.PictureId,
                 opt => opt.MapFrom(
                     l => IdHasher.EncodePictureId(l.Picture.Id)));

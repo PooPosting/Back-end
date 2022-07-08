@@ -45,6 +45,14 @@ public class AccountContextService : IAccountContextService
             .FirstOrDefaultAsync(a => a.Id == id)  ?? throw new UnauthorizedException("please log in");
     }
 
+    public async Task<Account> GetTrackedAccountAsync()
+    {
+        ValidateJwt();
+        var id = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+        return await _dbContext.Accounts
+            .FirstOrDefaultAsync(a => a.Id == id)  ?? throw new UnauthorizedException("please log in");
+    }
+
     public int? TryGetAccountId()
     {
         var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);

@@ -10,6 +10,7 @@ public interface IAccountContextService
     ClaimsPrincipal User { get; }
     int? TryGetAccountId();
     int GetAccountId();
+    Task<Account> GetTrackedAccountAsync();
     Task<Account> GetAccountAsync();
     int GetAccountRole();
 }

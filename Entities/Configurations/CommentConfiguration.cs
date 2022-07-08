@@ -16,7 +16,7 @@ public class CommentConfiguration: IEntityTypeConfiguration<Comment>
             .IsRequired();
         builder
             .Property(c => c.CommentAdded)
-            .HasDefaultValue(DateTime.Now)
+            .HasDefaultValueSql("now()")
             .IsRequired();
         builder
             .Property(c => c.IsDeleted)

@@ -32,20 +32,42 @@ public class ModifyAllower : IModifyAllower
         {
             item.Url = item.Url.StartsWith("http") ? item.Url : Path.Combine(_appOrigin, item.Url);
 
-            if (item.AccountId == accountId) item.IsModifiable = true;
+            if (item.AccountPreview.Id == accountId) item.IsModifiable = true;
             else if (accountRole == 3) item.IsAdminModifiable = true;
 
-            foreach (var comment in item.Comments)
+            if (item.Likes.Any())
             {
-                if (comment.AccountId == accountId) comment.IsModifiable = true;
-                else if (accountRole == 3) item.IsAdminModifiable = true;
+                foreach (var like in item.Likes)
+                {
+                    if (like.AccountPreview is not null)
+                    {
+                        if (like.AccountPreview.ProfilePicUrl is not null)
+                            like.AccountPreview.ProfilePicUrl = like.AccountPreview.ProfilePicUrl.StartsWith("http")
+                                ? like.AccountPreview.ProfilePicUrl
+                                : Path.Combine(_appOrigin, like.AccountPreview.ProfilePicUrl);
+                    }                        }
+            }
+            if (item.Comments.Any())
+            {
+                foreach (var comment in item.Comments)
+                {
+                    if (comment.AccountPreview is not null)
+                    {
+                        if (comment.AccountPreview.ProfilePicUrl is not null)
+                            comment.AccountPreview.ProfilePicUrl = comment.AccountPreview.ProfilePicUrl.StartsWith("http")
+                                ? comment.AccountPreview.ProfilePicUrl
+                                : Path.Combine(_appOrigin, comment.AccountPreview.ProfilePicUrl);
+                        if (comment.AccountPreview.Id == accountId) comment.IsModifiable = true;
+                        else if (accountRole == 3) item.IsAdminModifiable = true;
+                    }
+                }
             }
 
-            if (item.Likes.Any(l => (l.AccountId == accountId && l.IsLike)))
+            if (item.Likes.Any(l => (l.AccountPreview.Id == accountId && l.IsLike)))
             {
                 item.LikeState = LikeState.Liked;
             }
-            if (item.Likes.Any(l => (l.AccountId == accountId && !l.IsLike)))
+            if (item.Likes.Any(l => (l.AccountPreview.Id == accountId && !l.IsLike)))
             {
                 item.LikeState = LikeState.DisLiked;
             }
@@ -63,20 +85,42 @@ public class ModifyAllower : IModifyAllower
 
         item.Url = item.Url.StartsWith("http") ? item.Url : Path.Combine(_appOrigin, item.Url);
 
-        if (item.AccountId == accountId) item.IsModifiable = true;
+        if (item.AccountPreview.Id == accountId) item.IsModifiable = true;
         else if (accountRole == 3) item.IsAdminModifiable = true;
 
-        foreach (var comment in item.Comments)
+        if (item.Likes.Any())
         {
-            if (comment.AccountId == accountId) comment.IsModifiable = true;
-            else if (accountRole == 3) item.IsAdminModifiable = true;
+            foreach (var like in item.Likes)
+            {
+                if (like.AccountPreview is not null)
+                {
+                    if (like.AccountPreview.ProfilePicUrl is not null)
+                        like.AccountPreview.ProfilePicUrl = like.AccountPreview.ProfilePicUrl.StartsWith("http")
+                            ? like.AccountPreview.ProfilePicUrl
+                            : Path.Combine(_appOrigin, like.AccountPreview.ProfilePicUrl);
+                }                        }
+        }
+        if (item.Comments.Any())
+        {
+            foreach (var comment in item.Comments)
+            {
+                if (comment.AccountPreview is not null)
+                {
+                    if (comment.AccountPreview.ProfilePicUrl is not null)
+                        comment.AccountPreview.ProfilePicUrl = comment.AccountPreview.ProfilePicUrl.StartsWith("http")
+                            ? comment.AccountPreview.ProfilePicUrl
+                            : Path.Combine(_appOrigin, comment.AccountPreview.ProfilePicUrl);
+                    if (comment.AccountPreview.Id == accountId) comment.IsModifiable = true;
+                    else if (accountRole == 3) item.IsAdminModifiable = true;
+                }
+            }
         }
 
-        if (item.Likes.Any(l => (l.AccountId == accountId && l.IsLike)))
+        if (item.Likes.Any(l => (l.AccountPreview.Id == accountId && l.IsLike)))
         {
             item.LikeState = LikeState.Liked;
         }
-        if (item.Likes.Any(l => (l.AccountId == accountId && !l.IsLike)))
+        if (item.Likes.Any(l => (l.AccountPreview.Id == accountId && !l.IsLike)))
         {
             item.LikeState = LikeState.DisLiked;
         }
@@ -105,20 +149,42 @@ public class ModifyAllower : IModifyAllower
             {
                 item.Url = item.Url.StartsWith("http") ? item.Url : Path.Combine(_appOrigin, item.Url);
 
-                if (item.AccountId == accountId) item.IsModifiable = true;
+                if (item.AccountPreview.Id == accountId) item.IsModifiable = true;
                 else if (accountRole == 3) item.IsAdminModifiable = true;
 
-                foreach (var comment in item.Comments)
+                if (item.Likes.Any())
                 {
-                    if (comment.AccountId == accountId) comment.IsModifiable = true;
-                    else if (accountRole == 3) item.IsAdminModifiable = true;
+                    foreach (var like in item.Likes)
+                    {
+                        if (like.AccountPreview is not null)
+                        {
+                            if (like.AccountPreview.ProfilePicUrl is not null)
+                                like.AccountPreview.ProfilePicUrl = like.AccountPreview.ProfilePicUrl.StartsWith("http")
+                                    ? like.AccountPreview.ProfilePicUrl
+                                    : Path.Combine(_appOrigin, like.AccountPreview.ProfilePicUrl);
+                        }                        }
+                }
+                if (item.Comments.Any())
+                {
+                    foreach (var comment in item.Comments)
+                    {
+                        if (comment.AccountPreview is not null)
+                        {
+                            if (comment.AccountPreview.ProfilePicUrl is not null)
+                                comment.AccountPreview.ProfilePicUrl = comment.AccountPreview.ProfilePicUrl.StartsWith("http")
+                                    ? comment.AccountPreview.ProfilePicUrl
+                                    : Path.Combine(_appOrigin, comment.AccountPreview.ProfilePicUrl);
+                            if (comment.AccountPreview.Id == accountId) comment.IsModifiable = true;
+                            else if (accountRole == 3) item.IsAdminModifiable = true;
+                        }
+                    }
                 }
 
-                if (item.Likes.Any(l => (l.AccountId == accountId && l.IsLike)))
+                if (item.Likes.Any(l => (l.AccountPreview.Id == accountId && l.IsLike)))
                 {
                     item.LikeState = LikeState.Liked;
                 }
-                if (item.Likes.Any(l => (l.AccountId == accountId && !l.IsLike)))
+                if (item.Likes.Any(l => (l.AccountPreview.Id == accountId && !l.IsLike)))
                 {
                     item.LikeState = LikeState.DisLiked;
                 }
@@ -148,20 +214,42 @@ public class ModifyAllower : IModifyAllower
         {
             item.Url = item.Url.StartsWith("http") ? item.Url : Path.Combine(_appOrigin, item.Url);
 
-            if (item.AccountId == accountId) item.IsModifiable = true;
+            if (item.AccountPreview.Id == accountId) item.IsModifiable = true;
             else if (accountRole == 3) item.IsAdminModifiable = true;
 
-            foreach (var comment in item.Comments)
+            if (item.Likes.Any())
             {
-                if (comment.AccountId == accountId) comment.IsModifiable = true;
-                else if (accountRole == 3) item.IsAdminModifiable = true;
+                foreach (var like in item.Likes)
+                {
+                    if (like.AccountPreview is not null)
+                    {
+                        if (like.AccountPreview.ProfilePicUrl is not null)
+                            like.AccountPreview.ProfilePicUrl = like.AccountPreview.ProfilePicUrl.StartsWith("http")
+                                ? like.AccountPreview.ProfilePicUrl
+                                : Path.Combine(_appOrigin, like.AccountPreview.ProfilePicUrl);
+                    }                        }
+            }
+            if (item.Comments.Any())
+            {
+                foreach (var comment in item.Comments)
+                {
+                    if (comment.AccountPreview is not null)
+                    {
+                        if (comment.AccountPreview.ProfilePicUrl is not null)
+                            comment.AccountPreview.ProfilePicUrl = comment.AccountPreview.ProfilePicUrl.StartsWith("http")
+                                ? comment.AccountPreview.ProfilePicUrl
+                                : Path.Combine(_appOrigin, comment.AccountPreview.ProfilePicUrl);
+                        if (comment.AccountPreview.Id == accountId) comment.IsModifiable = true;
+                        else if (accountRole == 3) item.IsAdminModifiable = true;
+                    }
+                }
             }
 
-            if (item.Likes.Any(l => (l.AccountId == accountId && l.IsLike)))
+            if (item.Likes.Any(l => (l.AccountPreview.Id == accountId && l.IsLike)))
             {
                 item.LikeState = LikeState.Liked;
             }
-            if (item.Likes.Any(l => (l.AccountId == accountId && !l.IsLike)))
+            if (item.Likes.Any(l => (l.AccountPreview.Id == accountId && !l.IsLike)))
             {
                 item.LikeState = LikeState.DisLiked;
             }
@@ -181,9 +269,40 @@ public class ModifyAllower : IModifyAllower
             if (account.ProfilePicUrl is not null)
                 account.ProfilePicUrl = account.ProfilePicUrl.StartsWith("http") ? account.ProfilePicUrl : Path.Combine(_appOrigin, account.ProfilePicUrl);
 
-            foreach (var picture in account.Pictures)
+            if (account.Pictures.Any())
             {
-                picture.Url = picture.Url.StartsWith("http") ? picture.Url : Path.Combine(_appOrigin, picture.Url);
+                foreach (var picture in account.Pictures)
+                {
+                    if (picture.AccountPreview.ProfilePicUrl is not null)
+                        picture.AccountPreview.ProfilePicUrl = picture.AccountPreview.ProfilePicUrl.StartsWith("http") ? picture.AccountPreview.ProfilePicUrl : Path.Combine(_appOrigin, picture.AccountPreview.ProfilePicUrl);
+
+                    picture.Url = picture.Url.StartsWith("http") ? picture.Url : Path.Combine(_appOrigin, picture.Url);
+
+                    if (picture.Likes.Any())
+                    {
+                        foreach (var like in picture.Likes)
+                        {
+                            if (like.AccountPreview is not null)
+                            {
+                                if (like.AccountPreview.ProfilePicUrl is not null)
+                                    like.AccountPreview.ProfilePicUrl = like.AccountPreview.ProfilePicUrl.StartsWith("http")
+                                        ? like.AccountPreview.ProfilePicUrl
+                                        : Path.Combine(_appOrigin, like.AccountPreview.ProfilePicUrl);
+                            }                        }
+                    }
+                    if (picture.Comments.Any())
+                    {
+                        foreach (var comment in picture.Comments)
+                        {
+                            if (comment.AccountPreview is not null)
+                            {
+                                if (comment.AccountPreview.ProfilePicUrl is not null)
+                                    comment.AccountPreview.ProfilePicUrl = comment.AccountPreview.ProfilePicUrl.StartsWith("http")
+                                        ? comment.AccountPreview.ProfilePicUrl
+                                        : Path.Combine(_appOrigin, comment.AccountPreview.ProfilePicUrl);
+                            }                       }
+                    }
+                }
             }
         }
     }
@@ -191,7 +310,39 @@ public class ModifyAllower : IModifyAllower
     {
         foreach (var picture in pictures)
         {
+            if (picture.AccountPreview is not null)
+            {
+                if (picture.AccountPreview.ProfilePicUrl is not null)
+                    picture.AccountPreview.ProfilePicUrl = picture.AccountPreview.ProfilePicUrl.StartsWith("http") ? picture.AccountPreview.ProfilePicUrl : Path.Combine(_appOrigin, picture.AccountPreview.ProfilePicUrl);
+            }
             picture.Url = picture.Url.StartsWith("http") ? picture.Url : Path.Combine(_appOrigin, picture.Url);
+
+            if (picture.Likes.Any())
+            {
+                foreach (var like in picture.Likes)
+                {
+                    if (like.AccountPreview is not null)
+                    {
+                        if (like.AccountPreview.ProfilePicUrl is not null)
+                            like.AccountPreview.ProfilePicUrl = like.AccountPreview.ProfilePicUrl.StartsWith("http")
+                                ? like.AccountPreview.ProfilePicUrl
+                                : Path.Combine(_appOrigin, like.AccountPreview.ProfilePicUrl);
+                    }
+                }
+            }
+            if (picture.Comments.Any())
+            {
+                foreach (var comment in picture.Comments)
+                {
+                    if (comment.AccountPreview is not null)
+                    {
+                        if (comment.AccountPreview.ProfilePicUrl is not null)
+                            comment.AccountPreview.ProfilePicUrl = comment.AccountPreview.ProfilePicUrl.StartsWith("http")
+                                ? comment.AccountPreview.ProfilePicUrl
+                                : Path.Combine(_appOrigin, comment.AccountPreview.ProfilePicUrl);
+                    }
+                }
+            }
         }
     }
     private void AdjustUrls(AccountDto account)
@@ -201,14 +352,78 @@ public class ModifyAllower : IModifyAllower
         if (account.ProfilePicUrl is not null)
             account.ProfilePicUrl = account.ProfilePicUrl.StartsWith("http") ? account.ProfilePicUrl : Path.Combine(_appOrigin, account.ProfilePicUrl);
 
-        foreach (var picture in account.Pictures)
+        if (account.Pictures.Any())
         {
-            picture.Url = picture.Url.StartsWith("http") ? picture.Url : Path.Combine(_appOrigin, picture.Url);
+            foreach (var picture in account.Pictures)
+            {
+                if (picture.AccountPreview.ProfilePicUrl is not null)
+                    picture.AccountPreview.ProfilePicUrl = picture.AccountPreview.ProfilePicUrl.StartsWith("http") ? picture.AccountPreview.ProfilePicUrl : Path.Combine(_appOrigin, picture.AccountPreview.ProfilePicUrl);
+
+                picture.Url = picture.Url.StartsWith("http") ? picture.Url : Path.Combine(_appOrigin, picture.Url);
+
+                if (picture.Likes.Any())
+                {
+                    foreach (var like in picture.Likes)
+                    {
+                        if (like.AccountPreview is not null)
+                        {
+                            if (like.AccountPreview.ProfilePicUrl is not null)
+                                like.AccountPreview.ProfilePicUrl = like.AccountPreview.ProfilePicUrl.StartsWith("http")
+                                    ? like.AccountPreview.ProfilePicUrl
+                                    : Path.Combine(_appOrigin, like.AccountPreview.ProfilePicUrl);
+                        }                   }
+                }
+                if (picture.Comments.Any())
+                {
+                    foreach (var comment in picture.Comments)
+                    {
+                        if (comment.AccountPreview is not null)
+                        {
+                            if (comment.AccountPreview.ProfilePicUrl is not null)
+                                comment.AccountPreview.ProfilePicUrl = comment.AccountPreview.ProfilePicUrl.StartsWith("http")
+                                    ? comment.AccountPreview.ProfilePicUrl
+                                    : Path.Combine(_appOrigin, comment.AccountPreview.ProfilePicUrl);
+                        }
+                    }
+                }
+            }
         }
     }
     private void AdjustUrls(PictureDto picture)
     {
+        if (picture.AccountPreview is not null)
+        {
+            if (picture.AccountPreview.ProfilePicUrl is not null)
+                picture.AccountPreview.ProfilePicUrl = picture.AccountPreview.ProfilePicUrl.StartsWith("http") ? picture.AccountPreview.ProfilePicUrl : Path.Combine(_appOrigin, picture.AccountPreview.ProfilePicUrl);
+        }
+
         picture.Url = picture.Url.StartsWith("http") ? picture.Url : Path.Combine(_appOrigin, picture.Url);
+        if (picture.Likes.Any())
+        {
+            foreach (var like in picture.Likes)
+            {
+                if (like.AccountPreview is not null)
+                {
+                    if (like.AccountPreview.ProfilePicUrl is not null)
+                        like.AccountPreview.ProfilePicUrl = like.AccountPreview.ProfilePicUrl.StartsWith("http")
+                            ? like.AccountPreview.ProfilePicUrl
+                            : Path.Combine(_appOrigin, like.AccountPreview.ProfilePicUrl);
+                }
+            }
+        }
+        if (picture.Comments.Any())
+        {
+            foreach (var comment in picture.Comments)
+            {
+                if (comment.AccountPreview is not null)
+                {
+                    if (comment.AccountPreview.ProfilePicUrl is not null)
+                        comment.AccountPreview.ProfilePicUrl = comment.AccountPreview.ProfilePicUrl.StartsWith("http")
+                            ? comment.AccountPreview.ProfilePicUrl
+                            : Path.Combine(_appOrigin, comment.AccountPreview.ProfilePicUrl);
+                }
+            }
+        }
     }
 
     #endregion

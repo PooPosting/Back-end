@@ -29,17 +29,14 @@ public class PictureRepo : IPictureRepo
     public async Task<Picture?> GetByIdAsync(int id)
     {
         return await _dbContext.Pictures
-            .AsNoTracking()
-            .Where(p => !p.IsDeleted)
             .Include(p => p.Account)
-            .ThenInclude(a => a.Role)
             .Include(p => p.PictureTags)
             .ThenInclude(j => j.Tag)
             .Include(p => p.Likes)
             .ThenInclude(l => l.Account)
             .Include(p => p.Comments)
             .ThenInclude(c => c.Account)
-            .AsSplitQuery()
+            .AsNoTracking()
             .SingleOrDefaultAsync(p => p.Id == id);
     }
 

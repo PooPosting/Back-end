@@ -13,17 +13,9 @@ public class PictureMappingProfile : Profile
             .ForMember(dto => dto.Tags,
                 opt => opt.MapFrom(
                     p => p.PictureTags.Select(p => p.Tag.Value)))
-            .ForMember(
-                dto => dto.AccountNickname,
-                opt => opt.MapFrom(
-                    p => p.Account.IsDeleted ? "Unknown" : p.Account.Nickname))
             .ForMember(dto => dto.Id,
                 opt => opt.MapFrom(
                     p => IdHasher.EncodePictureId(p.Id)))
-            .ForMember(
-                dto => dto.AccountId,
-                opt => opt.MapFrom(
-                    p => p.Account.IsDeleted ? "0" : IdHasher.EncodeAccountId(p.AccountId)))
             .ForMember(dto => dto.LikeCount,
                 opt => opt.MapFrom(
                     p => p.Likes.Count(l => l.IsLike)))
@@ -37,10 +29,7 @@ public class PictureMappingProfile : Profile
         CreateMap<PictureDto, Picture>()
             .ForMember(p => p.Id,
                 opt => opt.MapFrom(
-                    pto => IdHasher.DecodePictureId(pto.Id)))
-            .ForMember(p => p.AccountId,
-                opt => opt.MapFrom(
-                    dto => IdHasher.DecodeAccountId(dto.AccountId)));
+                    pto => IdHasher.DecodePictureId(pto.Id)));
 
         CreateMap<CreatePictureDto, Picture>();
     }

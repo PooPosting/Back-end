@@ -38,7 +38,7 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
             .HasMaxLength(500);
         builder
             .Property(a => a.AccountCreated)
-            .HasDefaultValue(DateTime.Now);
+            .HasDefaultValueSql("now()");
         builder
             .Property(a => a.IsDeleted)
             .HasDefaultValue(false)

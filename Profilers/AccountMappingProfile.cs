@@ -18,13 +18,19 @@ public class AccountMappingProfile: Profile
                     a => a.IsDeleted ? "Unknown" : a.Nickname))
             .ForMember(dto => dto.Id,
                 opt => opt.MapFrom(
-                    a => a.IsDeleted ? "0" : IdHasher.EncodeAccountId(a.Id)))
+                    a => IdHasher.EncodeAccountId(a.Id)))
             .ForMember(dto => dto.Pictures,
                 opt => opt.MapFrom(
                     acc => acc.Pictures.Where(p => !p.IsDeleted)))
             .ForMember(dto => dto.RoleId,
                 opt => opt.MapFrom(
                     acc => acc.Role.Id));
+
+        CreateMap<Account, AccountPreviewDto>()
+            .ForMember(dto => dto.Id,
+                opt => opt.MapFrom(
+                    a => IdHasher.EncodeAccountId(a.Id)));
+
 
         CreateMap<AccountDto, Account>()
             .ForMember(acc => acc.Id,
@@ -36,5 +42,6 @@ public class AccountMappingProfile: Profile
                 acc => acc.AccountCreated,
                 opt => opt.MapFrom(
                     c => DateTime.Now));
+
     }
 }

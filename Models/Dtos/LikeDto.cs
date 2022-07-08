@@ -3,8 +3,7 @@
 public class LikeDto
 {
     public int Id { get; set; }
-    public string AccountNickname { get; set; }
-    public string AccountId { get; set; }
     public string PictureId { get; set; }
     public bool IsLike { get; set; }
+    public AccountPreviewDto AccountPreview { get; set; }
 }
