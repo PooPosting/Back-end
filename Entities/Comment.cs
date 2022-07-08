@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using PicturesAPI.Entities.Interfaces;
 
 namespace PicturesAPI.Entities;
 
-public class Comment : IModifiable
+public class Comment
 {
     public int Id { get; set; }
     public string Text { get; set; }

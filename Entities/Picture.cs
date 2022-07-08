@@ -1,9 +1,8 @@
-﻿using PicturesAPI.Entities.Interfaces;
-using PicturesAPI.Entities.Joins;
+﻿using PicturesAPI.Entities.Joins;
 
 namespace PicturesAPI.Entities;
 
-public class Picture : IModifiable
+public class Picture
 {
     public int Id { get; set; }
     public string Name { get; set; }

@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using PicturesAPI.Entities;
 using PicturesAPI.Entities.Joins;
 using PicturesAPI.Repos.Interfaces;
-using PicturesAPI.Services.Helpers;
 
 namespace PicturesAPI.Repos;
 
@@ -59,6 +58,7 @@ public class PictureRepo : IPictureRepo
                 Name = p.Name,
                 Description = p.Description,
                 PictureAdded = p.PictureAdded,
+                AccountId = p.AccountId,
                 Account = new Account()
                 {
                     Id = p.Account.Id,
@@ -75,9 +75,11 @@ public class PictureRepo : IPictureRepo
                         AccountLikedTags = t.Tag.AccountLikedTags.Select(at => new AccountLikedTag()
                         {
                             Id = at.Id,
+                            AccountId = at.AccountId,
                             Account = new Account()
                             {
-                                Id = at.Account.Id
+                                Id = at.Account.Id,
+                                ProfilePicUrl = at.Account.ProfilePicUrl
                             },
                         }).AsEnumerable()
                     },
@@ -85,10 +87,12 @@ public class PictureRepo : IPictureRepo
                 Likes = p.Likes.Select(l => new Like()
                 {
                     Id = l.Id,
+                    AccountId = l.AccountId,
                     Account = new Account()
                     {
                         Id = l.Account.Id,
                         Nickname = l.Account.Nickname,
+                        ProfilePicUrl = l.Account.ProfilePicUrl
                     },
                     Picture = new Picture()
                     {
@@ -100,10 +104,12 @@ public class PictureRepo : IPictureRepo
                 {
                     Id = c.Id,
                     CommentAdded = c.CommentAdded,
+                    AccountId = c.AccountId,
                     Account = new Account()
                     {
                         Id = c.Account.Id,
                         Nickname = c.Account.Nickname,
+                        ProfilePicUrl = c.Account.ProfilePicUrl
                     },
                     Picture = new Picture()
                     {
@@ -131,6 +137,7 @@ public class PictureRepo : IPictureRepo
                 Description = p.Description,
                 PictureAdded = p.PictureAdded,
                 PopularityScore = p.PopularityScore,
+                AccountId = p.AccountId,
                 Account = new Account()
                 {
                     Id = p.Account.Id,
@@ -147,9 +154,11 @@ public class PictureRepo : IPictureRepo
                         AccountLikedTags = t.Tag.AccountLikedTags.Select(at => new AccountLikedTag()
                         {
                             Id = at.Id,
+                            AccountId = at.AccountId,
                             Account = new Account()
                             {
-                                Id = at.Account.Id
+                                Id = at.Account.Id,
+                                ProfilePicUrl = at.Account.ProfilePicUrl
                             },
                         }).AsEnumerable()
                     },
@@ -157,10 +166,12 @@ public class PictureRepo : IPictureRepo
                 Likes = p.Likes.Select(l => new Like()
                 {
                     Id = l.Id,
+                    AccountId = l.AccountId,
                     Account = new Account()
                     {
                         Id = l.Account.Id,
                         Nickname = l.Account.Nickname,
+                        ProfilePicUrl = l.Account.ProfilePicUrl
                     },
                     Picture = new Picture()
                     {
@@ -172,10 +183,12 @@ public class PictureRepo : IPictureRepo
                 {
                     Id = c.Id,
                     CommentAdded = c.CommentAdded,
+                    AccountId = c.AccountId,
                     Account = new Account()
                     {
                         Id = c.Account.Id,
                         Nickname = c.Account.Nickname,
+                        ProfilePicUrl = c.Account.ProfilePicUrl
                     },
                     Picture = new Picture()
                     {

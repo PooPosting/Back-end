@@ -13,7 +13,7 @@ public class AccountDto
     public bool IsModifiable { get; set; } = false;
     public bool IsAdminModifiable { get; set; } = false;
 
-    public IEnumerable<PictureDto> Pictures { get; set; }
+    public IEnumerable<PicturePreviewDto> PicturePreviews { get; set; }
     public IEnumerable<CommentDto> Comments { get; set; }
     
     public int RoleId { get; set; }

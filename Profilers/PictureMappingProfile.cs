@@ -11,6 +11,8 @@ public class PictureMappingProfile : Profile
     public PictureMappingProfile()
     {
         CreateMap<Picture, PictureDto>()
+            .ForMember(dto => dto.LikeState,
+                opt => opt.MapFrom<LikeStateResolver>())
             .ForMember(dto => dto.AccountPreview,
                 opt => opt.MapFrom(
                     p => p.Account))
@@ -35,6 +37,13 @@ public class PictureMappingProfile : Profile
             .ForMember(dto => dto.CommentCount,
                 opt => opt.MapFrom(
                     p => p.Comments.Count()));
+
+        CreateMap<Picture, PicturePreviewDto>()
+            .ForMember(dto => dto.Id,
+                opt => opt.MapFrom(
+                    p => IdHasher.EncodePictureId(p.Id)))
+            .ForMember(dto => dto.Url,
+                opt => opt.MapFrom<UrlResolver>());
 
         CreateMap<PictureDto, Picture>()
             .ForMember(p => p.Id,

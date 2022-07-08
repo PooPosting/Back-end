@@ -24,13 +24,13 @@ public class AccountMappingProfile: Profile
                     a => a.IsDeleted ? string.Empty : a.Email))
             .ForMember(dto => dto.Nickname,
                 opt => opt.MapFrom(
-                    a => a.IsDeleted ? "Unknown" : a.Nickname))
+                    a => a.Nickname))
             .ForMember(dto => dto.Id,
                 opt => opt.MapFrom(
                     a => IdHasher.EncodeAccountId(a.Id)))
-            .ForMember(dto => dto.Pictures,
+            .ForMember(dto => dto.PicturePreviews,
                 opt => opt.MapFrom(
-                    acc => acc.Pictures.Where(p => !p.IsDeleted)))
+                    acc => acc.Pictures))
             .ForMember(dto => dto.RoleId,
                 opt => opt.MapFrom(
                     acc => acc.Role.Id));
