@@ -18,9 +18,9 @@ public class Account
     public int RoleId { get; set; }
 
     public Role Role { get; set; }
-    [AllowNull] public virtual IEnumerable<Picture> Pictures { get; set; }
-    [AllowNull] public virtual IEnumerable<Like> Likes { get; set; }
-    [AllowNull] public virtual IEnumerable<Comment> Comments { get; set; }
-    [AllowNull] public virtual IEnumerable<PictureSeenByAccount> PicturesSeen { get; set; }
-    [AllowNull] public virtual IEnumerable<AccountLikedTag> LikedTags { get; set; }
+    [AllowNull] public virtual ICollection<Picture> Pictures { get; set; }
+    [AllowNull] public virtual ICollection<Like> Likes { get; set; }
+    [AllowNull] public virtual ICollection<Comment> Comments { get; set; }
+    [AllowNull] public virtual ICollection<PictureSeenByAccount> PicturesSeen { get; set; }
+    [AllowNull] public virtual ICollection<AccountLikedTag> LikedTags { get; set; }
 }

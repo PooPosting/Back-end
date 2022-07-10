@@ -7,8 +7,8 @@ public class AccountDto
     public string Email { get; set; }
 
     public string ProfilePicUrl { get; set; }
-
     public string BackgroundPicUrl { get; set; }
+    public string AccountDescription { get; set; }
 
     public bool IsModifiable { get; set; } = false;
     public bool IsAdminModifiable { get; set; } = false;

@@ -33,10 +33,12 @@ public class CommentRepo : ICommentRepo
                 Id = c.Id,
                 Text = c.Text,
                 CommentAdded = c.CommentAdded,
+                AccountId = c.AccountId,
                 Account = new Account()
                 {
                     Id = c.Account.Id,
-                    Nickname = c.Account.Nickname
+                    Nickname = c.Account.Nickname,
+                    ProfilePicUrl = c.Account.ProfilePicUrl
                 },
                 Picture = new Picture()
                 {

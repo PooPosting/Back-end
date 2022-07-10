@@ -216,17 +216,18 @@ public class PictureService : IPictureService
 
         if (dto.Description is not null) picture.Description = dto.Description;
         if (dto.Name is not null) picture.Name = dto.Name;
-        if (dto.Tags is not null && dto.Tags.Count > 0)
+        if (dto.Tags is not null)
         {
-            foreach (var join in picture.PictureTags)
-            {
-                await _tagRepo.TryDeletePictureTagJoinAsync(join.Picture, join.Tag);
-            }
-            foreach (var tag in dto.Tags)
-            {
-                var insertedTag = await _tagRepo.InsertAsync(new Tag() { Value = tag });
-                await _tagRepo.TryInsertPictureTagJoinAsync(picture, insertedTag);
-            }
+            await _tagRepo.TryUpdatePictureTagsAsync(picture, dto.Tags);
+            // foreach (var join in picture.PictureTags)
+            // {
+            //     await _tagRepo.TryDeletePictureTagJoinAsync(join.Picture, join.Tag);
+            // }
+            // foreach (var tag in dto.Tags)
+            // {
+            //     var insertedTag = await _tagRepo.InsertAsync(new Tag() { Value = tag });
+            //     await _tagRepo.TryInsertPictureTagJoinAsync(picture, insertedTag);
+            // }
         }
 
         await _pictureRepo.UpdateAsync(picture);

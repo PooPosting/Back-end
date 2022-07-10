@@ -35,14 +35,12 @@ public class PictureRepo : IPictureRepo
             .ThenInclude(l => l.Account)
             .Include(p => p.Comments)
             .ThenInclude(c => c.Account)
-            .AsNoTracking()
             .SingleOrDefaultAsync(p => p.Id == id);
     }
-
     public async Task<IEnumerable<Picture>> GetNotSeenByAccountIdAsync(int accountId, int itemsToTake)
     {
         return await _dbContext.Pictures
-            .AsNoTracking()
+
             .OrderByDescending(p => (p.PictureTags
                 .Select(t => t.Tag)
                 .SelectMany(t => t.AccountLikedTags)
@@ -51,73 +49,14 @@ public class PictureRepo : IPictureRepo
             .Where(p => !_dbContext.PicturesSeenByAccounts
                 .Where(j => j.Account.Id == accountId)
                 .Any(j => j.Picture.Id == p.Id && j.Account.Id == accountId))
-            .Select(p => new Picture()
-            {
-                Id = p.Id,
-                Url = p.Url,
-                Name = p.Name,
-                Description = p.Description,
-                PictureAdded = p.PictureAdded,
-                AccountId = p.AccountId,
-                Account = new Account()
-                {
-                    Id = p.Account.Id,
-                    Nickname = p.Account.Nickname,
-                    ProfilePicUrl = p.Account.ProfilePicUrl
-                },
-                PictureTags = p.PictureTags.Select(t => new PictureTag()
-                {
-                    Id = t.Id,
-                    Tag = new Tag()
-                    {
-                        Id = t.Tag.Id,
-                        Value = t.Tag.Value,
-                        AccountLikedTags = t.Tag.AccountLikedTags.Select(at => new AccountLikedTag()
-                        {
-                            Id = at.Id,
-                            AccountId = at.AccountId,
-                            Account = new Account()
-                            {
-                                Id = at.Account.Id,
-                                ProfilePicUrl = at.Account.ProfilePicUrl
-                            },
-                        }).AsEnumerable()
-                    },
-                }).AsEnumerable(),
-                Likes = p.Likes.Select(l => new Like()
-                {
-                    Id = l.Id,
-                    AccountId = l.AccountId,
-                    Account = new Account()
-                    {
-                        Id = l.Account.Id,
-                        Nickname = l.Account.Nickname,
-                        ProfilePicUrl = l.Account.ProfilePicUrl
-                    },
-                    Picture = new Picture()
-                    {
-                        Id = l.Picture.Id
-                    },
-                    IsLike = l.IsLike
-                }).AsEnumerable(),
-                Comments = p.Comments.Select(c => new Comment()
-                {
-                    Id = c.Id,
-                    CommentAdded = c.CommentAdded,
-                    AccountId = c.AccountId,
-                    Account = new Account()
-                    {
-                        Id = c.Account.Id,
-                        Nickname = c.Account.Nickname,
-                        ProfilePicUrl = c.Account.ProfilePicUrl
-                    },
-                    Picture = new Picture()
-                    {
-                        Id = c.Picture.Id
-                    },
-                    Text = c.Text
-                }).AsEnumerable()
-            })
+
+            .Include(p => p.Account)
+            .Include(p => p.PictureTags)
+            .ThenInclude(j => j.Tag)
+            .Include(p => p.Likes)
+            .ThenInclude(l => l.Account)
+            .AsNoTracking()
+
             .Take(itemsToTake)
             .ToListAsync();
     }
@@ -128,75 +67,13 @@ public class PictureRepo : IPictureRepo
         Expression<Func<Picture, bool>>? filterExp)
     {
         var query = _dbContext.Pictures
+            .Include(p => p.Account)
+            .Include(p => p.PictureTags)
+            .ThenInclude(j => j.Tag)
+            .Include(p => p.Likes)
+            .ThenInclude(l => l.Account)
             .AsNoTracking()
-            .Select(p => new Picture()
-            {
-                Id = p.Id,
-                Url = p.Url,
-                Name = p.Name,
-                Description = p.Description,
-                PictureAdded = p.PictureAdded,
-                PopularityScore = p.PopularityScore,
-                AccountId = p.AccountId,
-                Account = new Account()
-                {
-                    Id = p.Account.Id,
-                    Nickname = p.Account.Nickname,
-                    ProfilePicUrl = p.Account.ProfilePicUrl
-                },
-                PictureTags = p.PictureTags.Select(t => new PictureTag()
-                {
-                    Id = t.Id,
-                    Tag = new Tag()
-                    {
-                        Id = t.Tag.Id,
-                        Value = t.Tag.Value,
-                        AccountLikedTags = t.Tag.AccountLikedTags.Select(at => new AccountLikedTag()
-                        {
-                            Id = at.Id,
-                            AccountId = at.AccountId,
-                            Account = new Account()
-                            {
-                                Id = at.Account.Id,
-                                ProfilePicUrl = at.Account.ProfilePicUrl
-                            },
-                        }).AsEnumerable()
-                    },
-                }).AsEnumerable(),
-                Likes = p.Likes.Select(l => new Like()
-                {
-                    Id = l.Id,
-                    AccountId = l.AccountId,
-                    Account = new Account()
-                    {
-                        Id = l.Account.Id,
-                        Nickname = l.Account.Nickname,
-                        ProfilePicUrl = l.Account.ProfilePicUrl
-                    },
-                    Picture = new Picture()
-                    {
-                        Id = l.Picture.Id
-                    },
-                    IsLike = l.IsLike
-                }).AsEnumerable(),
-                Comments = p.Comments.Select(c => new Comment()
-                {
-                    Id = c.Id,
-                    CommentAdded = c.CommentAdded,
-                    AccountId = c.AccountId,
-                    Account = new Account()
-                    {
-                        Id = c.Account.Id,
-                        Nickname = c.Account.Nickname,
-                        ProfilePicUrl = c.Account.ProfilePicUrl
-                    },
-                    Picture = new Picture()
-                    {
-                        Id = c.Picture.Id
-                    },
-                    Text = c.Text
-                }).AsEnumerable()
-            });
+            .AsQueryable();
 
         if (orderExp is not null)
         {

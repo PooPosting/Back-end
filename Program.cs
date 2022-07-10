@@ -110,7 +110,6 @@ builder.Services.AddScoped<IPopularService, PopularService>();
 builder.Services.AddScoped<IUserAccountService, UserAccountService>();
 builder.Services.AddScoped<ILogsService, LogsService>();
 builder.Services.AddScoped<IRestrictedIpsService, RestrictedIpsService>();
-// builder.Services.AddScoped<IModifyAllower, ModifyAllower>();
 
 // Repos
 builder.Services.AddScoped<IAccountRepo, AccountRepo>();

@@ -13,6 +13,6 @@ public class Comment
     public int AccountId { get; set; }
 
     // navigation props
-    [Required] public Account Account { get; set; }
-    [Required] public Picture Picture { get; set; }
+    public Account Account { get; set; }
+    public Picture Picture { get; set; }
 }

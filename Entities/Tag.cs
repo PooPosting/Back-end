@@ -6,8 +6,7 @@ namespace PicturesAPI.Entities;
 public class Tag
 {
     public int Id { get; set; }
-    [MaxLength(25)]
     public string Value { get; set; }
-    public IEnumerable<PictureTag> PictureTags { get; set; }
-    public IEnumerable<AccountLikedTag> AccountLikedTags { get; set; }
+    public ICollection<PictureTag> PictureTags { get; set; }
+    public ICollection<AccountLikedTag> AccountLikedTags { get; set; }
 }

@@ -77,11 +77,10 @@ public class LikeRepo : ILikeRepo
                 PictureId = pictureId,
                 IsLike = true,
             });
-            picture.PopularityScore = PictureScoreCalculator.CalcPoints(picture);
-            account.LikedTags = accLikedTags;
             picture.Likes = picLikes;
+            account.LikedTags = accLikedTags;
+            picture.PopularityScore = PictureScoreCalculator.CalcPoints(picture);
             await _dbContext.SaveChangesAsync();
-            return picture;
         }
         else
         {
@@ -104,12 +103,12 @@ public class LikeRepo : ILikeRepo
                         AccountId = accountId, TagId = pictureTag.TagId
                     }));
             }
-            picture.PopularityScore = PictureScoreCalculator.CalcPoints(picture);
-            account.LikedTags = accLikedTags;
-            picture.Likes = picLikes;
-            await _dbContext.SaveChangesAsync();
-            return picture;
         }
+        picture.Likes = picLikes;
+        account.LikedTags = accLikedTags;
+        picture.PopularityScore = PictureScoreCalculator.CalcPoints(picture);
+        await _dbContext.SaveChangesAsync();
+        return picture;
     }
 
     public async Task<Picture> DislikeAsync(int pictureId, int accountId)
@@ -139,9 +138,9 @@ public class LikeRepo : ILikeRepo
                 PictureId = pictureId,
                 IsLike = false,
             });
-            picture.PopularityScore = PictureScoreCalculator.CalcPoints(picture);
-            account.LikedTags = accLikedTags;
             picture.Likes = picLikes;
+            account.LikedTags = accLikedTags;
+            picture.PopularityScore = PictureScoreCalculator.CalcPoints(picture);
             await _dbContext.SaveChangesAsync();
             return picture;
         }
@@ -161,9 +160,9 @@ public class LikeRepo : ILikeRepo
             {
                 picLikes.Remove(like);
             }
-            picture.PopularityScore = PictureScoreCalculator.CalcPoints(picture);
-            account.LikedTags = accLikedTags;
             picture.Likes = picLikes;
+            account.LikedTags = accLikedTags;
+            picture.PopularityScore = PictureScoreCalculator.CalcPoints(picture);
             await _dbContext.SaveChangesAsync();
             return picture;
         }

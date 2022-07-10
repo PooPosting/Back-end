@@ -15,8 +15,8 @@ public class Picture
     // navigation props
     public int AccountId { get; set; }
     public virtual Account Account { get; set; }
-    public virtual IEnumerable<Like> Likes { get; set; }
-    public virtual IEnumerable<Comment> Comments { get; set; }
-    public IEnumerable<PictureTag> PictureTags { get; set; }
-    public IEnumerable<PictureSeenByAccount> SeenByAccount { get; set; }
+    public virtual ICollection<Like> Likes { get; set; }
+    public virtual ICollection<Comment> Comments { get; set; }
+    public virtual ICollection<PictureTag> PictureTags { get; set; }
+    public virtual ICollection<PictureSeenByAccount> SeenByAccount { get; set; }
 }

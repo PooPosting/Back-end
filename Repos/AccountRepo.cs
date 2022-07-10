@@ -27,35 +27,11 @@ public class AccountRepo : IAccountRepo
     public async Task<Account?> GetByIdAsync(int id)
     {
         return await _dbContext.Accounts
-            .AsNoTracking()
-            .Select(a => new Account()
-            {
-                Id = a.Id,
-                Nickname = a.Nickname,
-                Email = a.Email,
-                Verified = a.Verified,
-                ProfilePicUrl = a.ProfilePicUrl,
-                BackgroundPicUrl = a.BackgroundPicUrl,
-                AccountDescription = a.AccountDescription,
-                AccountCreated = a.AccountCreated,
-                Role = a.Role,
-                Pictures = a.Pictures.Select(p => new Picture()
-                {
-                    Id = p.Id,
-                    AccountId = p.AccountId,
-                    Name = p.Name,
-                    Url = p.Url,
-                    PictureAdded = p.PictureAdded,
-                    Comments = p.Comments.Select(c => new Comment()
-                    {
-                        Id = c.Id
-                    }),
-                    Likes = p.Likes.Select(l => new Like()
-                    {
-                        Id = l.Id,
-                    }).AsEnumerable(),
-                }).OrderByDescending(p => p.PictureAdded).AsEnumerable(),
-            })
+            .Include(a => a.Pictures)
+            .ThenInclude(p => p.Comments)
+            .Include(a => a.Pictures)
+            .ThenInclude(p => p.Likes)
+            .Include(a => a.Role)
             .SingleOrDefaultAsync(a => a.Id == id);
     }
 
@@ -130,12 +106,8 @@ public class AccountRepo : IAccountRepo
     public async Task<bool> TryDeleteByIdAsync(int id)
     {
         var account = _dbContext.Accounts.SingleOrDefault(a => a.Id == id);
-        if (account is not null)
-        {
-            account!.IsDeleted = true;
-            return await _dbContext.SaveChangesAsync() > 0;
-        }
-        return false;
+        account!.IsDeleted = true;
+        return await _dbContext.SaveChangesAsync() > 0;
     }
 
     public async Task<bool> MarkAsSeenAsync(int accountId, int pictureId)
