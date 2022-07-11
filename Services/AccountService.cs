@@ -117,6 +117,7 @@ public class AccountService : IAccountService
                 await stream.DisposeAsync();
             }
 
+            if (dto.Description is not null) account.AccountDescription = dto.Description;
             if (dto.Email is not null) account.Email = dto.Email;
             if (dto.Password is not null)
             {
@@ -124,6 +125,8 @@ public class AccountService : IAccountService
                     throw new BadRequestException("passwords are not the same");
                 account.PasswordHash = _passwordHasher.HashPassword(account, dto.Password);
             }
+
+            Console.WriteLine(account.AccountDescription);
 
             account = await _accountRepo.UpdateAsync(account);
 

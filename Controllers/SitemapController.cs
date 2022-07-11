@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Text;
+using Microsoft.AspNetCore.Mvc;
 using PicturesAPI.Factories.Interfaces;
 
 namespace PicturesAPI.Controllers;
@@ -21,6 +22,6 @@ public class SitemapController : ControllerBase
     public async Task<IActionResult> Get()
     {
         var sitemap = await _sitemapFactory.GenerateSitemap();
-        return File(sitemap.ToXml(), "application/xml");
+        return File(Encoding.UTF8.GetBytes(sitemap.ToXml()), "application/xml");
     }
 }

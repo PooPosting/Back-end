@@ -157,7 +157,7 @@ app.UseFileServer(new FileServerOptions
 {
     FileProvider = new PhysicalFileProvider(
         Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
-    RequestPath = "/wwwroot",
+    RequestPath = "/api/wwwroot",
     EnableDefaultFiles = true
 });
 
@@ -181,7 +181,7 @@ app.UseHttpsRedirection();
 app.UseSwagger();
 
 app.UseSwaggerUI(c =>
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "PicturesAPI v2.0.0"));
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "PicturesAPI v3.2.0"));
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
