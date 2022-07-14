@@ -13,7 +13,6 @@ public interface IPictureService
     Task<IEnumerable<AccountDto>> GetPicLikers(int id);
     Task<PictureDto> GetById(int id);
     Task<string> Create(IFormFile file, CreatePictureDto dto);
-    Task<SafeSearchAnnotation> Classify(IFormFile file);
     Task<PictureDto> Update(int id, UpdatePictureDto dto);
     Task<bool> Delete(int id);
 }

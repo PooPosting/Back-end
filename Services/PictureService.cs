@@ -154,6 +154,24 @@ public class PictureService : IPictureService
     {
         var validationResult = await StaticValidator.Validate(dto);
         if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
+
+        using var ms = new MemoryStream();
+        await file.CopyToAsync(ms);
+        var fileBytes = ms.ToArray();
+        var result = await NsfwClassifier.ClassifyAsync(fileBytes, CancellationToken.None);
+
+        var errors = new List<string>();
+
+        if (result.Adult > Likelihood.Possible) errors.Add("Adult");
+        if (result.Racy > Likelihood.Likely) errors.Add("Racy");
+        if (result.Medical > Likelihood.Likely) errors.Add("Medical");
+        if (result.Violence > Likelihood.Likely) errors.Add("Violence");
+
+        if (errors.Any())
+        {
+            throw new BadRequestException($"inappropriate picture: [{string.Join(", ", errors)}]");
+        }
+
         var accountId = _accountContextService.GetAccountId();
         var picture = _mapper.Map<Picture>(dto);
 
@@ -195,15 +213,6 @@ public class PictureService : IPictureService
         }
     }
 
-    public async Task<SafeSearchAnnotation> Classify(IFormFile file)
-    {
-        if (file is null) throw new BadRequestException("Invalid file");
-        using var ms = new MemoryStream();
-        await file.CopyToAsync(ms);
-        var fileBytes = ms.ToArray();
-        return await NsfwClassifier.ClassifyAsync(fileBytes, CancellationToken.None);
-    }
-
     public async Task<PictureDto> Update(int id, UpdatePictureDto dto)
     {
         var validationResult = await StaticValidator.Validate(dto);
@@ -219,15 +228,6 @@ public class PictureService : IPictureService
         if (dto.Tags is not null)
         {
             await _tagRepo.TryUpdatePictureTagsAsync(picture, dto.Tags);
-            // foreach (var join in picture.PictureTags)
-            // {
-            //     await _tagRepo.TryDeletePictureTagJoinAsync(join.Picture, join.Tag);
-            // }
-            // foreach (var tag in dto.Tags)
-            // {
-            //     var insertedTag = await _tagRepo.InsertAsync(new Tag() { Value = tag });
-            //     await _tagRepo.TryInsertPictureTagJoinAsync(picture, insertedTag);
-            // }
         }
 
         await _pictureRepo.UpdateAsync(picture);
@@ -238,16 +238,14 @@ public class PictureService : IPictureService
     public async Task<bool> Delete(int id)
     {
         var picture = await _pictureRepo.GetByIdAsync(id) ?? throw new NotFoundException();
-        _logger.LogWarning($"Picture with id: {id} DELETE action invoked");
+        _logger.LogWarning($"Picture with id: {id} DELETE (hide) action invoked");
 
         await AuthorizePictureOperation(picture, ResourceOperation.Delete ,"you have no rights to delete this picture");
 
         try
         {
             await _pictureRepo.DeleteByIdAsync(picture.Id);
-            var fullPath = Path.Combine(Directory.GetCurrentDirectory(), picture.Url);
-            File.Delete(fullPath);
-            _logger.LogWarning($"Picture with id: {id} DELETE action success");
+            _logger.LogWarning($"Picture with id: {id} DELETE (hide) action success");
             return true;
         }
         catch (Exception)

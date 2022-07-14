@@ -7,8 +7,7 @@ public class CommentConfiguration: IEntityTypeConfiguration<Comment>
 {
     public void Configure(EntityTypeBuilder<Comment> builder)
     {
-        builder.HasQueryFilter(c => !c.IsDeleted);
-        builder.HasQueryFilter(c => !c.Account.IsDeleted);
+        builder.HasQueryFilter(c => !c.IsDeleted && !c.Account.IsDeleted);
         builder.HasKey(c => c.Id);
 
         builder

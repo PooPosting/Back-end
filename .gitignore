@@ -1,8 +1,10 @@
-
 appsettings.json
 appsettings.Development.json
-Logs/internal-nlog.txt
+Logs/
 *.txt
 appsettings.Development.json
 authKey.json
-Logs/internal-nlog.txt
+bin/
+obj/
+wwwroot/
+.idea/

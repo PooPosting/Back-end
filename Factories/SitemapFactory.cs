@@ -30,7 +30,9 @@ public class SitemapFactory : ISitemapFactory
         {
             sitemap.Add(CreateUrl(site.Replace("#origin#", _sitemapSettings.Origin)));
         }
-        foreach (var picture in await _dbContext.Pictures.ToListAsync())
+        foreach (var picture in await _dbContext.Pictures
+                     .OrderByDescending(p => p.PictureAdded)
+                     .ToListAsync())
         {
             sitemap.Add(CreateUrl(
                 _sitemapSettings.PictureRoute
@@ -39,7 +41,9 @@ public class SitemapFactory : ISitemapFactory
                 picture.PictureAdded)
             );
         }
-        foreach (var account in await _dbContext.Accounts.ToListAsync())
+        foreach (var account in await _dbContext.Accounts
+                     .OrderByDescending(a => a.AccountCreated)
+                     .ToListAsync())
         {
             sitemap.Add(CreateUrl(
                 _sitemapSettings.AccountRoute

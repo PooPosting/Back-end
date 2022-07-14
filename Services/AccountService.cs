@@ -1,5 +1,7 @@
-﻿using AutoMapper;
+﻿using System.Globalization;
+using AutoMapper;
 using FluentValidation;
+using Google.Cloud.Vision.V1;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using PicturesAPI.Authorization;
@@ -90,10 +92,10 @@ public class AccountService : IAccountService
         var rootPath = Directory.GetCurrentDirectory();
         var account = await _accountContextService.GetAccountAsync();
 
-        var bgName = $"{IdHasher.EncodeAccountId(account.Id)}-bgp.webp";
+        var bgName = $"{IdHasher.EncodeAccountId(account.Id)}-{DateTime.Now.ToFileTimeUtc()}-bgp.webp";
         var fullBgPath = Path.Combine(rootPath, "wwwroot", "accounts", "background_pictures", $"{bgName}");
 
-        var picName = $"{IdHasher.EncodeAccountId(account.Id)}-pfp.webp";
+        var picName = $"{IdHasher.EncodeAccountId(account.Id)}-{DateTime.Now.ToFileTimeUtc()}-pfp.webp";
         var fullPicPath = Path.Combine(rootPath, "wwwroot", "accounts", "profile_pictures", $"{picName}");
 
         try
@@ -103,6 +105,23 @@ public class AccountService : IAccountService
                 if (dto.BackgroundPic is not { Length: > 0 }) throw new BadRequestException("invalid picture");
                 account.BackgroundPicUrl = Path.Combine("wwwroot", "accounts", "background_pictures", $"{bgName}");
 
+                using var ms = new MemoryStream();
+                await dto.BackgroundPic.CopyToAsync(ms);
+                var fileBytes = ms.ToArray();
+                var result = await NsfwClassifier.ClassifyAsync(fileBytes, CancellationToken.None);
+
+                var errors = new List<string>();
+
+                if (result.Adult > Likelihood.Possible) errors.Add("Adult");
+                if (result.Racy > Likelihood.Likely) errors.Add("Racy");
+                if (result.Medical > Likelihood.Likely) errors.Add("Medical");
+                if (result.Violence > Likelihood.Likely) errors.Add("Violence");
+
+                if (errors.Any())
+                {
+                    throw new BadRequestException($"inappropriate picture: [{string.Join(", ", errors)}]");
+                }
+
                 await using var stream = new FileStream(fullBgPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
                 await dto.BackgroundPic.CopyToAsync(stream);
                 await stream.DisposeAsync();
@@ -111,6 +130,23 @@ public class AccountService : IAccountService
             {
                 if (dto.ProfilePic is not { Length: > 0 }) throw new BadRequestException("invalid picture");
                 account.ProfilePicUrl = Path.Combine("wwwroot", "accounts", "profile_pictures", $"{picName}");
+
+                using var ms = new MemoryStream();
+                await dto.ProfilePic.CopyToAsync(ms);
+                var fileBytes = ms.ToArray();
+                var result = await NsfwClassifier.ClassifyAsync(fileBytes, CancellationToken.None);
+
+                var errors = new List<string>();
+
+                if (result.Adult > Likelihood.Possible) errors.Add("Adult");
+                if (result.Racy > Likelihood.Likely) errors.Add("Racy");
+                if (result.Medical > Likelihood.Likely) errors.Add("Medical");
+                if (result.Violence > Likelihood.Likely) errors.Add("Violence");
+
+                if (errors.Any())
+                {
+                    throw new BadRequestException($"inappropriate picture: [{string.Join(", ", errors)}]");
+                }
 
                 await using var stream = new FileStream(fullPicPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
                 await dto.ProfilePic.CopyToAsync(stream);
@@ -125,8 +161,6 @@ public class AccountService : IAccountService
                     throw new BadRequestException("passwords are not the same");
                 account.PasswordHash = _passwordHasher.HashPassword(account, dto.Password);
             }
-
-            Console.WriteLine(account.AccountDescription);
 
             account = await _accountRepo.UpdateAsync(account);
 
