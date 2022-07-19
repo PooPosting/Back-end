@@ -13,12 +13,13 @@ namespace PicturesAPI.Controllers;
 [Route("api/comment")]
 public class CommentController: ControllerBase
 {
-    private readonly IPictureCommentService _pictureCommentService;
+    private readonly ICommentService _commentService;
 
     public CommentController(
-        IPictureCommentService pictureCommentService)
+        ICommentService commentService
+        )
     {
-        _pictureCommentService = pictureCommentService;
+        _commentService = commentService;
     }
 
     [HttpPatch]
@@ -28,7 +29,7 @@ public class CommentController: ControllerBase
         [FromBody] PostPutCommentDto text
         )
     {
-        var result = await _pictureCommentService.Update(IdHasher.DecodeCommentId(commId), text.Text);
+        var result = await _commentService.Update(IdHasher.DecodeCommentId(commId), text.Text);
         return Ok(result);
     }
     
@@ -38,7 +39,7 @@ public class CommentController: ControllerBase
         [FromRoute] string commId
         )
     {
-        await _pictureCommentService.Delete(IdHasher.DecodeCommentId(commId));
+        await _commentService.Delete(IdHasher.DecodeCommentId(commId));
         return NoContent();
     }
 }

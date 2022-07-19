@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using PicturesAPI.Exceptions;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Models.Dtos.Picture;
 using PicturesAPI.Models.Queries;
@@ -70,13 +71,14 @@ public class PictureController : ControllerBase
     }
 
     [HttpPost]
-    [Route("create")]
+    [Route("post")]
     public async Task<IActionResult> PostPicture(
+        // can i somehow pass whole objects like that?
         [FromForm] IFormFile file,
         [FromForm] string name,
         [FromForm] string? description,
         [FromForm] string? tags
-        ) // can i somehow pass whole objects like that?
+        )
     {
         var dto = new CreatePictureDto()
         {
@@ -85,6 +87,35 @@ public class PictureController : ControllerBase
             File = file,
             Tags = tags?.Split(' ').ToList()
         };
+
+        // TEMPORARY
+
+        if (dto.Name.Length > 40 || dto.Name.Length < 4)
+        {
+            throw new BadRequestException("Picture name should be between 4 and 40 characters");
+        }
+
+        if (dto.Description is not null)
+        {
+            if (dto.Description.Length > 500)
+            {
+                throw new BadRequestException("Description should be shorter than 500 characters");
+            }
+        }
+
+        if (dto.File.Length > 4000000)
+        {
+            throw new BadRequestException("File should be smaller than 4mb");
+        }
+
+        if (tags is not null)
+        {
+            if (tags.Split(' ').Length > 4 || !tags.Split(' ').Any(t => t.Length > 25))
+            {
+                throw new BadRequestException("Maximum tag count is 4 and every tag should be shorter than 25 characters");
+            }
+        }
+
         var pictureId = await _pictureService.Create(dto);
         return Created($"api/picture/{pictureId}", null);
     }

@@ -71,6 +71,7 @@ public class AccountService : IAccountService
         var result = new PagedResult<AccountDto>(
             accountDtos,
             query.PageNumber,
+            query.PageSize,
             await _accountRepo.CountAccountsAsync(
                 a => string.IsNullOrEmpty(query.SearchPhrase) || a.Nickname.ToLower().Contains(query.SearchPhrase.ToLower())
                 )

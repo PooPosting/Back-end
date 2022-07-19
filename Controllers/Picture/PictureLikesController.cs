@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PicturesAPI.Services.Helpers;
 using PicturesAPI.Services.Interfaces;
 
@@ -21,31 +22,32 @@ public class PictureLikesController: ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetPictureLikes([FromRoute] string picId)
+    public async Task<IActionResult> GetPictureLikes(
+        [FromRoute] string picId
+        )
     {
-        var likes = await _pictureService.GetPicLikes(IdHasher.DecodePictureId(picId));
-        return Ok(likes);
-    }
-
-    [HttpGet]
-    [Route("account")]
-    public async Task<IActionResult> GetPictureLikers([FromRoute] string picId)
-    {
-        var likes = await _pictureService.GetPicLikers(IdHasher.DecodePictureId(picId));
-        return Ok(likes);
+        // var likes = await _pictureService.GetPicLikes(IdHasher.DecodePictureId(picId));
+        // return Ok(likes);
+        throw new NotImplementedException(); // make the result paged
     }
 
     [HttpPatch]
-    [Route("voteup")]
-    public async Task<IActionResult> PatchPictureVoteUp([FromRoute] string picId)
+    [Authorize]
+    [Route("vote-up")]
+    public async Task<IActionResult> PatchPictureVoteUp(
+        [FromRoute] string picId
+        )
     {
         var result = await _pictureLikingService.Like(IdHasher.DecodePictureId(picId));
         return Ok(result);
     }
 
     [HttpPatch]
-    [Route("votedown")]
-    public async Task<IActionResult> PatchPictureVoteDown([FromRoute] string picId)
+    [Authorize]
+    [Route("vote-down")]
+    public async Task<IActionResult> PatchPictureVoteDown(
+        [FromRoute] string picId
+        )
     {
         var result = await _pictureLikingService.DisLike(IdHasher.DecodePictureId(picId));
         return Ok(result);

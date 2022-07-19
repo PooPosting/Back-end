@@ -27,7 +27,6 @@ public class PictureService : IPictureService
     private readonly IAccountContextService _accountContextService;
     private readonly IPictureRepo _pictureRepo;
     private readonly IAccountRepo _accountRepo;
-    private readonly ILikeRepo _likeRepo;
     private readonly ITagRepo _tagRepo;
 
     public PictureService(
@@ -36,9 +35,9 @@ public class PictureService : IPictureService
         IAccountContextService accountContextService,
         IPictureRepo pictureRepo,
         IAccountRepo accountRepo,
-        ILikeRepo likeRepo,
         ITagRepo tagRepo,
-        IMapper mapper)
+        IMapper mapper
+        )
     {
         _logger = logger;
         _mapper = mapper;
@@ -46,11 +45,12 @@ public class PictureService : IPictureService
         _accountContextService = accountContextService;
         _pictureRepo = pictureRepo;
         _accountRepo = accountRepo;
-        _likeRepo = likeRepo;
         _tagRepo = tagRepo;
     }
 
-    public async Task<IEnumerable<PictureDto>> GetPersonalizedPictures(PersonalizedQuery query)
+    public async Task<IEnumerable<PictureDto>> GetPersonalizedPictures(
+        PersonalizedQuery query
+        )
     {
         var accId = _accountContextService.GetAccountId();
         var pictures = await _pictureRepo.GetNotSeenByAccountIdAsync(accId, query.PageSize);
@@ -64,7 +64,9 @@ public class PictureService : IPictureService
         return pictureDtos;
     }
 
-    public async Task<PagedResult<PictureDto>> GetPictures(Query query)
+    public async Task<PagedResult<PictureDto>> GetPictures
+        (Query query
+        )
     {
         var pictures = await _pictureRepo.SearchAllAsync(
             query.PageSize * (query.PageNumber - 1),
@@ -76,10 +78,14 @@ public class PictureService : IPictureService
         return new PagedResult<PictureDto>(
             pictureDtos,
             query.PageNumber,
+            query.PageSize,
             await _pictureRepo.CountPicturesAsync()
         );
     }
-    public async Task<PagedResult<PicturePreviewDto>> GetLikedPictures(int accId, Query query)
+    public async Task<PagedResult<PicturePreviewDto>> GetLikedPictures(
+        int accId,
+        Query query
+        )
     {
         var pictures = await _pictureRepo.GetLikedPicturesByAccountIdAsync(
             accId,
@@ -92,12 +98,16 @@ public class PictureService : IPictureService
         var result = new PagedResult<PicturePreviewDto>(
             picPreviews,
             query.PageNumber,
+            query.PageSize,
             await _pictureRepo.CountPicturesAsync(p => p.AccountId == accId)
         );
 
         return result;
     }
-    public async Task<PagedResult<PicturePreviewDto>> GetPostedPictures(int accId, Query query)
+    public async Task<PagedResult<PicturePreviewDto>> GetPostedPictures(
+        int accId,
+        Query query
+        )
     {
         var pictures = await _pictureRepo.GetPostedPicturesByAccountIdAsync(
             accId,
@@ -110,13 +120,16 @@ public class PictureService : IPictureService
         var result = new PagedResult<PicturePreviewDto>(
             picPreviews,
             query.PageNumber,
+            query.PageSize,
             await _pictureRepo.CountPicturesAsync(p => p.AccountId == accId)
         );
 
         return result;
     }
 
-    public async Task<PagedResult<PictureDto>> SearchAll(CustomQuery query)
+    public async Task<PagedResult<PictureDto>> SearchAll(
+        CustomQuery query
+        )
     {
         IEnumerable<Picture> pictures;
 
@@ -161,30 +174,15 @@ public class PictureService : IPictureService
         var result = new PagedResult<PictureDto>(
             pictureDtos,
             query.PageNumber,
+            query.PageSize,
             await _pictureRepo.CountPicturesAsync(p => query.SearchPhrase == string.Empty || p.Name.ToLower().Contains(query.SearchPhrase.ToLower()))
             );
         return result;
     }
 
-    public async Task<IEnumerable<LikeDto>> GetPicLikes(int id)
-    {
-        if (await _pictureRepo.GetByIdAsync(id) is null) throw new NotFoundException();
-        var likes = await _likeRepo.GetByLikedIdAsync(id);
-        var likeDtos = _mapper.Map<List<LikeDto>>(likes);
-
-        return likeDtos;
-    }
-    
-    public async Task<IEnumerable<AccountDto>> GetPicLikers(int id)
-    {
-        if (await _pictureRepo.GetByIdAsync(id) is null) throw new NotFoundException();
-        var likes = await _likeRepo.GetByLikedIdAsync(id);
-        var accounts = likes.Select(like => like.Account).ToList();
-        var accountDtos = _mapper.Map<List<AccountDto>>(accounts);
-        return accountDtos;
-    }
-    
-    public async Task<PictureDto> GetById(int id)
+    public async Task<PictureDto> GetById(
+        int id
+        )
     {
         var picture = await _pictureRepo.GetByIdAsync(id);
         if (picture == null) throw new NotFoundException();
@@ -192,7 +190,9 @@ public class PictureService : IPictureService
         return pictureDtos;
     }
     
-    public async Task<string> Create(CreatePictureDto dto)
+    public async Task<string> Create(
+        CreatePictureDto dto
+        )
     {
         // var validationResult = await StaticValidator.Validate(dto);
         // if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
@@ -254,29 +254,9 @@ public class PictureService : IPictureService
         }
     }
 
-    // public async Task<PictureDto> Update(int id, UpdatePictureDto dto)
-    // {
-    //     // var validationResult = await StaticValidator.Validate(dto);
-    //     // if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
-    //
-    //     var picture = await _pictureRepo.GetByIdAsync(id);
-    //     if (picture is null) throw new NotFoundException();
-    //
-    //     await AuthorizePictureOperation(picture, ResourceOperation.Update,"you cant modify picture you didnt added");
-    //
-    //     if (dto.Description is not null) picture.Description = dto.Description;
-    //     if (dto.Name is not null) picture.Name = dto.Name;
-    //     if (dto.Tags is not null)
-    //     {
-    //         await _tagRepo.TryUpdatePictureTagsAsync(picture, dto.Tags);
-    //     }
-    //
-    //     await _pictureRepo.UpdateAsync(picture);
-    //     var pictureDto = _mapper.Map<PictureDto>(picture);
-    //     return pictureDto;
-    // }
-    //
-    public async Task<bool> Delete(int id)
+    public async Task<bool> Delete(
+        int id
+        )
     {
         var picture = await _pictureRepo.GetByIdAsync(id) ?? throw new NotFoundException();
         _logger.LogWarning($"Picture with id: {id} DELETE (hide) action invoked");
@@ -285,7 +265,8 @@ public class PictureService : IPictureService
 
         try
         {
-            await _pictureRepo.DeleteByIdAsync(picture.Id);
+            picture.IsDeleted = true;
+            await _pictureRepo.UpdateAsync(picture);
             _logger.LogWarning($"Picture with id: {id} DELETE (hide) action success");
             return true;
         }
@@ -297,7 +278,11 @@ public class PictureService : IPictureService
 
     #region Private methods
 
-    private async Task AuthorizePictureOperation(Picture picture, ResourceOperation operation, string message)
+    private async Task AuthorizePictureOperation(
+        Picture picture,
+        ResourceOperation operation,
+        string message
+        )
     {
         var user = _accountContextService.User;
         var authorizationResult = await _authorizationService.AuthorizeAsync(user, picture, new PictureOperationRequirement(operation));

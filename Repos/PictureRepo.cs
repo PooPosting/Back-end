@@ -155,15 +155,4 @@ public class PictureRepo : IPictureRepo
         await _dbContext.SaveChangesAsync();
         return picture;
     }
-
-    public async Task<bool> DeleteByIdAsync(
-        int id
-        )
-    {
-        var pic = _dbContext.Pictures.SingleOrDefault(p => p.Id == id);
-        if (pic is null) return false;
-
-        pic.IsDeleted = true;
-        return await _dbContext.SaveChangesAsync() > 0;
-    }
 }

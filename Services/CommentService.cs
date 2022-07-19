@@ -4,25 +4,27 @@ using PicturesAPI.Authorization;
 using PicturesAPI.Entities;
 using PicturesAPI.Enums;
 using PicturesAPI.Exceptions;
+using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos.Comment;
 using PicturesAPI.Models.Queries;
 using PicturesAPI.Repos.Interfaces;
+using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Services;
 
-public class CommentService
+public class CommentService : ICommentService
 {
     private readonly IMapper _mapper;
     private readonly ICommentRepo _commentRepo;
     private readonly IPictureRepo _pictureRepo;
-    private readonly AccountContextService _accountContextService;
+    private readonly IAccountContextService _accountContextService;
     private readonly IAuthorizationService _authorizationService;
 
     public CommentService(
         IMapper mapper,
         ICommentRepo commentRepo,
         IPictureRepo pictureRepo,
-        AccountContextService accountContextService,
+        IAccountContextService accountContextService,
         IAuthorizationService authorizationService
         )
     {
@@ -33,12 +35,23 @@ public class CommentService
         _authorizationService = authorizationService;
     }
 
-    public async Task<IEnumerable<Comment>> GetPagedByAccountId(
-        int accId,
+    public async Task<PagedResult<CommentDto>> GetByPictureId(
+        int picId,
         Query query
-        )
+    )
     {
-        throw new NotImplementedException();
+        var comments = await _commentRepo
+            .GetByPictureIdAsync(
+                picId,
+                query.PageSize * (query.PageNumber - 1),
+                query.PageSize);
+
+        return new PagedResult<CommentDto>(
+            _mapper.Map<IEnumerable<CommentDto>>(comments),
+            query.PageNumber,
+            query.PageSize,
+            await _commentRepo.CountCommentsAsync(c => c.PictureId == picId)
+        );
     }
 
     public async Task<CommentDto> Create(
@@ -79,7 +92,11 @@ public class CommentService
         )
     {
         await AuthorizeCommentOperation(commId, ResourceOperation.Delete,"you have no rights to delete this comment");
-        return await _commentRepo.TryDeleteByIdAsync(commId);
+        var comment = await _commentRepo.GetByIdAsync(commId);
+        if (comment is null) throw new NotFoundException();
+        comment.IsDeleted = true;
+        await _commentRepo.UpdateAsync(comment);
+        return true;
     }
 
     private async Task AuthorizeCommentOperation(

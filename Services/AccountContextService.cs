@@ -69,7 +69,8 @@ public class AccountContextService : IAccountContextService
     private void ValidateJwt()
     {
         var exp = User.FindAll(c => true);
-        var role = User.FindFirst(c => c.Type == ClaimTypes.Role)!.Value;
+        var role = User
+            .FindFirst(c => c.Type == ClaimTypes.Role)?.Value;
         var id = User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
 
         if (

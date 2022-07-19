@@ -21,6 +21,7 @@ using PicturesAPI.Models.Configuration;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Models.Dtos.Account;
 using PicturesAPI.Models.Dtos.Account.Validators;
+using PicturesAPI.Models.Dtos.Comment;
 using PicturesAPI.Models.Queries;
 using PicturesAPI.Models.Queries.Validators;
 using PicturesAPI.Models.Validators;
@@ -105,8 +106,6 @@ builder.Services.AddScoped<IValidator<PatchRestrictedIp>, PatchRestrictedIpValid
 builder.Services.AddScoped<ErrorHandlingMiddleware>();
 builder.Services.AddScoped<RequestTimeMiddleware>();
 builder.Services.AddScoped<UserDataMiddleware>();
-// builder.Services.AddScoped<CanGetFilter>();
-// builder.Services.AddScoped<CanPostFilter>();
 builder.Services.AddScoped<IsUserAdminFilter>();
 
 // builder.Services
@@ -114,8 +113,9 @@ builder.Services.AddScoped<IAccountContextService, AccountContextService>();
 builder.Services.AddScoped<IPictureLikingService, PictureLikingService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IPictureService, PictureService>();
-builder.Services.AddScoped<IPictureCommentService, PictureCommentService>();
 builder.Services.AddScoped<IPopularService, PopularService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<ILikeService, LikeService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ILogsService, LogsService>();
 builder.Services.AddScoped<IRestrictedIpsService, RestrictedIpsService>();

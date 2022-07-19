@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
 using PicturesAPI.ActionFilters;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Models.Dtos.Comment;
@@ -10,35 +11,38 @@ using PicturesAPI.Services.Interfaces;
 namespace PicturesAPI.Controllers.Picture;
 
 [ApiController]
-[Authorize]
 [Route("api/picture/{picId}/comment")]
 public class PictureCommentsController: ControllerBase
 {
-    private readonly IPictureCommentService _pictureCommentService;
+    private readonly ICommentService _commentService;
 
     public PictureCommentsController(
-        IPictureCommentService pictureCommentService)
+        ICommentService commentService
+        )
     {
-        _pictureCommentService = pictureCommentService;
+        _commentService = commentService;
     }
 
     [HttpGet]
+    [EnableQuery]
     public async Task<IActionResult> GetPictureComments(
         [FromRoute] string picId,
-        [FromBody] Query query
+        [FromQuery] Query query
         )
     {
-        throw new NotImplementedException();
+        var result = await _commentService.GetByPictureId(IdHasher.DecodePictureId(picId), query);
+        return Ok(result);
     }
 
 
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> PostComment(
         [FromRoute] string picId,
         [FromBody] PostPutCommentDto dto
         )
     {
-        var result = await _pictureCommentService.Create(IdHasher.DecodePictureId(picId), dto.Text);
+        var result = await _commentService.Create(IdHasher.DecodePictureId(picId), dto.Text);
         return Ok(result);
     }
 

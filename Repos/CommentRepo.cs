@@ -15,6 +15,21 @@ public class CommentRepo : ICommentRepo
         _dbContext = dbContext;
     }
 
+    public async Task<IEnumerable<Comment>> GetByPictureIdAsync(
+        int picId,
+        int itemsToSkip,
+        int itemsToTake
+    )
+    {
+        return await _dbContext.Comments
+            .Where(c => c.PictureId == picId)
+            .OrderByDescending(c => c.CommentAdded)
+            .Include(c => c.Account)
+            .Skip(itemsToSkip)
+            .Take(itemsToTake)
+            .ToListAsync();
+    }
+
     public async Task<int> CountCommentsAsync(
         Expression<Func<Comment, bool>> predicate
         )
@@ -22,20 +37,6 @@ public class CommentRepo : ICommentRepo
         return await _dbContext.Comments
             .Where(predicate)
             .CountAsync();
-    }
-
-    public async Task<IEnumerable<Comment>> GetByAccountIdAsync(
-        int accId,
-        int itemsToTake,
-        int itemsToSkip
-        )
-    {
-        return await _dbContext.Comments
-            .Where(c => c.AccountId == accId)
-            .Include(c => c.Account)
-            .Skip(itemsToSkip)
-            .Take(itemsToTake)
-            .ToListAsync();
     }
 
     public async Task<Comment?> GetByIdAsync(
@@ -85,17 +86,4 @@ public class CommentRepo : ICommentRepo
         return comment;
     }
 
-    public async Task<bool> TryDeleteByIdAsync(
-        int id
-        )
-    {
-        var comment =  _dbContext.Comments.SingleOrDefault(c => c.Id == id);
-        if (comment is not null)
-        {
-            comment.IsDeleted = true;
-            return await _dbContext.SaveChangesAsync() > 0;
-        }
-        return false;
-    }
-    
 }

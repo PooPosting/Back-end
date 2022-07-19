@@ -19,5 +19,4 @@ public interface IPictureRepo
         Expression<Func<Picture, bool>>? filterExp);
     Task<Picture> InsertAsync(Picture picture);
     Task<Picture> UpdateAsync(Picture picture);
-    Task<bool> DeleteByIdAsync(int id);
 }
