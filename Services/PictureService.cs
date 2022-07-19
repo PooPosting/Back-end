@@ -8,6 +8,10 @@ using PicturesAPI.Enums;
 using PicturesAPI.Exceptions;
 using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos;
+using PicturesAPI.Models.Dtos.Account;
+using PicturesAPI.Models.Dtos.Like;
+using PicturesAPI.Models.Dtos.Picture;
+using PicturesAPI.Models.Queries;
 using PicturesAPI.Models.Validators;
 using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services.Helpers;
@@ -46,7 +50,7 @@ public class PictureService : IPictureService
         _tagRepo = tagRepo;
     }
 
-    public async Task<IEnumerable<PictureDto>> GetPersonalizedPictures(PictureQueryPersonalized query)
+    public async Task<IEnumerable<PictureDto>> GetPersonalizedPictures(PersonalizedQuery query)
     {
         var accId = _accountContextService.GetAccountId();
         var pictures = await _pictureRepo.GetNotSeenByAccountIdAsync(accId, query.PageSize);
@@ -60,7 +64,7 @@ public class PictureService : IPictureService
         return pictureDtos;
     }
 
-    public async Task<PagedResult<PictureDto>> GetPictures(PictureQuery query)
+    public async Task<PagedResult<PictureDto>> GetPictures(Query query)
     {
         var pictures = await _pictureRepo.SearchAllAsync(
             query.PageSize * (query.PageNumber - 1),
@@ -71,33 +75,68 @@ public class PictureService : IPictureService
         var pictureDtos = _mapper.Map<List<PictureDto>>(pictures);
         return new PagedResult<PictureDto>(
             pictureDtos,
-            query.PageSize,
             query.PageNumber,
-            await _pictureRepo.CountPicturesAsync((p) => true)
+            await _pictureRepo.CountPicturesAsync()
         );
     }
+    public async Task<PagedResult<PicturePreviewDto>> GetLikedPictures(int accId, Query query)
+    {
+        var pictures = await _pictureRepo.GetLikedPicturesByAccountIdAsync(
+            accId,
+            query.PageSize * (query.PageNumber - 1),
+            query.PageSize
+        );
 
-    public async Task<PagedResult<PictureDto>> SearchAll(SearchQuery query)
+        var picPreviews = _mapper.Map<IEnumerable<PicturePreviewDto>>(pictures);
+
+        var result = new PagedResult<PicturePreviewDto>(
+            picPreviews,
+            query.PageNumber,
+            await _pictureRepo.CountPicturesAsync(p => p.AccountId == accId)
+        );
+
+        return result;
+    }
+    public async Task<PagedResult<PicturePreviewDto>> GetPostedPictures(int accId, Query query)
+    {
+        var pictures = await _pictureRepo.GetPostedPicturesByAccountIdAsync(
+            accId,
+            query.PageSize * (query.PageNumber - 1),
+            query.PageSize
+        );
+
+        var picPreviews = _mapper.Map<IEnumerable<PicturePreviewDto>>(pictures);
+
+        var result = new PagedResult<PicturePreviewDto>(
+            picPreviews,
+            query.PageNumber,
+            await _pictureRepo.CountPicturesAsync(p => p.AccountId == accId)
+        );
+
+        return result;
+    }
+
+    public async Task<PagedResult<PictureDto>> SearchAll(CustomQuery query)
     {
         IEnumerable<Picture> pictures;
 
         switch (query.SearchBy)
         {
-            case SortSearchBy.MostPopular:
+            case SortBy.MostPopular:
                 pictures = await _pictureRepo.SearchAllAsync(
                     query.PageSize * (query.PageNumber - 1),
                     query.PageSize,
                     p => p.PopularityScore,
                     p => query.SearchPhrase == string.Empty || p.Name.ToLower().Contains(query.SearchPhrase.ToLower()));
                 break;
-            case SortSearchBy.Newest:
+            case SortBy.Newest:
                 pictures = await _pictureRepo.SearchAllAsync(
                     query.PageSize * (query.PageNumber - 1),
                     query.PageSize,
                     p => p.PictureAdded.Ticks,
                     p => query.SearchPhrase == string.Empty || p.Name.ToLower().Contains(query.SearchPhrase.ToLower()));
                 break;
-            case SortSearchBy.MostLikes:
+            case SortBy.MostLikes:
                 pictures = await _pictureRepo.SearchAllAsync(
                     query.PageSize * (query.PageNumber - 1),
                     query.PageSize,
@@ -105,7 +144,12 @@ public class PictureService : IPictureService
                     p => query.SearchPhrase == string.Empty || p.Name.ToLower().Contains(query.SearchPhrase.ToLower()));
                 break;
             default:
-                throw new BadRequestException("Invalid 'search by' option");
+                pictures = await _pictureRepo.SearchAllAsync(
+                    query.PageSize * (query.PageNumber - 1),
+                    query.PageSize,
+                    p => p.PopularityScore,
+                    p => query.SearchPhrase == string.Empty || p.Name.ToLower().Contains(query.SearchPhrase.ToLower()));
+                break;
         }
 
         var picBuffer = pictures as List<Picture> ?? pictures.ToList();
@@ -116,11 +160,9 @@ public class PictureService : IPictureService
             .ToList();
         var result = new PagedResult<PictureDto>(
             pictureDtos,
-            query.PageSize,
             query.PageNumber,
-            await _pictureRepo.CountPicturesAsync(
-                p => query.SearchPhrase == string.Empty || p.Name.ToLower().Contains(query.SearchPhrase.ToLower())
-            ));
+            await _pictureRepo.CountPicturesAsync(p => query.SearchPhrase == string.Empty || p.Name.ToLower().Contains(query.SearchPhrase.ToLower()))
+            );
         return result;
     }
 
@@ -150,13 +192,14 @@ public class PictureService : IPictureService
         return pictureDtos;
     }
     
-    public async Task<string> Create(IFormFile file, CreatePictureDto dto)
+    public async Task<string> Create(CreatePictureDto dto)
     {
-        var validationResult = await StaticValidator.Validate(dto);
-        if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
+        // var validationResult = await StaticValidator.Validate(dto);
+        // if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
+        if (dto.File is not { Length: > 0 }) throw new BadRequestException("invalid picture");
 
         using var ms = new MemoryStream();
-        await file.CopyToAsync(ms);
+        await dto.File.CopyToAsync(ms);
         var fileBytes = ms.ToArray();
         var result = await NsfwClassifier.ClassifyAsync(fileBytes, CancellationToken.None);
 
@@ -177,8 +220,6 @@ public class PictureService : IPictureService
 
         picture.AccountId = accountId;
 
-        if (file is not { Length: > 0 }) throw new BadRequestException("invalid picture");
-        
         var rootPath = Directory.GetCurrentDirectory();
 
         var randomName = $"{Path.GetRandomFileName().Replace('.', '-')}.webp";
@@ -189,7 +230,7 @@ public class PictureService : IPictureService
         {
             await using (var stream = new FileStream(fullPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
             {
-                await file.CopyToAsync(stream);
+                await dto.File.CopyToAsync(stream);
                 await stream.DisposeAsync();
             }
             await _pictureRepo.InsertAsync(picture);
@@ -213,28 +254,28 @@ public class PictureService : IPictureService
         }
     }
 
-    public async Task<PictureDto> Update(int id, UpdatePictureDto dto)
-    {
-        var validationResult = await StaticValidator.Validate(dto);
-        if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
-
-        var picture = await _pictureRepo.GetByIdAsync(id);
-        if (picture is null) throw new NotFoundException();
-        
-        await AuthorizePictureOperation(picture, ResourceOperation.Update,"you cant modify picture you didnt added");
-
-        if (dto.Description is not null) picture.Description = dto.Description;
-        if (dto.Name is not null) picture.Name = dto.Name;
-        if (dto.Tags is not null)
-        {
-            await _tagRepo.TryUpdatePictureTagsAsync(picture, dto.Tags);
-        }
-
-        await _pictureRepo.UpdateAsync(picture);
-        var pictureDto = _mapper.Map<PictureDto>(picture);
-        return pictureDto;
-    }
-        
+    // public async Task<PictureDto> Update(int id, UpdatePictureDto dto)
+    // {
+    //     // var validationResult = await StaticValidator.Validate(dto);
+    //     // if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
+    //
+    //     var picture = await _pictureRepo.GetByIdAsync(id);
+    //     if (picture is null) throw new NotFoundException();
+    //
+    //     await AuthorizePictureOperation(picture, ResourceOperation.Update,"you cant modify picture you didnt added");
+    //
+    //     if (dto.Description is not null) picture.Description = dto.Description;
+    //     if (dto.Name is not null) picture.Name = dto.Name;
+    //     if (dto.Tags is not null)
+    //     {
+    //         await _tagRepo.TryUpdatePictureTagsAsync(picture, dto.Tags);
+    //     }
+    //
+    //     await _pictureRepo.UpdateAsync(picture);
+    //     var pictureDto = _mapper.Map<PictureDto>(picture);
+    //     return pictureDto;
+    // }
+    //
     public async Task<bool> Delete(int id)
     {
         var picture = await _pictureRepo.GetByIdAsync(id) ?? throw new NotFoundException();

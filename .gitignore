@@ -6,5 +6,7 @@ appsettings.Development.json
 authKey.json
 bin/
 obj/
-wwwroot/
+wwwroot/pictures/*
+wwwroot/accounts/profile_pictures/*
+wwwroot/accounts/background_pictures/*
 .idea/

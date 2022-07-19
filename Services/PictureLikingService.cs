@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using PicturesAPI.Exceptions;
 using PicturesAPI.Models.Dtos;
+using PicturesAPI.Models.Dtos.Picture;
 using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services.Interfaces;
 
@@ -16,7 +17,6 @@ public class PictureLikingService : IPictureLikingService
     public PictureLikingService(
         ILikeRepo likeRepo,
         IPictureRepo pictureRepo,
-        ITagRepo tagRepo,
         IMapper mapper,
         IAccountContextService accountContextService)
     {

@@ -3,6 +3,7 @@ using AutoMapper;
 using PicturesAPI.Entities;
 using PicturesAPI.Enums;
 using PicturesAPI.Models.Dtos;
+using PicturesAPI.Models.Dtos.Picture;
 
 namespace PicturesAPI.Profilers.ValueResolvers;
 

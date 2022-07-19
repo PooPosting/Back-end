@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using PicturesAPI.Models.Dtos;
+using PicturesAPI.Models.Dtos.Account;
+using PicturesAPI.Models.Dtos.Picture;
 using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services.Interfaces;
 

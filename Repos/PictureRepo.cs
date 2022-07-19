@@ -18,14 +18,24 @@ public class PictureRepo : IPictureRepo
         _dbContext = dbContext;
     }
 
-    public async Task<int> CountPicturesAsync(Expression<Func<Picture, bool>> predicate)
+    public async Task<int> CountPicturesAsync(
+        Expression<Func<Picture, bool>> predicate
+        )
     {
         return await _dbContext.Pictures
             .Where(predicate)
             .CountAsync();
     }
 
-    public async Task<Picture?> GetByIdAsync(int id)
+    public async Task<int> CountPicturesAsync()
+    {
+        return await _dbContext.Pictures
+            .CountAsync();
+    }
+
+    public async Task<Picture?> GetByIdAsync(
+        int id
+        )
     {
         return await _dbContext.Pictures
             .Include(p => p.Account)
@@ -37,7 +47,11 @@ public class PictureRepo : IPictureRepo
             .ThenInclude(c => c.Account)
             .SingleOrDefaultAsync(p => p.Id == id);
     }
-    public async Task<IEnumerable<Picture>> GetNotSeenByAccountIdAsync(int accountId, int itemsToTake)
+
+    public async Task<IEnumerable<Picture>> GetNotSeenByAccountIdAsync(
+        int accountId,
+        int itemsToTake
+        )
     {
         return await _dbContext.Pictures
 
@@ -61,10 +75,41 @@ public class PictureRepo : IPictureRepo
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<Picture>> GetLikedPicturesByAccountIdAsync(
+        int accountId,
+        int itemsToSkip,
+        int itemsToTake
+    )
+    {
+        return await _dbContext.Pictures
+            .AsNoTracking()
+            .Where(p => p.Likes.Any(l => ((l.AccountId == accountId) && l.IsLike)))
+            .OrderByDescending(p => p.Likes.Max(l => l.Id))
+            .Skip(itemsToSkip)
+            .Take(itemsToTake)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Picture>> GetPostedPicturesByAccountIdAsync(
+        int accountId,
+        int itemsToSkip,
+        int itemsToTake
+        )
+    {
+        return await _dbContext.Pictures
+            .AsNoTracking()
+            .Where(p => p.AccountId == accountId)
+            .OrderByDescending(p => p.Id)
+            .Skip(itemsToSkip)
+            .Take(itemsToTake)
+            .ToListAsync();
+    }
+
     public async Task<IEnumerable<Picture>> SearchAllAsync(
         int itemsToSkip, int itemsToTake,
         Expression<Func<Picture, long>>? orderExp,
-        Expression<Func<Picture, bool>>? filterExp)
+        Expression<Func<Picture, bool>>? filterExp
+        )
     {
         var query = _dbContext.Pictures
             .Include(p => p.Account)
@@ -92,7 +137,9 @@ public class PictureRepo : IPictureRepo
             .ToListAsync();
     }
 
-    public async Task<Picture> InsertAsync(Picture picture)
+    public async Task<Picture> InsertAsync(
+        Picture picture
+        )
     {
         await _dbContext.Pictures.AddAsync(picture);
 
@@ -100,14 +147,18 @@ public class PictureRepo : IPictureRepo
         return picture;
     }
 
-    public async Task<Picture> UpdateAsync(Picture picture)
+    public async Task<Picture> UpdateAsync(
+        Picture picture
+        )
     {
         _dbContext.Pictures.Update(picture);
         await _dbContext.SaveChangesAsync();
         return picture;
     }
 
-    public async Task<bool> DeleteByIdAsync(int id)
+    public async Task<bool> DeleteByIdAsync(
+        int id
+        )
     {
         var pic = _dbContext.Pictures.SingleOrDefault(p => p.Id == id);
         if (pic is null) return false;

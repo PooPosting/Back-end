@@ -9,7 +9,8 @@ public class ErrorHandlingMiddleware : IMiddleware
     private readonly ILogger<ErrorHandlingMiddleware> _logger;
         
     public ErrorHandlingMiddleware(
-        ILogger<ErrorHandlingMiddleware> logger)
+        ILogger<ErrorHandlingMiddleware> logger
+        )
     {
         _logger = logger;
     }
@@ -42,6 +43,7 @@ public class ErrorHandlingMiddleware : IMiddleware
             context.Response.StatusCode = 401;
             await context.Response.WriteAsync(unauthorizedException.Message);
         }
+
         catch (ForbidException forbidException)
         {
             context.Response.StatusCode = 403;
@@ -56,14 +58,19 @@ public class ErrorHandlingMiddleware : IMiddleware
         catch (NoResultException)
         {
             context.Response.StatusCode = 404;
-            await context.Response.WriteAsync("resource not found");
+            await context.Response.WriteAsync("Resource not found");
         }
         catch (NotFoundException)
         {
             context.Response.StatusCode = 404;
-            await context.Response.WriteAsync("resource not found");
+            await context.Response.WriteAsync("Resource not found");
         }
 
+        catch (NotImplementedException e)
+        {
+            context.Response.StatusCode = 500;
+            await context.Response.WriteAsync("Not implemented");
+        }
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);

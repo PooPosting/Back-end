@@ -19,8 +19,13 @@ public class AccountRepo : IAccountRepo
     public async Task<int> CountAccountsAsync(Expression<Func<Account, bool>> filterExp)
     {
         return await _dbContext.Accounts
-            .Where(a => !a.IsDeleted)
             .Where(filterExp)
+            .CountAsync();
+    }
+
+    public async Task<int> CountAccountsAsync()
+    {
+        return await _dbContext.Accounts
             .CountAsync();
     }
 
@@ -101,13 +106,6 @@ public class AccountRepo : IAccountRepo
         _dbContext.Accounts.Update(account);
         await _dbContext.SaveChangesAsync();
         return account;
-    }
-
-    public async Task<bool> TryDeleteByIdAsync(int id)
-    {
-        var account = _dbContext.Accounts.SingleOrDefault(a => a.Id == id);
-        account!.IsDeleted = true;
-        return await _dbContext.SaveChangesAsync() > 0;
     }
 
     public async Task<bool> MarkAsSeenAsync(int accountId, int pictureId)

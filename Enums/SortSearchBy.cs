@@ -1,6 +1,6 @@
 ﻿namespace PicturesAPI.Enums;
 
-public enum SortSearchBy
+public enum SortBy
 {
     MostPopular,
     MostLikes,

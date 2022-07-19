@@ -8,6 +8,7 @@ public interface IAccountRepo
 {
     Task<int> CountAccountsAsync(
         Expression<Func<Account, bool>> filterExp);
+    Task<int> CountAccountsAsync();
     Task<Account?> GetByIdAsync(int id);
     Task<Account?> GetByIdAsync(int id,
         params Expression<Func<Account, object>>[] includes);
@@ -22,6 +23,5 @@ public interface IAccountRepo
 
     Task<Account> InsertAsync(Account account);
     Task<Account> UpdateAsync(Account account);
-    Task<bool> TryDeleteByIdAsync(int id);
     Task<bool> MarkAsSeenAsync(int accountId, int pictureId);
 }

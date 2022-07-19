@@ -2,6 +2,9 @@
 using AutoMapper;
 using PicturesAPI.Entities;
 using PicturesAPI.Models.Dtos;
+using PicturesAPI.Models.Dtos.Account;
+using PicturesAPI.Models.Dtos.Comment;
+using PicturesAPI.Models.Dtos.Picture;
 
 namespace PicturesAPI.Profilers.ValueResolvers;
 

@@ -5,6 +5,7 @@ using PicturesAPI.Entities;
 using PicturesAPI.Enums;
 using PicturesAPI.Exceptions;
 using PicturesAPI.Models.Dtos;
+using PicturesAPI.Models.Dtos.Comment;
 using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services.Helpers;
 using PicturesAPI.Services.Interfaces;

@@ -7,7 +7,10 @@ namespace PicturesAPI.Repos.Interfaces;
 public interface IPictureRepo
 {
     Task<int> CountPicturesAsync(Expression<Func<Picture, bool>> predicate);
+    Task<int> CountPicturesAsync();
     Task<Picture?> GetByIdAsync(int id);
+    Task<IEnumerable<Picture>> GetLikedPicturesByAccountIdAsync(int accountId, int itemsToSkip, int itemsToTake);
+    Task<IEnumerable<Picture>> GetPostedPicturesByAccountIdAsync(int accountId, int itemsToSkip, int itemsToTake);
     Task<IEnumerable<Picture>> GetNotSeenByAccountIdAsync(int accountId, int itemsToTake);
     Task<IEnumerable<Picture>> SearchAllAsync(
         int itemsToSkip,

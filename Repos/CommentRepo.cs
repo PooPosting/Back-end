@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using PicturesAPI.Entities;
 using PicturesAPI.Repos.Interfaces;
@@ -13,7 +14,33 @@ public class CommentRepo : ICommentRepo
     {
         _dbContext = dbContext;
     }
-    public async Task<Comment?> GetByIdAsync(int commId)
+
+    public async Task<int> CountCommentsAsync(
+        Expression<Func<Comment, bool>> predicate
+        )
+    {
+        return await _dbContext.Comments
+            .Where(predicate)
+            .CountAsync();
+    }
+
+    public async Task<IEnumerable<Comment>> GetByAccountIdAsync(
+        int accId,
+        int itemsToTake,
+        int itemsToSkip
+        )
+    {
+        return await _dbContext.Comments
+            .Where(c => c.AccountId == accId)
+            .Include(c => c.Account)
+            .Skip(itemsToSkip)
+            .Take(itemsToTake)
+            .ToListAsync();
+    }
+
+    public async Task<Comment?> GetByIdAsync(
+        int commId
+        )
     {
         return await _dbContext.Comments
             .Include(c => c.Picture)
@@ -22,7 +49,9 @@ public class CommentRepo : ICommentRepo
             .SingleOrDefaultAsync(c => c.Id == commId);
     }
 
-    public async Task<Comment> InsertAsync(Comment comment)
+    public async Task<Comment> InsertAsync(
+        Comment comment
+        )
     {
         await _dbContext.Comments.AddAsync(comment);
         await _dbContext.SaveChangesAsync();
@@ -47,14 +76,18 @@ public class CommentRepo : ICommentRepo
             }).SingleOrDefault(c => c.Id == comment.Id)!;
     }
 
-    public async Task<Comment> UpdateAsync(Comment comment)
+    public async Task<Comment> UpdateAsync(
+        Comment comment
+        )
     {
         _dbContext.Comments.Update(comment);
         await _dbContext.SaveChangesAsync();
         return comment;
     }
 
-    public async Task<bool> TryDeleteByIdAsync(int id)
+    public async Task<bool> TryDeleteByIdAsync(
+        int id
+        )
     {
         var comment =  _dbContext.Comments.SingleOrDefault(c => c.Id == id);
         if (comment is not null)

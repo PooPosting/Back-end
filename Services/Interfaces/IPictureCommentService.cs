@@ -1,4 +1,5 @@
 ﻿using PicturesAPI.Models.Dtos;
+using PicturesAPI.Models.Dtos.Comment;
 
 namespace PicturesAPI.Services.Interfaces;
 

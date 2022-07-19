@@ -1,5 +1,6 @@
 ﻿using PicturesAPI.Enums;
 using PicturesAPI.Models.Dtos;
+using PicturesAPI.Models.Dtos.Like;
 
 namespace PicturesAPI.Models;
 

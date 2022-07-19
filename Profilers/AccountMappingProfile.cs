@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using PicturesAPI.Entities;
 using PicturesAPI.Models.Dtos;
+using PicturesAPI.Models.Dtos.Account;
 using PicturesAPI.Profilers.ValueResolvers;
 using PicturesAPI.Services.Helpers;
 
@@ -28,9 +29,9 @@ public class AccountMappingProfile: Profile
             .ForMember(dto => dto.Id,
                 opt => opt.MapFrom(
                     a => IdHasher.EncodeAccountId(a.Id)))
-            .ForMember(dto => dto.PicturePreviews,
-                opt => opt.MapFrom(
-                    acc => acc.Pictures))
+            // .ForMember(dto => dto.PicturePreviews,
+            //     opt => opt.MapFrom(
+            //         acc => acc.Pictures))
             .ForMember(dto => dto.RoleId,
                 opt => opt.MapFrom(
                     acc => acc.Role.Id));

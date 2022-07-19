@@ -17,9 +17,12 @@ using PicturesAPI.Entities;
 using PicturesAPI.Factories;
 using PicturesAPI.Factories.Interfaces;
 using PicturesAPI.Middleware;
-using PicturesAPI.Models;
 using PicturesAPI.Models.Configuration;
 using PicturesAPI.Models.Dtos;
+using PicturesAPI.Models.Dtos.Account;
+using PicturesAPI.Models.Dtos.Account.Validators;
+using PicturesAPI.Models.Queries;
+using PicturesAPI.Models.Queries.Validators;
 using PicturesAPI.Models.Validators;
 using PicturesAPI.Repos;
 using PicturesAPI.Repos.Interfaces;
@@ -84,20 +87,26 @@ builder.Services.AddDbContext<PictureDbContext>(options =>
 });
 
 // Validators
-builder.Services.AddScoped<IValidator<AccountQuery>, AccountQueryValidator>();
-builder.Services.AddScoped<IValidator<PictureQuery>, PictureQueryValidator>();
-builder.Services.AddScoped<IValidator<UpdateAccountDto>, UpdateAccountDtoValidator>();
-builder.Services.AddScoped<IValidator<UpdatePictureDto>, UpdatePictureDtoValidator>();
-builder.Services.AddScoped<IValidator<CreateAccountDto>, CreateAccountDtoValidator>();
+builder.Services.AddScoped<IValidator<CustomQuery>, CustomQueryValidator>();
+builder.Services.AddScoped<IValidator<Query>, QueryValidator>();
+builder.Services.AddScoped<IValidator<PersonalizedQuery>, PersonalizedQueryValidator>();
+
 builder.Services.AddScoped<IValidator<LsLoginDto>, LsLoginDtoValidator>();
+
+builder.Services.AddScoped<IValidator<UpdateAccountEmailDto>, UpdateAccountEmailDtoValidator>();
+builder.Services.AddScoped<IValidator<UpdateAccountPasswordDto>, UpdateAccountPasswordDtoValidator>();
+builder.Services.AddScoped<IValidator<UpdateAccountDescriptionDto>, UpdateAccountDescriptionDtoValidator>();
+builder.Services.AddScoped<IValidator<UpdateAccountPictureDto>, UpdateAccountPictureDtoValidator>();
+
+builder.Services.AddScoped<IValidator<CreateAccountDto>, CreateAccountDtoValidator>();
 builder.Services.AddScoped<IValidator<PatchRestrictedIp>, PatchRestrictedIpValidator>();
 
 // Middleware
 builder.Services.AddScoped<ErrorHandlingMiddleware>();
 builder.Services.AddScoped<RequestTimeMiddleware>();
 builder.Services.AddScoped<UserDataMiddleware>();
-builder.Services.AddScoped<CanGetFilter>();
-builder.Services.AddScoped<CanPostFilter>();
+// builder.Services.AddScoped<CanGetFilter>();
+// builder.Services.AddScoped<CanPostFilter>();
 builder.Services.AddScoped<IsUserAdminFilter>();
 
 // builder.Services
@@ -107,7 +116,7 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IPictureService, PictureService>();
 builder.Services.AddScoped<IPictureCommentService, PictureCommentService>();
 builder.Services.AddScoped<IPopularService, PopularService>();
-builder.Services.AddScoped<IUserAccountService, UserAccountService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ILogsService, LogsService>();
 builder.Services.AddScoped<IRestrictedIpsService, RestrictedIpsService>();
 

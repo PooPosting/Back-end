@@ -2,18 +2,15 @@
 
 public class PagedResult<T>
 {
-    public PagedResult(List<T> items, int pageSize, int pageNumber, int totalItemsCount)
+    public PagedResult(IEnumerable<T> items, int pageNumber, int totalItems)
     {
         Items = items;
         Page = pageNumber;
-        PageSize = pageSize;
-        TotalPages = (int)Math.Ceiling(totalItemsCount /(double) pageSize);
+        TotalItems = totalItems;
     }
     
-    public List<T> Items { get; set; }
+    public IEnumerable<T> Items { get; set; }
     public int Page { get; set; }
-    public int PageSize { get; set; }
-
-    public int TotalPages { get; set; }
+    public int TotalItems { get; set; }
 
 }
