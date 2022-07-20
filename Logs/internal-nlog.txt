@@ -9503,3 +9503,40 @@
 2022-07-19 23:10:57.6724 Info NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c. File version: 4.7.11.13229. Product version: 4.7.11+33ed3a9f86277651e93ddf39cda64a046a06778b. GlobalAssemblyCache: False
 2022-07-19 23:28:35.0589 Info AppDomain Shutting down. Logger closing...
 2022-07-19 23:28:35.0589 Info Logger has been shut down.
+2022-07-20 09:06:43.8899 Info Message Template Auto Format enabled
+2022-07-20 09:06:43.8899 Info Loading assembly: NLog.Web.AspNetCore
+2022-07-20 09:06:43.9303 Info Adding target FileTarget(Name=allfile)
+2022-07-20 09:06:43.9323 Info Adding target FileTarget(Name=warnings)
+2022-07-20 09:06:43.9323 Info Adding target FileTarget(Name=exceptions)
+2022-07-20 09:06:43.9323 Info Adding target FileTarget(Name=request-time)
+2022-07-20 09:06:43.9323 Info Adding target FileTarget(Name=userdata)
+2022-07-20 09:06:43.9323 Info Adding target FileTarget(Name=userdata-warn)
+2022-07-20 09:06:43.9526 Info Validating config: Targets=6, ConfigItems=108, FilePath=C:\Users\mrgra\Documents\code-projects\GitHub\PicturesApi\bin\Debug\net6.0\NLog.config
+2022-07-20 09:06:43.9646 Info Configuration initialized.
+2022-07-20 09:06:43.9646 Info NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c. File version: 4.7.11.13229. Product version: 4.7.11+33ed3a9f86277651e93ddf39cda64a046a06778b. GlobalAssemblyCache: False
+2022-07-20 10:10:24.2109 Info AppDomain Shutting down. Logger closing...
+2022-07-20 10:10:24.2194 Info Logger has been shut down.
+2022-07-20 10:10:30.4768 Info Message Template Auto Format enabled
+2022-07-20 10:10:30.4846 Info Loading assembly: NLog.Web.AspNetCore
+2022-07-20 10:10:30.5164 Info Adding target FileTarget(Name=allfile)
+2022-07-20 10:10:30.5164 Info Adding target FileTarget(Name=warnings)
+2022-07-20 10:10:30.5164 Info Adding target FileTarget(Name=exceptions)
+2022-07-20 10:10:30.5164 Info Adding target FileTarget(Name=request-time)
+2022-07-20 10:10:30.5164 Info Adding target FileTarget(Name=userdata)
+2022-07-20 10:10:30.5164 Info Adding target FileTarget(Name=userdata-warn)
+2022-07-20 10:10:30.5376 Info Validating config: Targets=6, ConfigItems=108, FilePath=C:\Users\mrgra\Documents\code-projects\GitHub\PicturesApi\bin\Debug\net6.0\NLog.config
+2022-07-20 10:10:30.5491 Info Configuration initialized.
+2022-07-20 10:10:30.5491 Info NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c. File version: 4.7.11.13229. Product version: 4.7.11+33ed3a9f86277651e93ddf39cda64a046a06778b. GlobalAssemblyCache: False
+2022-07-20 10:13:30.0408 Info AppDomain Shutting down. Logger closing...
+2022-07-20 10:13:30.0408 Info Logger has been shut down.
+2022-07-20 10:13:35.2089 Info Message Template Auto Format enabled
+2022-07-20 10:13:35.2171 Info Loading assembly: NLog.Web.AspNetCore
+2022-07-20 10:13:35.2488 Info Adding target FileTarget(Name=allfile)
+2022-07-20 10:13:35.2488 Info Adding target FileTarget(Name=warnings)
+2022-07-20 10:13:35.2488 Info Adding target FileTarget(Name=exceptions)
+2022-07-20 10:13:35.2488 Info Adding target FileTarget(Name=request-time)
+2022-07-20 10:13:35.2488 Info Adding target FileTarget(Name=userdata)
+2022-07-20 10:13:35.2488 Info Adding target FileTarget(Name=userdata-warn)
+2022-07-20 10:13:35.2691 Info Validating config: Targets=6, ConfigItems=108, FilePath=C:\Users\mrgra\Documents\code-projects\GitHub\PicturesApi\bin\Debug\net6.0\NLog.config
+2022-07-20 10:13:35.2805 Info Configuration initialized.
+2022-07-20 10:13:35.2805 Info NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c. File version: 4.7.11.13229. Product version: 4.7.11+33ed3a9f86277651e93ddf39cda64a046a06778b. GlobalAssemblyCache: False

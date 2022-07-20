@@ -22,7 +22,7 @@ public class AccountUpdateController: ControllerBase
     [HttpPost]
     [Route("email")]
     public async Task<IActionResult> UpdateAccountEmail(
-        [FromForm] UpdateAccountEmailDto dto
+        [FromBody] UpdateAccountEmailDto dto
     )
     {
         return Ok(await _accountService.UpdateEmail(dto));
@@ -31,7 +31,7 @@ public class AccountUpdateController: ControllerBase
     [HttpPost]
     [Route("password")]
     public async Task<IActionResult> UpdateAccountPassword(
-        [FromForm] UpdateAccountPasswordDto dto
+        [FromBody] UpdateAccountPasswordDto dto
     )
     {
         return Ok(await _accountService.UpdatePassword(dto));
@@ -40,11 +40,10 @@ public class AccountUpdateController: ControllerBase
     [HttpPatch]
     [Route("description")]
     public async Task<IActionResult> UpdateAccountDescription(
-        [FromForm] UpdateAccountDescriptionDto dto
+        [FromBody] UpdateAccountDescriptionDto dto
     )
     {
         return Ok(await _accountService.UpdateDescription(dto));
-
     }
 
     [HttpPatch]

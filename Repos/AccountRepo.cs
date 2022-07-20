@@ -77,8 +77,8 @@ public class AccountRepo : IAccountRepo
         var query = _dbContext.Accounts
             .AsNoTracking()
             .Where(a => string.IsNullOrEmpty(searchPhrase) || a.Nickname.ToLower().Contains(searchPhrase.ToLower()))
-            .OrderByDescending(a => a.Pictures.Sum(picture => picture.Likes.Count()))
-            .ThenByDescending(a => a.Pictures.Count())
+            .OrderByDescending(a => a.Pictures.Sum(picture => picture.Likes.Count))
+            .ThenByDescending(a => a.Pictures.Count)
             .Skip(itemsToSkip)
             .Take(itemsToTake)
             .AsSplitQuery();
@@ -106,21 +106,6 @@ public class AccountRepo : IAccountRepo
         _dbContext.Accounts.Update(account);
         await _dbContext.SaveChangesAsync();
         return account;
-    }
-
-    public async Task<bool> MarkAsSeenAsync(int accountId, int pictureId)
-    {
-        if (!_dbContext.PicturesSeenByAccounts
-            .Any(j => (j.Account.Id == accountId) && (j.Picture.Id == pictureId)))
-        {
-            _dbContext.PicturesSeenByAccounts.Add(new PictureSeenByAccount()
-            {
-                AccountId = accountId,
-                PictureId = pictureId
-            });
-            return await _dbContext.SaveChangesAsync() > 0;
-        }
-        return false;
     }
 
 }

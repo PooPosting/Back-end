@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using FluentValidation;
 using Google.Cloud.Vision.V1;
 using Microsoft.AspNetCore.Authorization;
 using PicturesAPI.Authorization;
@@ -7,14 +6,11 @@ using PicturesAPI.Entities;
 using PicturesAPI.Enums;
 using PicturesAPI.Exceptions;
 using PicturesAPI.Models;
-using PicturesAPI.Models.Dtos;
-using PicturesAPI.Models.Dtos.Account;
-using PicturesAPI.Models.Dtos.Like;
 using PicturesAPI.Models.Dtos.Picture;
 using PicturesAPI.Models.Queries;
-using PicturesAPI.Models.Validators;
 using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services.Helpers;
+using PicturesAPI.Services.Helpers.Interfaces;
 using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Services;
@@ -26,16 +22,18 @@ public class PictureService : IPictureService
     private readonly IAuthorizationService _authorizationService;
     private readonly IAccountContextService _accountContextService;
     private readonly IPictureRepo _pictureRepo;
-    private readonly IAccountRepo _accountRepo;
+    private readonly IPictureHelper _pictureHelper;
     private readonly ITagRepo _tagRepo;
+    private readonly ITagHelper _tagHelper;
 
     public PictureService(
         ILogger<PictureService> logger, 
         IAuthorizationService authorizationService, 
         IAccountContextService accountContextService,
         IPictureRepo pictureRepo,
-        IAccountRepo accountRepo,
+        IPictureHelper pictureHelper,
         ITagRepo tagRepo,
+        ITagHelper tagHelper,
         IMapper mapper
         )
     {
@@ -44,8 +42,19 @@ public class PictureService : IPictureService
         _authorizationService = authorizationService;
         _accountContextService = accountContextService;
         _pictureRepo = pictureRepo;
-        _accountRepo = accountRepo;
+        _pictureHelper = pictureHelper;
         _tagRepo = tagRepo;
+        _tagHelper = tagHelper;
+    }
+
+    public async Task<PictureDto> GetById(
+        int id
+    )
+    {
+        var picture = await _pictureRepo.GetByIdAsync(id);
+        if (picture == null) throw new NotFoundException();
+        var pictureDtos = _mapper.Map<PictureDto>(picture);
+        return pictureDtos;
     }
 
     public async Task<IEnumerable<PictureDto>> GetPersonalizedPictures(
@@ -55,17 +64,17 @@ public class PictureService : IPictureService
         var accId = _accountContextService.GetAccountId();
         var pictures = await _pictureRepo.GetNotSeenByAccountIdAsync(accId, query.PageSize);
 
-        var picArray = pictures.ToList(); // avoiding multiple enumeration
+        var picArray = pictures.ToList();
         foreach (var picture in picArray)
         {
-            await _accountRepo.MarkAsSeenAsync(accId, picture.Id);
+            await _pictureHelper.MarkAsSeenAsync(accId, picture.Id);
         }
         var pictureDtos = _mapper.Map<List<PictureDto>>(picArray).ToList();
         return pictureDtos;
     }
 
-    public async Task<PagedResult<PictureDto>> GetPictures
-        (Query query
+    public async Task<PagedResult<PictureDto>> GetPictures(
+        Query query
         )
     {
         var pictures = await _pictureRepo.SearchAllAsync(
@@ -180,22 +189,47 @@ public class PictureService : IPictureService
         return result;
     }
 
-    public async Task<PictureDto> GetById(
-        int id
+    public async Task<PictureDto> UpdatePictureName(
+        int picId,
+        UpdatePictureNameDto dto
         )
     {
-        var picture = await _pictureRepo.GetByIdAsync(id);
-        if (picture == null) throw new NotFoundException();
-        var pictureDtos = _mapper.Map<PictureDto>(picture);
-        return pictureDtos;
+        var picture = await _pictureRepo.GetByIdAsync(picId);
+        if (picture is null) throw new NotFoundException();
+        await AuthorizePictureOperation(picture, ResourceOperation.Update, "you cannot modify picture you didnt post");
+        picture.Name = dto.Name;
+        return _mapper.Map<PictureDto>(await _pictureRepo.UpdateAsync(picture));
     }
-    
+
+    public async Task<PictureDto> UpdatePictureDescription(
+        int picId,
+        UpdatePictureDescriptionDto dto
+    )
+    {
+        var picture = await _pictureRepo.GetByIdAsync(picId);
+        if (picture is null) throw new NotFoundException();
+        await AuthorizePictureOperation(picture, ResourceOperation.Update, "you cannot modify picture you didnt post");
+        picture.Description = dto.Description;
+        return _mapper.Map<PictureDto>(await _pictureRepo.UpdateAsync(picture));
+    }
+
+    public async Task<PictureDto> UpdatePictureTags(
+        int picId,
+        UpdatePictureTagsDto dto
+    )
+    {
+        var picture = await _pictureRepo.GetByIdAsync(picId);
+        if (picture is null) throw new NotFoundException();
+        await AuthorizePictureOperation(picture, ResourceOperation.Update, "you cannot modify picture you didnt post");
+        await _tagHelper.TryUpdatePictureTagsAsync(picture, dto.Tags);
+
+        return _mapper.Map<PictureDto>(await _pictureRepo.UpdateAsync(picture));
+    }
+
     public async Task<string> Create(
         CreatePictureDto dto
         )
     {
-        // var validationResult = await StaticValidator.Validate(dto);
-        // if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
         if (dto.File is not { Length: > 0 }) throw new BadRequestException("invalid picture");
 
         using var ms = new MemoryStream();
@@ -242,7 +276,7 @@ public class PictureService : IPictureService
                     {
                         Value = tag,
                     });
-                    await _tagRepo.TryInsertPictureTagJoinAsync(picture, insertedTag);
+                    await _tagHelper.TryInsertPictureTagJoinAsync(picture, insertedTag);
                 }
             }
             return IdHasher.EncodePictureId(picture.Id);

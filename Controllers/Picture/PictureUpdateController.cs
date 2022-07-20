@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PicturesAPI.Models.Dtos.Picture;
+using PicturesAPI.Services.Helpers;
+using PicturesAPI.Services.Interfaces;
 
 namespace PicturesAPI.Controllers.Picture;
 
@@ -8,35 +11,42 @@ namespace PicturesAPI.Controllers.Picture;
 [Route("api/picture/{picId}/update")]
 public class PictureUpdateController : ControllerBase
 {
-    // use models instead of simple types in 'fromforms' and validate them.
+    private readonly IPictureService _pictureService;
+
+    public PictureUpdateController(
+        IPictureService pictureService
+        )
+    {
+        _pictureService = pictureService;
+    }
 
     [HttpPatch]
     [Route("name")]
     public async Task<IActionResult> UpdatePictureName(
         [FromRoute] string picId,
-        [FromForm] string name
+        [FromBody] UpdatePictureNameDto dto
     )
     {
-        throw new NotImplementedException();
+        return Ok(await _pictureService.UpdatePictureName(IdHasher.DecodePictureId(picId), dto));
     }
 
     [HttpPatch]
     [Route("description")]
     public async Task<IActionResult> UpdatePictureDescription(
         [FromRoute] string picId,
-        [FromForm] string description
+        [FromBody] UpdatePictureDescriptionDto dto
     )
     {
-        throw new NotImplementedException();
+        return Ok(await _pictureService.UpdatePictureDescription(IdHasher.DecodePictureId(picId), dto));
     }
 
     [HttpPatch]
     [Route("tags")]
     public async Task<IActionResult> UpdatePictureTags(
         [FromRoute] string picId,
-        [FromForm] string tags
+        [FromBody] UpdatePictureTagsDto dto
     )
     {
-        throw new NotImplementedException();
+        return Ok(await _pictureService.UpdatePictureTags(IdHasher.DecodePictureId(picId), dto));
     }
 }

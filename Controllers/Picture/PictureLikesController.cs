@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
+using PicturesAPI.Models.Queries;
 using PicturesAPI.Services.Helpers;
 using PicturesAPI.Services.Interfaces;
 
@@ -9,26 +11,30 @@ namespace PicturesAPI.Controllers.Picture;
 [Route("api/picture/{picId}/like")]
 public class PictureLikesController: ControllerBase
 {
-    private readonly IPictureService _pictureService;
     private readonly IPictureLikingService _pictureLikingService;
+    private readonly ILikeService _likeService;
 
     public PictureLikesController(
-        IPictureService pictureService,
-        IPictureLikingService pictureLikingService
+        IPictureLikingService pictureLikingService,
+        ILikeService likeService
         )
     {
-        _pictureService = pictureService;
         _pictureLikingService = pictureLikingService;
+        _likeService = likeService;
     }
 
     [HttpGet]
+    [EnableQuery]
     public async Task<IActionResult> GetPictureLikes(
-        [FromRoute] string picId
+        [FromRoute] string picId,
+        [FromQuery] Query query
         )
     {
-        // var likes = await _pictureService.GetPicLikes(IdHasher.DecodePictureId(picId));
-        // return Ok(likes);
-        throw new NotImplementedException(); // make the result paged
+        var likes = await _likeService.GetLikesByPictureId(
+            query,
+            IdHasher.DecodePictureId(picId)
+            );
+        return Ok(likes);
     }
 
     [HttpPatch]

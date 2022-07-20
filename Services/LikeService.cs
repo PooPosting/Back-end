@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using PicturesAPI.Exceptions;
+using PicturesAPI.Models;
 using PicturesAPI.Models.Dtos.Like;
+using PicturesAPI.Models.Queries;
 using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services.Interfaces;
 
@@ -10,27 +13,34 @@ public class LikeService : ILikeService
 {
     private readonly IMapper _mapper;
     private readonly ILikeRepo _likeRepo;
-    private readonly IPictureRepo _pictureRepo;
 
     public LikeService(
         IMapper mapper,
-        ILikeRepo likeRepo,
-        IPictureRepo pictureRepo
+        ILikeRepo likeRepo
         )
     {
         _mapper = mapper;
         _likeRepo = likeRepo;
-        _pictureRepo = pictureRepo;
     }
 
-    public async Task<IEnumerable<LikeDto>> GetLikesByPicture(
-        int id
+    public async Task<PagedResult<LikeDto>> GetLikesByPictureId(
+        Query query,
+        int picId
     )
     {
-        if (await _pictureRepo.GetByIdAsync(id) is null) throw new NotFoundException();
-        var likes = await _likeRepo.GetByLikedIdAsync(id);
-        var likeDtos = _mapper.Map<List<LikeDto>>(likes);
+        var likes = await _likeRepo
+            .GetByPictureIdAsync(
+                picId,
+                query.PageSize * (query.PageNumber - 1),
+                query.PageSize
+                );
 
-        return likeDtos;
+        return new PagedResult<LikeDto>(
+            _mapper.Map<IEnumerable<LikeDto>>(likes),
+            query.PageNumber,
+            query.PageSize,
+            await _likeRepo.CountLikesAsync(l => l.PictureId == picId)
+            );
     }
+
 }

@@ -23,5 +23,4 @@ public interface IAccountRepo
 
     Task<Account> InsertAsync(Account account);
     Task<Account> UpdateAsync(Account account);
-    Task<bool> MarkAsSeenAsync(int accountId, int pictureId);
 }

@@ -21,13 +21,16 @@ using PicturesAPI.Models.Configuration;
 using PicturesAPI.Models.Dtos;
 using PicturesAPI.Models.Dtos.Account;
 using PicturesAPI.Models.Dtos.Account.Validators;
-using PicturesAPI.Models.Dtos.Comment;
+using PicturesAPI.Models.Dtos.Picture;
+using PicturesAPI.Models.Dtos.Picture.Validators;
 using PicturesAPI.Models.Queries;
 using PicturesAPI.Models.Queries.Validators;
 using PicturesAPI.Models.Validators;
 using PicturesAPI.Repos;
 using PicturesAPI.Repos.Interfaces;
 using PicturesAPI.Services;
+using PicturesAPI.Services.Helpers;
+using PicturesAPI.Services.Helpers.Interfaces;
 using PicturesAPI.Services.Interfaces;
 using PicturesAPI.Services.Startup;
 
@@ -91,16 +94,18 @@ builder.Services.AddDbContext<PictureDbContext>(options =>
 builder.Services.AddScoped<IValidator<CustomQuery>, CustomQueryValidator>();
 builder.Services.AddScoped<IValidator<Query>, QueryValidator>();
 builder.Services.AddScoped<IValidator<PersonalizedQuery>, PersonalizedQueryValidator>();
-
 builder.Services.AddScoped<IValidator<LsLoginDto>, LsLoginDtoValidator>();
+builder.Services.AddScoped<IValidator<CreateAccountDto>, CreateAccountDtoValidator>();
+builder.Services.AddScoped<IValidator<PatchRestrictedIp>, PatchRestrictedIpValidator>();
 
 builder.Services.AddScoped<IValidator<UpdateAccountEmailDto>, UpdateAccountEmailDtoValidator>();
 builder.Services.AddScoped<IValidator<UpdateAccountPasswordDto>, UpdateAccountPasswordDtoValidator>();
 builder.Services.AddScoped<IValidator<UpdateAccountDescriptionDto>, UpdateAccountDescriptionDtoValidator>();
 builder.Services.AddScoped<IValidator<UpdateAccountPictureDto>, UpdateAccountPictureDtoValidator>();
 
-builder.Services.AddScoped<IValidator<CreateAccountDto>, CreateAccountDtoValidator>();
-builder.Services.AddScoped<IValidator<PatchRestrictedIp>, PatchRestrictedIpValidator>();
+builder.Services.AddScoped<IValidator<UpdatePictureNameDto>, UpdatePictureNameDtoValidator>();
+builder.Services.AddScoped<IValidator<UpdatePictureDescriptionDto>, UpdatePictureDescriptionDtoValidator>();
+builder.Services.AddScoped<IValidator<UpdatePictureTagsDto>, UpdatePictureTagsDtoValidator>();
 
 // Middleware
 builder.Services.AddScoped<ErrorHandlingMiddleware>();
@@ -119,6 +124,11 @@ builder.Services.AddScoped<ILikeService, LikeService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ILogsService, LogsService>();
 builder.Services.AddScoped<IRestrictedIpsService, RestrictedIpsService>();
+
+// Helpers
+builder.Services.AddScoped<ITagHelper, TagHelper>();
+builder.Services.AddScoped<ILikeHelper, LikeHelper>();
+builder.Services.AddScoped<IPictureHelper, PictureHelper>();
 
 // Repos
 builder.Services.AddScoped<IAccountRepo, AccountRepo>();
