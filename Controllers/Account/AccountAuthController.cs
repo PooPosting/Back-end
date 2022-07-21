@@ -19,8 +19,8 @@ public class AccountAuthController : ControllerBase
     [Route("register")]
     public async Task<IActionResult> PostAccount([FromBody] CreateAccountDto dto)
     {
-        var result = await _authService.RegisterAccount(dto);
-        return Created($"/api/account/{result.Id}", result);
+        var accountId = await _authService.RegisterAccount(dto);
+        return Created($"/api/account/{accountId}", null);
     }
 
     [HttpPost]

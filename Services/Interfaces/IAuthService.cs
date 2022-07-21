@@ -6,7 +6,7 @@ namespace PicturesAPI.Services.Interfaces;
 
 public interface IAuthService
 {
-    Task<AccountDto> RegisterAccount(CreateAccountDto dto);
+    Task<string> RegisterAccount(CreateAccountDto dto);
     Task<LoginSuccessResult> GenerateJwt(LoginDto dto);
     Task<LoginSuccessResult> VerifyJwt(LsLoginDto dto);
 }

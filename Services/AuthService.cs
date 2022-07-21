@@ -20,22 +20,19 @@ public class AuthService: IAuthService
     private readonly IPasswordHasher<Account> _passwordHasher;
     private readonly AuthenticationSettings _authenticationSettings;
     private readonly IAccountRepo _accountRepo;
-    private readonly IMapper _mapper;
 
     public AuthService(
         IPasswordHasher<Account> passwordHasher,
         AuthenticationSettings authenticationSettings,
-        IAccountRepo accountRepo,
-        IMapper mapper
+        IAccountRepo accountRepo
         )
     {
         _passwordHasher = passwordHasher;
         _authenticationSettings = authenticationSettings;
         _accountRepo = accountRepo;
-        _mapper = mapper;
     }
 
-    public async Task<AccountDto> RegisterAccount(CreateAccountDto dto)
+    public async Task<string> RegisterAccount(CreateAccountDto dto)
     {
         var newAccount = new Account()
         {
@@ -53,7 +50,7 @@ public class AuthService: IAuthService
             Path.Combine("wwwroot", "accounts", "profile_pictures", $"default{new Random().Next(0, 5)}-pfp.webp");
 
         var account = await _accountRepo.InsertAsync(newAccount);
-        return _mapper.Map<AccountDto>(account);
+        return IdHasher.EncodeAccountId(account.Id);
     }
 
     public async Task<LoginSuccessResult> GenerateJwt(LoginDto dto)

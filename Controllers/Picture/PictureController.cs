@@ -108,9 +108,9 @@ public class PictureController : ControllerBase
             throw new BadRequestException("File should be smaller than 4mb");
         }
 
-        if (tags is not null)
+        if (dto.Tags is not null)
         {
-            if (tags.Split(' ').Length > 4 || !tags.Split(' ').Any(t => t.Length > 25))
+            if ((dto.Tags.Count > 4) || dto.Tags.Any(t => t.Length > 25))
             {
                 throw new BadRequestException("Maximum tag count is 4 and every tag should be shorter than 25 characters");
             }

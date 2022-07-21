@@ -27,8 +27,8 @@ public class PictureService : IPictureService
     private readonly ITagHelper _tagHelper;
 
     public PictureService(
-        ILogger<PictureService> logger, 
-        IAuthorizationService authorizationService, 
+        ILogger<PictureService> logger,
+        IAuthorizationService authorizationService,
         IAccountContextService accountContextService,
         IPictureRepo pictureRepo,
         IPictureHelper pictureHelper,
