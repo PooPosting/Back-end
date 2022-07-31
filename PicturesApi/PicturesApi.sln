@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PicturesApi", "PicturesApi\PicturesApi.csproj", "{6935180E-F641-4E0C-AF92-759FD4D0CF47}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PicturesApi.Tests", "PicturesApi.Tests\PicturesApi.Tests.csproj", "{07C4EBEA-28B3-4169-B194-76AA5054A39C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6935180E-F641-4E0C-AF92-759FD4D0CF47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6935180E-F641-4E0C-AF92-759FD4D0CF47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6935180E-F641-4E0C-AF92-759FD4D0CF47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6935180E-F641-4E0C-AF92-759FD4D0CF47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07C4EBEA-28B3-4169-B194-76AA5054A39C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07C4EBEA-28B3-4169-B194-76AA5054A39C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07C4EBEA-28B3-4169-B194-76AA5054A39C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07C4EBEA-28B3-4169-B194-76AA5054A39C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
