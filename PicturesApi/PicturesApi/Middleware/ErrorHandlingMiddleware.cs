@@ -66,7 +66,7 @@ public class ErrorHandlingMiddleware : IMiddleware
             await context.Response.WriteAsync("Resource not found");
         }
 
-        catch (NotImplementedException e)
+        catch (NotImplementedException)
         {
             context.Response.StatusCode = 500;
             await context.Response.WriteAsync("Not implemented");

@@ -172,6 +172,7 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 // Configure
 app.UseCors("FrontEndClient");
+DirectoryManager.EnsureAllDirectoriesAreCreated();
 app.UseFileServer(new FileServerOptions
 {
     FileProvider = new PhysicalFileProvider(

@@ -2,7 +2,6 @@ appsettings.json
 appsettings.Development.json
 authKey.json
 *.editorconfig
-*.txt
 PicturesApi/PicturesApi/wwwroot/pictures/*
 PicturesApi/PicturesApi/wwwroot/accounts/profile_pictures/*
 PicturesApi/PicturesApi/wwwroot/accounts/background_pictures/*
