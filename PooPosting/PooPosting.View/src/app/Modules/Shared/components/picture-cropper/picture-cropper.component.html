@@ -1,0 +1,29 @@
+<p-fileUpload name="profPic"
+              accept="image/*"
+              [multiple]="false"
+              [maxFileSize]="4194304"
+              [showUploadButton]="false"
+              [chooseLabel]="'Wybierz'"
+              [cancelLabel]="'Anuluj'"
+              [invalidFileSizeMessageSummary]="'{0}: Nieprawidłowa wielkość obrazka,'"
+              [invalidFileSizeMessageDetail]="'Maksymalna wielkość obrazka to {0}.'"
+              (onRemove)="onFileCancel()"
+              (onSelect)="onFileSelect($event)"
+              (onClear)="onFileCancel()">
+</p-fileUpload>
+
+<div *ngIf="cropperDataUrl">
+
+  <angular-cropper #cropper
+                   [cropperOptions]="config"
+                   [imageUrl]="cropperDataUrl">
+  </angular-cropper>
+
+  <div class="mt-3 text-center" *ngIf="showDefaultSubmitButton">
+    <button pButton class="px-5" label="{{buttonLabel}}"
+            [disabled]="!cropperDataUrl || awaitSubmit" (click)="crop()">
+    </button>
+  </div>
+
+</div>
+

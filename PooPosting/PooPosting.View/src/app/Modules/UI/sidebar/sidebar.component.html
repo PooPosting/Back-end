@@ -1,0 +1,43 @@
+<div class="sidebar">
+  <div class="p-0 text-center disable-selection shadow-sm">
+
+    <p-accordion [multiple]="false">
+
+      <div *ngFor="let expandableItem of sidebarItems">
+        <p-accordionTab header="{{expandableItem.label}}"
+          [ngClass]="sidebarItems.indexOf(expandableItem) === 0 && loggedIn ? 'd-none' : ''"
+          [disabled]="!loggedIn === expandableItem.showWhileLoggedIn"
+          [selected]="
+          sidebarItems.indexOf(expandableItem) === 0 && !loggedIn ||
+          sidebarItems.indexOf(expandableItem) === 1 && loggedIn">
+
+          <div class="d-flex flex-column gap">
+            <div *ngFor="let item of expandableItem.menuItems">
+              <div *ngIf="item.label !== 'Wyloguj'">
+                <button pButton pRipple class="min-w-75 p-button-outlined"
+                        routerLink="{{item.url}}" label="{{item.label}}" icon="{{item.class}}" attr.aria-label="{{item.label}}">
+                </button>
+              </div>
+              <div *ngIf="item.label === 'Wyloguj'">
+                <button pButton pRipple class="w-75 p-button-outlined"
+                        (click)="logout()" label="{{item.label}}" icon="{{item.class}}" attr.aria-label="{{item.label}}">
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </p-accordionTab>
+      </div>
+
+    </p-accordion>
+  </div>
+
+  <div class="p-1 py-2 text-muted opaque">
+    <ul class="nav d-flex flex-column justify-content-center align-items-center">
+      <li class="nav-item px-1" *ngFor="let item of sidebarLinks">
+        <a href="{{item.url}}" target="_blank" class="nav-link">{{item.label}}</a>
+      </li>
+    </ul>
+  </div>
+
+</div>

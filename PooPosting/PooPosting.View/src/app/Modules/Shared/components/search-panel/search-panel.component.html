@@ -1,0 +1,74 @@
+<div class="bg-dark text-white p-2 px-md-4 mx-3 mb-5 mx-md-0 rounded shadow d-flex flex-column">
+<!--  Title -->
+  <div class="text-center pt-2 pb-4">
+    <h2>Panel wyszukiwania</h2>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" (reset)="reset()">
+
+    <div class="row">
+      <div class="d-sm-flex justify-content-center justify-content-sm-around w-100 mb-3">
+
+        <div class="min-width d-flex justify-content-center pb-3 p-sm-0">
+          <div>
+            <p class="text-center text-sm-left">Szukaj wśród:</p>
+            <div class="form-check">
+              <input class="form-check-input" name="lookFor" type="radio" (click)="switchOpts('pictures')"
+                     id="lookForPictures" [value]="0" formControlName="lookFor" checked>
+              <label class="form-check-label" for="lookForPictures">
+                Obrazków
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" name="lookFor" type="radio" (click)="switchOpts('accounts')"
+                     id="lookForAccounts" [value]="1" formControlName="lookFor">
+              <label class="form-check-label" for="lookForAccounts">
+                Kont
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="min-width d-flex justify-content-center">
+          <div>
+            <p class="text-center text-sm-left">Sortuj:</p>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="sortBy"
+                     id="sortByMostPopular" [value]="0" formControlName="sortBy" checked>
+              <label class="form-check-label" for="sortByMostPopular">
+                Najpopularniejsze
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="sortBy"
+                     id="sortByMostLikes" [value]="1" formControlName="sortBy">
+              <label class="form-check-label" for="sortByMostLikes">
+                Najbardziej lubiane
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="sortBy"
+                     id="sortByNewest" [value]="2" formControlName="sortBy">
+              <label class="form-check-label" for="sortByNewest">
+                Najnowsze
+              </label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="px-3">
+      <input type="text" class="form-control" placeholder="Wyszukaj, co cię interesuje..." formControlName="searchPhrase">
+    </div>
+
+    <div class="d-flex justify-content-center mt-3 mb-2">
+      <button pButton pRipple type="reset" label="Wyczyść" class="p-button-secondary text-white p-button-text border mx-2"></button>
+      <button pButton pRipple type="submit" label="Wyszukaj" [disabled]="form.invalid"
+              class="p-button-secondary text-white p-button-text border mx-2"></button>
+    </div>
+
+  </form>
+
+</div>

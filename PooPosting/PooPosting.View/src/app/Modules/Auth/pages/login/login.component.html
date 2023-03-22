@@ -1,0 +1,63 @@
+<div class="main">
+  <div class="container pt-4 py-md-5 w-100">
+
+    <div class="card">
+      <div class="card-header text-center">
+        <h2>Logowanie</h2>
+      </div>
+      <div class="card-body">
+        <form class="text-center row pt-3" [formGroup]="form" type="submit" (ngSubmit)="onSubmit()">
+
+          <div class="text-left col-12 mb-form-input">
+            <span class="p-float-label">
+              <input id="nickname-input" class="w-100" type="text"
+                     [ngClass]="form.get('nickname')!.touched ? 'ng-dirty' : ''"
+                     formControlName="nickname" pInputText>
+              <label for="nickname-input">
+                Nazwa użytkownika
+              </label>
+            </span>
+            <span class="errors" *ngIf="!formDisabled">
+              <small id="nickname-input-help" class="p-error d-block"
+                     *ngIf="!form.get('nickname')!.valid && form.get('nickname')!.touched">
+              Proszę wpisać nazwę użytkownika
+            </small>
+            </span>
+          </div>
+
+          <div class="text-left col-12 mb-form-input">
+            <span class="p-float-label">
+                <input id="password-input" class="w-100" type="password"
+                       [ngClass]="form.get('password')!.touched ? 'ng-dirty' : ''"
+                       formControlName="password" pInputText>
+                <label for="password-input">
+                  Hasło
+                </label>
+            </span>
+            <span class="errors" *ngIf="!formDisabled">
+              <small id="password-input-help" class="p-error d-block ng-dirty"
+                     *ngIf="!form.get('password')!.valid && form.get('password')!.touched">
+              Proszę wpisać hasło
+            </small>
+            </span>
+          </div>
+
+          <div class="col-12">
+            <button pButton pRipple type="submit" label="Zaloguj się"
+                    class="p-button-primary px-5 py-2" [disabled]="form.invalid || !form.enabled"></button>
+          </div>
+
+
+        </form>
+
+      </div>
+    </div>
+
+    <div class="col-12 text-center py-2">
+      <a [routerLink]="['/auth/register']" class="register-link underline">Nie masz jescze konta? Zarejestruj się!</a>
+    </div>
+
+    <p-messages key="login-failed"></p-messages>
+
+  </div>
+</div>

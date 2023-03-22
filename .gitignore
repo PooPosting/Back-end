@@ -10,3 +10,8 @@ bin/
 obj/
 .idea/
 *.user
+.angular/
+.vscode/
+node_modules
+internal-nlog.txt
+PooPosting/PooPosting.Api/logs/internal-nlog.txt

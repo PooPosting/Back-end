@@ -1,0 +1,13 @@
+.skeleton-header,.skeleton-subheader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.skeleton-img {
+  aspect-ratio: 4/3 !important;
+  width: 100% !important;
+}
+.skeleton-img-wrapper {
+  width: 100%;
+  aspect-ratio: 4/3;
+}

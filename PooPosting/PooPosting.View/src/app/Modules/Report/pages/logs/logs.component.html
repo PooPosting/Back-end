@@ -1,0 +1,61 @@
+<div class="px-3 px-md-0">
+  <h2 class="mb-3">Zgłaszanie błędów</h2>
+
+  <div class="mb-5">
+    <h4 class="mb-2 font-weight-normal">Lista automatycznie wyłapanych błędów HTTP w bieżącej sesji:</h4>
+    <p-accordion [activeIndex]="logs.errors.length-1" *ngIf="logs.errors.length">
+      <p-accordionTab style="justify-content: flex-start"
+                      *ngFor="let displayLog of logs.errors, index as i">
+        <ng-template pTemplate="header">
+          <div class="w-100 d-flex justify-content-between align-items-center">
+            <div>
+              <span class="headerSpan"><strong>{{i+1}}.&ensp;</strong></span>
+              <span class="headerSpan">Status: <b>{{logs.errors[i].status}}</b>,&ensp;</span>
+              <span class="headerSpan">Godzina: {{parseDate(logs.errors[i].date)}}</span>
+            </div>
+            <div>
+              <span class="headerSpan">Metoda: <strong>{{logs.errors[i].request.method}}</strong></span>
+            </div>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="body">
+          <code class="mb-3"><pre class="pre-scrollable">{{jsonToString(displayLog)}}</pre></code>
+          <div class="w-100 text-center">
+            <button pButton pRipple label="Skopiuj błąd" icon="bi bi-clipboard" class="mt-3" (click)="copyErrorLog(displayLog)"></button>
+          </div>
+        </ng-template>
+      </p-accordionTab>
+    </p-accordion>
+    <p-accordion *ngIf="!logs.errors.length" [activeIndex]="0">
+      <p-accordionTab header="Brak błędów HTTP w bieżącej sesji.">
+        <div class="border text-center">
+          <img src="../../../../../assets/images/no-errors.webp"
+               alt="Brak błędów" class="img-fluid">
+        </div>
+      </p-accordionTab>
+    </p-accordion>
+
+<!--    Contact form -->
+    <div class="w-100 text-center mt-5">
+      <div class="form-label mb-2">
+        <h4>Chcesz zgłosić błąd?</h4>
+        <h6>Postaraj się go opisać w poniższym formularzu.</h6>
+      </div>
+      <small class="text-muted text-center my-1 message-label w-100">
+        <p class="label-paragraph font-weight-bold">Postaraj się opisać, podczas wykonywania jakiej akcji na stronie wystąpił błąd.</p>
+        <p class="label-paragraph">Do programisty zostaną wysłane podstawowe informacje o Twoim koncie, logi dotyczące błędów (jeżeli istnieją), które wystąpiły w obecnej sesji, oraz Twój opis błędu.</p>
+        <p class="label-paragraph">Maksymalna długość opisu to 1000 znaków.</p>
+      </small>
+      <form class="d-flex flex-column justify-content-center align-items-center">
+        <span class="p-float-label mt-4 mb-2">
+          <textarea pInputTextarea name="email content" id="emailMessage" cols="60" rows="5" [disabled]="!isLoggedOn" [(ngModel)]="userMsg"></textarea>
+          <label for="emailMessage">Opis błędu</label>
+        </span>
+        <button pButton pRipple label="Wyślij wiadomość do programisty" icon="bi bi-send"
+                (click)="sendErrorLogs()" [disabled]="canSendLogs !== true || (userMsg.length < 4) || userMsg.length > 1000 || !isLoggedOn"></button>
+        <small class="text-danger text-center mt-1" *ngIf="canSendLogs === false">Twoje logi zostały już wysłane.</small>
+        <small class="text-danger text-center mt-1" *ngIf="!isLoggedOn">Aby zgłosić błąd, użytkownik musi być zalogowany.</small>
+      </form>
+    </div>
+  </div>
+</div>

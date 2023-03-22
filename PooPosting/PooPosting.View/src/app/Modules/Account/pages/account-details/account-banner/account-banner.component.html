@@ -1,0 +1,16 @@
+<div class="w-100 banner"
+     [style.background]='"url(" + account.backgroundPicUrl + ")"'
+     [style.padding]="account.accountDescription ? '' : '5rem 0'">
+  <div class="banner-header"
+       [style.margin-bottom]="!account.accountDescription ? '' : '4rem'">
+    <div class="py-4 d-flex justify-content-center align-items-center">
+      <img class="prof-pic" src="{{account.profilePicUrl}}" alt="{{account.nickname}}">
+      <p class="nickname">{{account.nickname}}</p>
+    </div>
+  </div>
+
+  <div class="banner-footer p-2 mt-5" *ngIf="account.accountDescription">
+    <p class="description">{{account.accountDescription}}</p>
+  </div>
+</div>
+

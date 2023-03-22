@@ -1,0 +1,20 @@
+img {
+  aspect-ratio: 16/10;
+}
+.account-link {
+  cursor: pointer;
+  width: max-content;
+  &:hover{
+    text-decoration: underline;
+  }
+}
+.img {
+  width: 30% !important;
+}
+.img-container {
+  width: 180%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.5rem;
+}

@@ -1,0 +1,24 @@
+<div *ngIf="account != undefined" class="mb-4">
+  <p-card>
+    <p-header class="d-flex justify-content-center py-2">
+      <h3 routerLink="/account/{{account.id}}" class="account-link"
+          attr.aria-label="Konto {{account.nickname}}">
+        <span class="bi bi-person-fill"></span>{{account.nickname}}
+      </h3>
+    </p-header>
+
+    <div class="d-flex p-2">
+      <div class="img-container">
+        <div class="img" *ngFor="let picture of account.picturePreviews | slice:0:5">
+          <img src="{{picture.url}}" alt="{{picture.id}}" class="img-fluid border">
+        </div>
+      </div>
+      <div *ngIf="!account.picturePreviews.length" class="col-12">
+        <div class="d-flex justify-content-center">
+          <span class="text-muted text-center">Brak obrazków</span>
+        </div>
+      </div>
+    </div>
+
+  </p-card>
+</div>

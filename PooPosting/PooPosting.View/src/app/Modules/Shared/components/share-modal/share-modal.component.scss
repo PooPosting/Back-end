@@ -1,0 +1,6 @@
+.share-container {
+  width: 70vw;
+  @media screen and (min-width: 768px) {
+    width: 50rem;
+  }
+}

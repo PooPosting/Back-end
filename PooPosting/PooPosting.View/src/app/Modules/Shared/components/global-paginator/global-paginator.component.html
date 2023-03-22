@@ -1,0 +1,20 @@
+<nav class="paginator bg-surface-gray p-0 m-0">
+  <div class="d-flex justify-content-center align-items-center w-100 gap py-2">
+    <button pButton pRipple icon="bi bi-chevron-double-left"
+            (click)="paginateLeftMax()" [disabled]="currentPage < 1" aria-label="Pierwsza strona"></button>
+    <button pButton pRipple icon="bi bi-chevron-left"
+            (click)="paginateLeft()" [disabled]="currentPage < 1" aria-label="Poprzednia strona"></button>
+
+    <div *ngFor="let item of pagesToShow">
+      <button pButton pRipple class="p-button-sm" label="{{item + 1}}"
+              [ngClass]="item === currentPage ? '' : 'p-button-outlined'"
+              [disabled]="item === currentPage" (click)="paginate(item + 1)">
+      </button>
+    </div>
+
+    <button pButton pRipple icon="bi bi-chevron-right"
+            (click)="paginateRight()" [disabled]="currentPage >= totalPages" aria-label="Następna strona"></button>
+    <button pButton pRipple icon="bi bi-chevron-double-right"
+            (click)="paginateRightMax()" [disabled]="currentPage >= totalPages" aria-label="Ostatnia strona"></button>
+  </div>
+</nav>

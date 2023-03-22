@@ -1,0 +1,42 @@
+<div class="w-100 banner mb-3"
+     [style.background]='"url(" + account.backgroundPicUrl + ")"'>
+  <div class="top border-bottom">
+    <h3 class="text-center text-break font-weight-bold">
+      <div class="py-4 d-flex justify-content-center align-items-center">
+        <img class="prof-pic" src="{{account.profilePicUrl}}" alt="{{account.nickname}}">
+        <p class="nickname">{{account.nickname}}</p>
+      </div>
+    </h3>
+  </div>
+  <div class="bottom py-4 border-bottom">
+    <ul class="d-flex flex-column flex-md-row justify-content-around align-items-center">
+      <li *ngIf="account.isModifiable">
+        <span class="li-item mt-2 mt-lg-0 w-100">
+          <span class="bi bi-envelope mr-1"></span>
+          <b>Adres e-mail:</b>
+        </span>
+        <span class="text-center w-100">
+          {{account.email}}
+        </span>
+      </li>
+      <li>
+        <span class="li-item mt-2 mt-lg-0 w-100">
+          <span class="bi bi-calendar mr-1"></span>
+          <b>Konto utworzone:</b>
+        </span>
+        <span class="text-center w-100">
+          {{account.accountCreated | date:"hh:mm, dd/MM/yyyy"}}
+        </span>
+      </li>
+      <li>
+        <span class="li-item mt-2 mt-lg-0 w-100">
+          <span class="bi bi-images mr-1"></span>
+          <b>Ilość obrazków:</b>
+        </span>
+        <span class="text-center w-100">
+          {{account.picturePreviews.length}}
+        </span>
+      </li>
+    </ul>
+  </div>
+</div>

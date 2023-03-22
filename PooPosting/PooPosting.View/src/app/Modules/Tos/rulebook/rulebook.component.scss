@@ -1,0 +1,25 @@
+ol {
+  list-style: decimal;
+  font-weight: 600;
+  li.mb-1, h3 {
+    font-size: 1.25rem;
+    li, p {
+      font-weight: normal;
+      font-size: 1rem;
+    }
+  }
+
+}
+.link {
+  cursor: pointer;
+  text-decoration: underline;
+  &:hover {
+    opacity: 0.85;
+  }
+  &:active {
+    opacity: 1;
+  }
+}
+ol, ul {
+  padding-left: 2rem;
+}

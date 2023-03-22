@@ -1,0 +1,61 @@
+.gap-1 {
+  gap: 0.5rem;
+}
+.gap-2 {
+  gap: 1rem;
+}
+.account-nickname {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+ul {
+  padding: 0;
+  margin: 0;
+  li {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    word-break: break-word;
+  }
+  .li-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+}
+
+.banner {
+  border-radius: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-size: cover !important;
+  background-position: center center;
+  color: white;
+
+  .top {
+    border-radius: 0.25rem 0.25rem 0 0 ;
+    backdrop-filter: brightness(0.6);
+  }
+  .bottom {
+    border-radius: 0 0 0.25rem 0.25rem;
+    backdrop-filter: brightness(0.6);
+  }
+
+  .prof-pic {
+    margin-right: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    background-color: rgba(255, 255, 255);
+    max-width: 3.5rem;
+    border-radius: 35%;
+  }
+  .nickname {
+    font-size: 2.25rem;
+    font-weight: 500;
+    font-style: italic;
+  }
+}
+

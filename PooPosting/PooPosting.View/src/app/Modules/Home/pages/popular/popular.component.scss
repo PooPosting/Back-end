@@ -1,0 +1,62 @@
+@use '../../../../../styles/themes/variables';
+h1, h2 {
+  cursor: default;
+}
+.title {
+  font-size: 2rem;
+}
+.select-item {
+  font-size: clamp(0.95rem, 1400px, 1rem) !important;
+}
+th {
+  text-align: center !important;
+  padding: 0.75rem 0.2rem !important;
+  cursor: default;
+}
+.loading-title {
+  font-size: 1.5rem;
+}
+.td-icon-data {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  .bi {
+    font-size: 1rem;
+  }
+}
+.bg-darker {
+  background-color: rgb(250, 250, 250) !important;
+}
+:host ::ng-deep .custom-spinner .p-progress-spinner-circle {
+  animation: custom-progress-spinner-dash 1.5s ease-in-out infinite, custom-progress-spinner-color 6s ease-in-out infinite;
+}
+@keyframes custom-progress-spinner-color {
+  100%,
+  0% {
+    stroke: variables.$primary-color;
+  }
+  40% {
+    stroke: variables.$primary-hover-color;
+  }
+  66% {
+    stroke: variables.$primary-color;
+  }
+  80%,
+  90% {
+    stroke: variables.$primary-hover-color;
+  }
+}
+@keyframes custom-progress-spinner-dash {
+  0% {
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 89, 200;
+    stroke-dashoffset: -35px;
+  }
+  100% {
+    stroke-dasharray: 89, 200;
+    stroke-dashoffset: -124px;
+  }
+}

@@ -1,0 +1,33 @@
+<main>
+  <app-search-panel
+    (searchAccEvent)="searchAccounts()"
+    (searchPicEvent)="searchPictures()"
+    (resetSearchEvent)="clearSearch()">
+  </app-search-panel>
+
+  <div>
+    <app-picture-preview
+      *ngFor="let picture of picturesResult!.items"
+      [picture]="picture" [isLoggedOn]="isLoggedOn">
+    </app-picture-preview>
+    <app-account-preview
+      *ngFor="let account of accountsResult!.items"
+      [account]="account">
+    </app-account-preview>
+  </div>
+
+  <nav class="paginator w-100 shadow border" [ngClass]="picturesResult.items.length ? '' : 'd-none'">
+    <app-global-paginator #picPaginator
+                 [totalPages]="picturesResult.totalPages-2"
+                 [pageSize]="10" (onPaginate)="paginate($event)">
+    </app-global-paginator>
+  </nav>
+
+  <nav class="paginator w-100 shadow border" [ngClass]="accountsResult.items.length ? '' : 'd-none'">
+    <app-global-paginator #accPaginator
+                          [totalPages]="accountsResult.totalPages-2"
+                          [pageSize]="5" (onPaginate)="paginateAccs($event)">
+    </app-global-paginator>
+  </nav>
+
+</main>

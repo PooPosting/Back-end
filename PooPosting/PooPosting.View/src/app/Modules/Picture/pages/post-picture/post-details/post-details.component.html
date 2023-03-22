@@ -1,0 +1,83 @@
+
+<form class="text-center row mt-4 mb-5" [formGroup]="form" (ngSubmit)="submit()">
+
+  <!--          Picture name -->
+  <div class="text-left col-12 mt-3 mb-4">
+      <span class="p-float-label">
+        <input id="name-input" class="w-100" type="text"
+               [ngClass]="form.get('name')!.touched ? 'ng-dirty' : ''"
+               formControlName="name" pInputText>
+        <label for="name-input">
+          Nazwa obrazka
+          <span class="text-danger">*</span>
+        </label>
+      </span>
+    <span *ngIf="form.get('name')!.touched && form.get('name')!.invalid">
+      <small id="name-input-error-required" class="px-1 p-error block"
+             *ngIf="form.get('name')!.errors!['required']">
+        Proszę wypełnić to pole
+      </small>
+      <small id="name-input-error-minlength" class="px-1 p-error block"
+             *ngIf="form.get('name')!.errors!['minlength']">
+        Nazwa obrazka powinna zawierać co najmniej 4 znaki
+      </small>
+      <small id="name-input-error-maxlength" class="px-1 p-error block"
+             *ngIf="form.get('name')!.errors!['maxlength']">
+        Nazwa obrazka powinna zawierać maksymalnie 40 znaków
+      </small>
+      <small id="name-input-error-regex-mismatch" class="px-1 p-error block"
+             *ngIf="!form.get('name')!.errors!['pattern']">
+        Nazwa obrazka nie może zaczynać i kończyć się spacją, oraz nie może posiadać wielu spacji obok siebie
+      </small>
+    </span>
+  </div>
+
+  <!--          Picture Desc-->
+  <div class="mb-4 text-left col-12">
+            <span class="p-float-label w-100">
+              <textarea id="float-input" class="w-100" formControlName="description" rows="3" cols="30" pInputTextarea></textarea>
+              <label for="float-input">Opis obrazka</label>
+            </span>
+    <small id="desc-area-error-maxlength" class="px-1 p-error block"
+           *ngIf="form.get('description')!.errors">
+      Opis obrazka powinien zawierać maksymalnie 500 znaków
+    </small>
+  </div>
+
+  <!--          Picture tags-->
+  <div class="mx-3 mb-4 w-100 text-left">
+    <div class="p-float-label w-100">
+      <p-chips #pChips
+               id="chips"
+               formControlName="tags"
+               [allowDuplicate]="false"
+               [addOnTab]="true"
+               (onAdd)="trimChips()" (onRemove)="popChips()" (keydown)="onKeyDown($event)" (touchend)="onKeyDown($event)" [addOnBlur]="true">
+        <ng-template let-item pTemplate="item">
+          <span class="bi bi-tag">{{item}}</span>
+        </ng-template>
+      </p-chips>
+      <label for="chips">Tagi</label>
+    </div>
+    <p class="lh15 mt-1 d-flex flex-column">
+      <small id="chips-help2" class="mx-1 text-muted">ENTER lub SPACE aby zatwierdzić tag</small>
+      <small id="chips-help1" class="mx-1 text-muted">Możesz wprowadzić maksymalnie 4 tagi.</small>
+    </p>
+  </div>
+
+<!--  <div class="d-flex w-100 justify-content-center mb-3">-->
+<!--    <p-captcha [siteKey]="siteKey" (onResponse)="passCaptcha()"></p-captcha>-->
+<!--  </div>-->
+
+  <div class="d-flex justify-content-between w-100 align-items-center mt-4 mb-5">
+    <button pButton label="Powrót" icon="bi bi-arrow-90deg-left"
+            (click)="return()">
+    </button>
+    <button pButton label="Dalej" type="submit" [disabled]="form.invalid"
+            icon="bi bi-arrow-return-right">
+    </button>
+  </div>
+
+</form>
+
+
