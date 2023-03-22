@@ -3,13 +3,13 @@ import {UntypedFormControl, UntypedFormGroup, Validators} from "@angular/forms";
 import {MessageService} from "primeng/api";
 import {map, Observable, Subscription} from "rxjs";
 import {ActivatedRoute, Router} from "@angular/router";
-import {PictureModel} from "../../../../Models/ApiModels/Get/PictureModel";
 import {HttpServiceService} from "../../../../Services/http/http-service.service";
 import {LocationServiceService} from "../../../../Services/helpers/location-service.service";
 import {Title} from "@angular/platform-browser";
 import {CacheServiceService} from "../../../../Services/data/cache-service.service";
 import {TitleCasePipe} from "@angular/common";
 import {PictureDetailsServiceService} from "../../../../Services/data/picture-details-service.service";
+import {PictureDto} from "../../../../Models/Dtos/PictureDto";
 
 @Component({
   selector: 'app-picture-details',
@@ -17,7 +17,7 @@ import {PictureDetailsServiceService} from "../../../../Services/data/picture-de
   styleUrls: ['./picture-details.component.scss']
 })
 export class PictureDetailsComponent implements OnInit {
-  picture!: PictureModel;
+  picture!: PictureDto;
   id: Observable<string>;
   isLoggedOn: boolean = false;
 
@@ -63,7 +63,7 @@ export class PictureDetailsComponent implements OnInit {
       }
     })
     this.picChangedSubscription = this.pictureDetailsService.pictureChangedSubject.subscribe({
-      next: (val: PictureModel) => {
+      next: (val: PictureDto) => {
         if (val.id === this.picture.id) {
           this.picture = val;
         }
@@ -98,7 +98,7 @@ export class PictureDetailsComponent implements OnInit {
     this.id.subscribe({
       next: (val) => {
         this.httpService.getPictureRequest(val).subscribe({
-          next: (pic: PictureModel) => {
+          next: (pic: PictureDto) => {
             this.picture = pic;
             this.title.setTitle(`PicturesUI - Obrazek "${this.titleCasePipe.transform(pic.name)}"`);
             this.cacheService.cachePictures([this.picture]);
@@ -114,7 +114,7 @@ export class PictureDetailsComponent implements OnInit {
   likeObserver = {
     next: () => {
       this.httpService.getPictureRequest(this.picture.id).subscribe({
-        next: (value: PictureModel) => {
+        next: (value: PictureDto) => {
           this.picture = value;
         }
       })

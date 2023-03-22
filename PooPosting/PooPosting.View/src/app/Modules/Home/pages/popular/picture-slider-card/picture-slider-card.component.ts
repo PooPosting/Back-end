@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {PictureModel} from "../../../../../Models/ApiModels/Get/PictureModel";
 import {HttpServiceService} from "../../../../../Services/http/http-service.service";
-import {LikeResult} from "../../../../../Models/ApiModels/Patch/LikeResult";
+import {LikeResult} from "../../../../../Models/Dtos/LikeResult";
+import {PictureDto} from "../../../../../Models/Dtos/PictureDto";
 
 @Component({
   selector: 'app-picture-slider-card',
@@ -9,7 +9,7 @@ import {LikeResult} from "../../../../../Models/ApiModels/Patch/LikeResult";
   styleUrls: ['./picture-slider-card.component.scss']
 })
 export class PictureSliderCardComponent implements OnInit {
-  @Input() picture!: PictureModel;
+  @Input() picture!: PictureDto;
   @Input() index!: number;
   @Input() showCommentCount: boolean = false;
   @Input() showLikeCount: boolean = false;

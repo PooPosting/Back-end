@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpParams} from "@angular/common/http";
-import { GetPQuery } from 'src/app/Models/QueryModels/GetPQuery';
+import { GetPictureQuery } from 'src/app/Models/QueryModels/GetPictureQuery';
 import { SearchQuery } from 'src/app/Models/QueryModels/SearchQuery';
 import { SortSearchBy } from 'src/app/Enums/SortSearchBy';
 import {BehaviorSubject, Observable, Subject} from "rxjs";
@@ -11,7 +11,7 @@ import {BehaviorSubject, Observable, Subject} from "rxjs";
 export class HttpParamsServiceService {
   constructor() {}
 
-  GetPQuery: GetPQuery = {
+  GetPQuery: GetPictureQuery = {
     searchPhrase: "",
     pageNumber: 1,
     pageSize: 2,

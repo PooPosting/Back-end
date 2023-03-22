@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
-import { PictureModel } from 'src/app/Models/ApiModels/Get/PictureModel';
 import { HttpServiceService } from 'src/app/Services/http/http-service.service';
 import {PictureDetailsServiceService} from "../../../../Services/data/picture-details-service.service";
+import {PictureDto} from "../../../../Models/Dtos/PictureDto";
 
 @Component({
   selector: 'app-picture-preview',
@@ -9,7 +9,7 @@ import {PictureDetailsServiceService} from "../../../../Services/data/picture-de
   styleUrls: ['./picture-preview.component.scss']
 })
 export class PicturePreviewComponent implements OnInit {
-  @Input() picture!: PictureModel;
+  @Input() picture!: PictureDto;
   @Input() isLoggedOn!: boolean;
   isDeleted: boolean = false;
 
@@ -29,7 +29,7 @@ export class PicturePreviewComponent implements OnInit {
       }
     })
     this.pictureDetailsService.pictureChangedSubject.subscribe({
-      next: (val: PictureModel) => {
+      next: (val: PictureDto) => {
         if (val.id === this.picture.id) {
           this.picture = val;
         }
@@ -48,7 +48,7 @@ export class PicturePreviewComponent implements OnInit {
   }
 
   likeObserver = {
-    next: (v: PictureModel) => {
+    next: (v: PictureDto) => {
       this.picture = v;
     },
   }

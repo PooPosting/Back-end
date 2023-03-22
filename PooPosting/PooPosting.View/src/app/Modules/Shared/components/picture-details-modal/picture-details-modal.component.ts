@@ -1,7 +1,5 @@
 import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
-import {PictureModel} from "../../../../Models/ApiModels/Get/PictureModel";
 import {HttpServiceService} from "../../../../Services/http/http-service.service";
-import {CommentModel} from "../../../../Models/ApiModels/Get/CommentModel";
 import {MessageService} from "primeng/api";
 import {ItemName} from "../../../../Regexes/ItemName";
 import {UntypedFormControl, UntypedFormGroup, Validators} from "@angular/forms";
@@ -10,6 +8,8 @@ import {SelectOption} from "../../../../Models/QueryModels/SelectOption";
 import {PictureDetailsServiceService} from "../../../../Services/data/picture-details-service.service";
 import {CacheServiceService} from "../../../../Services/data/cache-service.service";
 import {environment} from "../../../../../environments/environment";
+import {PictureDto} from "../../../../Models/Dtos/PictureDto";
+import {CommentDto} from "../../../../Models/Dtos/CommentDto";
 
 @Component({
   selector: 'app-picture-details-modal',
@@ -17,10 +17,10 @@ import {environment} from "../../../../../environments/environment";
   styleUrls: ['./picture-details-modal.component.scss']
 })
 export class PictureDetailsModalComponent implements OnInit {
-  @Input() picture: PictureModel | null = null;
+  @Input() picture: PictureDto | null = null;
   @Input() isLoggedOn!: boolean;
 
-  @Output() pictureChanged: EventEmitter<PictureModel> = new EventEmitter<PictureModel>();
+  @Output() pictureChanged: EventEmitter<PictureDto> = new EventEmitter<PictureDto>();
   @Output() modalClose: EventEmitter<void> = new EventEmitter<void>()
 
   shareUrl!: string;
@@ -205,13 +205,13 @@ export class PictureDetailsModalComponent implements OnInit {
   }
 
   likeObserver = {
-    next: (v: PictureModel) => {
+    next: (v: PictureDto) => {
       this.picture = v;
       this.pictureChanged.emit(v);
     },
   }
   commentObserver = {
-    next: (v: CommentModel) => {
+    next: (v: CommentDto) => {
       this.picture!.comments.unshift(v);
       this.commentForm.reset();
       this.awaitSubmit = false;

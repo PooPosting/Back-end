@@ -2,11 +2,11 @@ import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {map, Observable, Subscription} from "rxjs";
 import {ActivatedRoute, Router} from "@angular/router";
 import {HttpServiceService} from "../../../../Services/http/http-service.service";
-import {AccountModel} from "../../../../Models/ApiModels/Get/AccountModel";
 import {LocationServiceService} from "../../../../Services/helpers/location-service.service";
 import {MessageService} from "primeng/api";
 import {Title} from "@angular/platform-browser";
 import {PictureDetailsServiceService} from "../../../../Services/data/picture-details-service.service";
+import {AccountDto} from "../../../../Models/Dtos/AccountDto";
 
 @Component({
   selector: 'app-account-details',
@@ -15,7 +15,7 @@ import {PictureDetailsServiceService} from "../../../../Services/data/picture-de
 })
 export class AccountDetailsComponent implements OnInit, OnDestroy {
   id: Observable<string>;
-  account!: AccountModel;
+  account!: AccountDto;
   showInfo: boolean = false;
   showShare: boolean = false;
 
@@ -55,7 +55,7 @@ export class AccountDetailsComponent implements OnInit, OnDestroy {
     this.locationService.goBack();
   }
 
-  updateAccount(account: AccountModel) {
+  updateAccount(account: AccountDto) {
     this.account.accountDescription = account.accountDescription;
     this.account.profilePicUrl = account.profilePicUrl;
     this.account.backgroundPicUrl = account.backgroundPicUrl;
@@ -79,7 +79,7 @@ export class AccountDetailsComponent implements OnInit, OnDestroy {
   }
 
   private initialObserver = {
-    next: (acc: AccountModel) => {
+    next: (acc: AccountDto) => {
       this.account = acc;
       this.title.setTitle(`PicturesUI - ${acc.nickname}`);
     },

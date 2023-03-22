@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {AccountModel} from "../../../../../Models/ApiModels/Get/AccountModel";
+import {AccountDto} from "../../../../../Models/Dtos/AccountDto";
 
 @Component({
   selector: 'app-account-info',
@@ -8,7 +8,7 @@ import {AccountModel} from "../../../../../Models/ApiModels/Get/AccountModel";
 })
 export class AccountInfoComponent implements OnInit {
 
-  @Input() account!: AccountModel;
+  @Input() account!: AccountDto;
 
   constructor() { }
 

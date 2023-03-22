@@ -1,4 +1,4 @@
-export interface PictureClassifiedModel {
+export interface PictureClassificationDto {
   adult: number,
   spoof: number,
   medical: number,

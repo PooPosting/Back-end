@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import {PostPictureServiceService} from "../../../../../Services/helpers/post-picture-service.service";
 import {LocationServiceService} from "../../../../../Services/helpers/location-service.service";
-import {PictureModel} from "../../../../../Models/ApiModels/Get/PictureModel";
 import {CacheServiceService} from "../../../../../Services/data/cache-service.service";
 import {HttpServiceService} from "../../../../../Services/http/http-service.service";
 import {MessageService} from "primeng/api";
+import {PictureDto} from "../../../../../Models/Dtos/PictureDto";
 
 @Component({
   selector: 'app-post-overview',
@@ -15,7 +15,7 @@ export class PostOverviewComponent implements OnInit {
 
   imgDataUrl: string = "";
   awaitSubmit = false;
-  picturePreview?: PictureModel;
+  picturePreview?: PictureDto;
 
   constructor(
     private postPictureService: PostPictureServiceService,

@@ -1,4 +1,4 @@
-export interface PostSendLogsModel {
+export interface PostLogsDto {
   firstName: string;
   emailAddress: string;
   text: string;

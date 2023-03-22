@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {ErrorLogModel} from "../../Models/JsonModels/ErrorLogModel";
-import {PostSendLogsModel} from "../../Models/ApiModels/Post/PostSendLogsModel";
+import {PostLogsDto} from "../../Models/Dtos/PostLogsDto";
 import {CacheServiceService} from "../data/cache-service.service";
 import {environment} from "../../../environments/environment";
 
@@ -15,8 +15,8 @@ export class EmailBuilderServiceService {
 
   }
 
-  buildEmail(errorLogs: ErrorLogModel, userMsg: string): PostSendLogsModel {
-    let logs: PostSendLogsModel = {
+  buildEmail(errorLogs: ErrorLogModel, userMsg: string): PostLogsDto {
+    let logs: PostLogsDto = {
       firstName: this.cacheService.getCachedUserAccount().nickname,
       emailAddress: this.cacheService.getCachedUserAccount().email,
       text: userMsg,

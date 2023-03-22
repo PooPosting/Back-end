@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {PopularModel} from "../../../../Models/ApiModels/Get/PopularModel";
+import {PopularDto} from "../../../../Models/Dtos/PopularDto";
 import {HttpServiceService} from "../../../../Services/http/http-service.service";
 import {SelectOption} from "../../../../Models/QueryModels/SelectOption";
 import {Title} from "@angular/platform-browser";
@@ -10,7 +10,7 @@ import {Title} from "@angular/platform-browser";
   styleUrls: ['./popular.component.scss']
 })
 export class PopularComponent implements OnInit {
-  popular: PopularModel = {
+  popular: PopularDto = {
     mostCommentedPictures: [],
     mostLikedPictures: [],
     mostVotedPictures: [],
@@ -57,7 +57,7 @@ export class PopularComponent implements OnInit {
 
   ngOnInit(): void {
     this.httpService.getPopularRequest().subscribe({
-      next: (val: PopularModel) => {
+      next: (val: PopularDto) => {
         this.popular = val;
       }
     });

@@ -1,11 +1,11 @@
-import {AccountPreviewModel} from "./AccountPreviewModel";
+import {AccountPreviewDto} from "./AccountPreviewDto";
 
-export interface CommentModel {
+export interface CommentDto {
   id: string;
   pictureId: string,
   text: string,
   isModifiable: boolean,
   isAdminModifiable: boolean,
   commentAdded: string
-  accountPreview: AccountPreviewModel,
+  accountPreview: AccountPreviewDto,
 }

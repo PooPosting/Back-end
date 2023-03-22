@@ -1,6 +1,6 @@
-﻿import {PicturePreviewModel} from "./PicturePreviewModel";
+﻿import {PicturePreviewDto} from "./PicturePreviewDto";
 
-export interface AccountModel {
+export interface AccountDto {
   id: string;
   roleId: string;
   nickname: string;
@@ -8,7 +8,7 @@ export interface AccountModel {
   profilePicUrl: string;
   backgroundPicUrl: string;
   accountDescription: string;
-  picturePreviews: PicturePreviewModel[];
+  picturePreviews: PicturePreviewDto[];
   accountCreated: string;
 
   isModifiable: boolean;

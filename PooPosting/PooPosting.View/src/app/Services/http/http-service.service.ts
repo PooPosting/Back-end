@@ -2,21 +2,27 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {HttpParamsServiceService} from "./http-params-service.service";
-import { PictureModel } from 'src/app/Models/ApiModels/Get/PictureModel';
-import { PicturePagedResult } from 'src/app/Models/ApiModels/Get/PicturePagedResult';
-import { LoginModel } from 'src/app/Models/ApiModels/Post/LoginModel';
+import { PictureDto } from 'src/app/Models/Dtos/PictureDto';
+import { PictureDtoPaged } from 'src/app/Models/Dtos/PictureDtoPaged';
+import { LoginDto } from 'src/app/Models/Dtos/LoginDto';
 import { UserInfoModel } from 'src/app/Models/UserInfoModel';
-import { RegisterModel } from 'src/app/Models/ApiModels/Post/RegisterModel';
-import {LikeModel} from "../../Models/ApiModels/Get/LikeModel";
-import {AccountPagedResult} from "../../Models/ApiModels/Get/AccountPagedResult";
-import {AccountModel} from "../../Models/ApiModels/Get/AccountModel";
-import {CommentModel} from "../../Models/ApiModels/Get/CommentModel";
-import {PutPostCommentModel} from "../../Models/ApiModels/Post/PutPostCommentModel";
-import {PopularModel} from "../../Models/ApiModels/Get/PopularModel";
-import {LsJwtDetails} from "../../Models/ApiModels/Post/LsJwtDetails";
-import {PostSendLogsModel} from "../../Models/ApiModels/Post/PostSendLogsModel";
-import {PictureClassifiedModel} from "../../Models/ApiModels/Post/PictureClassifiedModel";
+import { RegisterDto } from 'src/app/Models/Dtos/RegisterDto';
+import {LikeDto} from "../../Models/Dtos/LikeDto";
+import {AccountDtoPaged} from "../../Models/Dtos/AccountDtoPaged";
+import {AccountDto} from "../../Models/Dtos/AccountDto";
+import { CommentDto } from "../../Models/Dtos/CommentDto";
+import {PutPostCommentDto} from "../../Models/Dtos/PutPostCommentDto";
+import {PopularDto} from "../../Models/Dtos/PopularDto";
+import {VerifyJwtDto} from "../../Models/Dtos/VerifyJwtDto";
+import {PostLogsDto} from "../../Models/Dtos/PostLogsDto";
+import {PictureClassificationDto} from "../../Models/Dtos/PictureClassificationDto";
 import {environment} from "../../../environments/environment";
+import {UpdatePictureNameDto} from "../../Models/Dtos/UpdatePictureNameDto";
+import {UpdatePictureDescriptionDto} from "../../Models/Dtos/UpdatePictureDescriptionDto";
+import {UpdatePictureTagsDto} from "../../Models/Dtos/UpdatePictureTagsDto";
+import {UpdateAccountEmailDto} from "../../Models/Dtos/UpdateAccountEmailDto";
+import {UpdateAccountPasswordDto} from "../../Models/Dtos/UpdateAccountPasswordDto";
+import {UpdateAccountDescriptionDto} from "../../Models/Dtos/UpdateAccountDescriptionDto";
 
 @Injectable({
   providedIn: 'root'
@@ -27,80 +33,80 @@ export class HttpServiceService {
     private params: HttpParamsServiceService
   ) {}
 
-  getPicturesRequest(params: HttpParams): Observable<PicturePagedResult>{
+  getPicturesRequest(params: HttpParams): Observable<PictureDtoPaged>{
     return this.http
-      .get<PicturePagedResult>(
+      .get<PictureDtoPaged>(
       `${environment.picturesApiUrl}/api/picture`,
       {params: params}
     );
   }
-  getPersonalizedPicturesRequest(): Observable<PictureModel[]>{
+  getPersonalizedPicturesRequest(): Observable<PictureDto[]>{
     return this.http
-      .get<PictureModel[]>(
+      .get<PictureDto[]>(
         `${environment.picturesApiUrl}/api/picture/personalized`,
         {params: this.params.getGetPersonalizedPicParams()}
       );
   }
-  searchPicturesRequest(): Observable<PicturePagedResult>{
+  searchPicturesRequest(): Observable<PictureDtoPaged>{
     return this.http
-      .get<PicturePagedResult>(
+      .get<PictureDtoPaged>(
         `${environment.picturesApiUrl}/api/picture/search`,
         {params: this.params.getSearchPicParams()}
       );
   }
 
-  getPictureRequest(id?: string): Observable<PictureModel>{
+  getPictureRequest(id?: string): Observable<PictureDto>{
     return this.http
-      .get<PictureModel>(
+      .get<PictureDto>(
       `${environment.picturesApiUrl}/api/picture/${id}`
     );
   }
-  getPictureLikesRequest(id?: string): Observable<LikeModel[]>{
+  getPictureLikesRequest(id?: string): Observable<LikeDto[]>{
     return this.http
-      .get<LikeModel[]>(
-        `${environment.picturesApiUrl}/api/picture/${id}/likes`
+      .get<LikeDto[]>(
+        `${environment.picturesApiUrl}/api/picture/${id}/like`
       );
   }
-  searchAccountsRequest(): Observable<AccountPagedResult>{
+  searchAccountsRequest(): Observable<AccountDtoPaged>{
     return this.http
-      .get<AccountPagedResult>(
+      .get<AccountDtoPaged>(
         `${environment.picturesApiUrl}/api/account`,
         {params: this.params.getSearchAccParams()}
       );
   }
-  getAccountRequest(id: string): Observable<AccountModel>{
+  getAccountRequest(id: string): Observable<AccountDto>{
     return this.http
-      .get<AccountModel>(
+      .get<AccountDto>(
         `${environment.picturesApiUrl}/api/account/${id}`
       );
   }
-  getAccountLikesRequest(id?: string): Observable<LikeModel[]>{
+  getAccountLikesRequest(id?: string): Observable<LikeDto[]>{
     return this.http
-      .get<LikeModel[]>(
+      .get<LikeDto[]>(
         `${environment.picturesApiUrl}/api/account/${id}/likes`
       );
   }
-  getPopularRequest(): Observable<PopularModel> {
+  getPopularRequest(): Observable<PopularDto> {
     return this.http
-      .get<PopularModel>(
+      .get<PopularDto>(
         `${environment.picturesApiUrl}/api/popular`
       );
   }
-  postLoginRequest(data: LoginModel): Observable<UserInfoModel> {
+  postLoginRequest(data: LoginDto): Observable<UserInfoModel> {
     return this.http
       .post<UserInfoModel>(
         `${environment.picturesApiUrl}/api/account/auth/login`,
         data,
         {responseType: "json",});
   }
-  postLsLoginRequest(data: LsJwtDetails): Observable<UserInfoModel> {
+  postLsLoginRequest(data: VerifyJwtDto): Observable<UserInfoModel> {
     return this.http
       .post<UserInfoModel>(
         `${environment.picturesApiUrl}/api/account/auth/verifyJwt`,
         data,
         {responseType: "json",});
   }
-  postRegisterRequest(data: RegisterModel): Observable<any> {
+  postRegisterRequest(data: RegisterDto): Observable<any> {
     return this.http
       .post(
         `${environment.picturesApiUrl}/api/account/auth/register`,
@@ -110,26 +116,26 @@ export class HttpServiceService {
   postPictureRequest(data: FormData): Observable<any> {
     return this.http
       .post(
-        `${environment.picturesApiUrl}/api/picture/create`,
+        `${environment.picturesApiUrl}/api/picture/post`,
         data
       );
   }
-  postClassifyPictureRequest(data: FormData): Observable<PictureClassifiedModel> {
+  postClassifyPictureRequest(data: FormData): Observable<PictureClassificationDto> {
     return this.http
-      .post<PictureClassifiedModel>(
+      .post<PictureClassificationDto>(
         `${environment.picturesApiUrl}/api/picture/classify`,
         data
       );
   }
-  postCommentRequest(picId: string, data: PutPostCommentModel): Observable<CommentModel> {
+  postCommentRequest(picId: string, data: PutPostCommentDto): Observable<CommentDto> {
     return this.http
-      .post<CommentModel>(
+      .post<CommentDto>(
         `${environment.picturesApiUrl}/api/picture/${picId}/comment`,
         data
       );
   }
 
-  postSendLogsRequest(data: PostSendLogsModel) {
+  postSendLogsRequest(data: PostLogsDto) {
     return this.http
       .post<boolean>(
         `${environment.emailApiUrl}/api/contact/sendErrorEmail`,
@@ -145,9 +151,9 @@ export class HttpServiceService {
   }
 
 
-  deleteCommentRequest(picId: string, commId: string): Observable<CommentModel> {
+  deleteCommentRequest(picId: string, commId: string): Observable<CommentDto> {
     return this.http
-      .delete<CommentModel>(
+      .delete<CommentDto>(
         `${environment.picturesApiUrl}/api/picture/${picId}/comment/${commId}`,
         {}
       );
@@ -165,35 +171,99 @@ export class HttpServiceService {
       );
   }
 
-  patchPictureLikeRequest(id: string): Observable<PictureModel> {
+  patchPictureLikeRequest(id: string): Observable<PictureDto> {
     return this.http
-      .patch<PictureModel>(
-        `${environment.picturesApiUrl}/api/picture/${id}/voteup`,
+      .patch<PictureDto>(
+        `${environment.picturesApiUrl}/api/picture/${id}/vote-up`,
         {}
       );
   }
-  patchPictureDislikeRequest(id: string): Observable<PictureModel> {
+  patchPictureDislikeRequest(id: string): Observable<PictureDto> {
     return this.http
-      .patch<PictureModel>(
-        `${environment.picturesApiUrl}/api/picture/${id}/votedown`,
+      .patch<PictureDto>(
+        `${environment.picturesApiUrl}/api/picture/${id}/vote-down`,
         {}
       );
   }
 
   updatePictureRequest(data: FormData, id: string) {
     return this.http
-      .post<PictureModel>(
+      .post<PictureDto>(
         `${environment.picturesApiUrl}/api/picture/${id}`,
         data
       );
   }
+
+  updatePictureNameRequest(data: UpdatePictureNameDto, id: string) {
+    return this.http
+      .post<PictureDto>(
+        `${environment.picturesApiUrl}/api/picture/${id}/update/name`,
+        data
+      );
+  }
+
+  updatePictureDescriptionRequest(data: UpdatePictureDescriptionDto, id: string) {
+    return this.http
+      .post<PictureDto>(
+        `${environment.picturesApiUrl}/api/picture/${id}/update/description`,
+        data
+      );
+  }
+
+  updatePictureTagsRequest(data: UpdatePictureTagsDto, id: string) {
+    return this.http
+      .post<PictureDto>(
+        `${environment.picturesApiUrl}/api/picture/${id}/update/tags`,
+        data
+      );
+  }
+
   updateAccountRequest(data: FormData) {
     return this.http
-      .post<AccountModel>(
+      .post<AccountDto>(
         `${environment.picturesApiUrl}/api/account/update`,
         data
       );
   }
 
+  updateAccountEmailRequest(data: UpdateAccountEmailDto) {
+    return this.http
+      .post<AccountDto>(
+        `${environment.picturesApiUrl}/api/account/update/email`,
+        data
+      );
+  }
+
+  updateAccountPasswordRequest(data: UpdateAccountPasswordDto) {
+    return this.http
+      .post<AccountDto>(
+        `${environment.picturesApiUrl}/api/account/update/password`,
+        data
+      );
+  }
+
+  updateAccountDescriptionRequest(data: UpdateAccountDescriptionDto) {
+    return this.http
+      .patch<AccountDto>(
+        `${environment.picturesApiUrl}/api/account/update/description`,
+        data
+      );
+  }
+
+  updateAccountProfilePictureRequest(file: string) {
+    return this.http
+      .patch<AccountDto>(
+        `${environment.picturesApiUrl}/api/account/update/profile-picture`,
+        file
+      );
+  }
+
+  updateAccountBackgroundPictureRequest(file: string) {
+    return this.http
+      .patch<AccountDto>(
+        `${environment.picturesApiUrl}/api/account/update/background-picture`,
+        file
+      );
+  }
 
 }

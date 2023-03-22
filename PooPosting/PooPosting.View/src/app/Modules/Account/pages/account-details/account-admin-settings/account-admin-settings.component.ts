@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {AccountModel} from "../../../../../Models/ApiModels/Get/AccountModel";
+import {AccountDto} from "../../../../../Models/Dtos/AccountDto";
 
 @Component({
   selector: 'app-account-admin-settings',
@@ -8,7 +8,7 @@ import {AccountModel} from "../../../../../Models/ApiModels/Get/AccountModel";
 })
 export class AccountAdminSettingsComponent {
 
-  @Input() account!: AccountModel
+  @Input() account!: AccountDto
   @Output() onBan: EventEmitter<void> = new EventEmitter<void>();
 
   banPhrase: string = "";

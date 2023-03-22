@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import {PictureModel} from "../../Models/ApiModels/Get/PictureModel";
-import {AccountModel} from "../../Models/ApiModels/Get/AccountModel";
-import {UserInfoModel} from "../../Models/UserInfoModel";
 import {Subject} from "rxjs";
 import {Router} from "@angular/router";
 import {HttpServiceService} from "../http/http-service.service";
+import {AccountDto} from "../../Models/Dtos/AccountDto";
+import {PictureDto} from "../../Models/Dtos/PictureDto";
+import {UserInfoModel} from "../../Models/UserInfoModel";
 
 @Injectable({
   providedIn: 'root'
@@ -24,13 +24,13 @@ export class CacheServiceService {
   randomSite: number = 1;
 
   loggedOnSubject: Subject<boolean> = new Subject<boolean>();
-  cachedPictures: PictureModel[] = [];
-  cachedUserAccount?: AccountModel;
+  cachedPictures: PictureDto[] = [];
+  cachedUserAccount?: AccountDto;
   cachedUserInfo?: UserInfoModel;
 
-  public cachePictures(pictures: PictureModel[]): void {
-    pictures.forEach((p: PictureModel) => {
-      if (!this.cachedPictures.some((r: PictureModel) => r.id == p.id)) {
+  public cachePictures(pictures: PictureDto[]): void {
+    pictures.forEach((p: PictureDto) => {
+      if (!this.cachedPictures.some((r: PictureDto) => r.id == p.id)) {
         this.cachedPictures.push(p);
       }
       while (this.cachedPictures.length > 4) {
@@ -41,7 +41,7 @@ export class CacheServiceService {
   public purgeCachePictures(): void {
     this.cachedPictures = [];
   }
-  public cacheUserAccount(account: AccountModel): void {
+  public cacheUserAccount(account: AccountDto): void {
     this.cachedUserAccount = account;
   }
   public cacheUserInfo(userInfo: UserInfoModel): void {
@@ -55,7 +55,7 @@ export class CacheServiceService {
     if (!this.getUserInfo() && !this.getUserInfo()?.uid) return false;
     this.httpService.getAccountRequest(this.getUserInfo()!.uid)
       .subscribe({
-        next: (v: AccountModel) => {
+        next: (v: AccountDto) => {
           this.cachedUserAccount = v;
           return true;
         }
@@ -70,10 +70,10 @@ export class CacheServiceService {
     return this.cachedPictures.length !== 0;
   }
 
-  public getCachedPictures(): PictureModel[] {
+  public getCachedPictures(): PictureDto[] {
     return this.cachedPictures!;
   }
-  public getCachedUserAccount(): AccountModel {
+  public getCachedUserAccount(): AccountDto {
     return this.cachedUserAccount!;
   }
 

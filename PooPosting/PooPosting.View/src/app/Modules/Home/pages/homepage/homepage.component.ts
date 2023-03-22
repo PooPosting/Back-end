@@ -2,12 +2,12 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {HttpServiceService} from 'src/app/Services/http/http-service.service';
 import {ScrollServiceService} from "../../../../Services/helpers/scroll-service.service";
 import {Title} from "@angular/platform-browser";
-import {PictureModel} from "../../../../Models/ApiModels/Get/PictureModel";
 import {CacheServiceService} from "../../../../Services/data/cache-service.service";
 import {HomePageOption} from "../../../../Enums/HomePageOption";
 import {HttpParamsServiceService} from "../../../../Services/http/http-params-service.service";
-import {PicturePagedResult} from "../../../../Models/ApiModels/Get/PicturePagedResult";
 import {Subscription} from "rxjs";
+import {PictureDto} from "../../../../Models/Dtos/PictureDto";
+import {PictureDtoPaged} from "../../../../Models/Dtos/PictureDtoPaged";
 
 @Component({
   selector: 'app-body',
@@ -16,7 +16,7 @@ import {Subscription} from "rxjs";
 })
 
 export class HomepageComponent implements OnInit, OnDestroy {
-  items: (PictureModel)[] = [];
+  items: (PictureDto)[] = [];
   isLoggedOn: boolean = false;
   pictureFetchingOption?: HomePageOption;
 
@@ -60,10 +60,10 @@ export class HomepageComponent implements OnInit, OnDestroy {
       case HomePageOption.PERSONALIZED: {
         this.httpService.getPersonalizedPicturesRequest()
           .subscribe({
-          next: (value: PictureModel[]) => {
+          next: (value: PictureDto[]) => {
             if (value.length !== 0) {
-              let loadedItems: PictureModel[] = this.items;
-              value.forEach((pic: PictureModel) => {
+              let loadedItems: PictureDto[] = this.items;
+              value.forEach((pic: PictureDto) => {
                 loadedItems.push(pic);
               });
               this.items = loadedItems;
@@ -82,10 +82,10 @@ export class HomepageComponent implements OnInit, OnDestroy {
         this.httpService.getPicturesRequest(
           this.paramsService.getGetPicParams(this.cacheService.mostPopularSite)
         ).subscribe({
-          next: (value: PicturePagedResult) => {
+          next: (value: PictureDtoPaged) => {
             if (value.items.length) {
-              let loadedItems: PictureModel[] = this.items;
-              value.items.forEach((pic: PictureModel) => {
+              let loadedItems: PictureDto[] = this.items;
+              value.items.forEach((pic: PictureDto) => {
                 loadedItems.push(pic);
               });
               this.items = loadedItems;

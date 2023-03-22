@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {Subject} from "rxjs";
 import {HttpServiceService} from "../http/http-service.service";
-import {PictureModel} from "../../Models/ApiModels/Get/PictureModel";
+import {PictureDto} from "../../Models/Dtos/PictureDto";
 
 @Injectable({
   providedIn: 'root'
@@ -9,8 +9,8 @@ import {PictureModel} from "../../Models/ApiModels/Get/PictureModel";
 export class PictureDetailsServiceService {
 
   modalTriggerSubject: Subject<string> = new Subject<string>();
-  showModalSubject: Subject<PictureModel> = new Subject<PictureModel>();
-  pictureChangedSubject: Subject<PictureModel> = new Subject<PictureModel>();
+  showModalSubject: Subject<PictureDto> = new Subject<PictureDto>();
+  pictureChangedSubject: Subject<PictureDto> = new Subject<PictureDto>();
   pictureDeletedSubject: Subject<string> = new Subject<string>();
 
   constructor(
@@ -28,7 +28,7 @@ export class PictureDetailsServiceService {
     })
   }
 
-  pictureChanged(picture: PictureModel) {
+  pictureChanged(picture: PictureDto) {
     this.pictureChangedSubject.next(picture);
   }
 

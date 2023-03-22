@@ -3,11 +3,11 @@ import {MessageService, PrimeNGConfig} from "primeng/api";
 import {Router} from "@angular/router";
 import {UserInfoModel} from "./Models/UserInfoModel";
 import {HttpServiceService} from "./Services/http/http-service.service";
-import {LsJwtDetails} from "./Models/ApiModels/Post/LsJwtDetails";
+import {VerifyJwtDto} from "./Models/Dtos/VerifyJwtDto";
 import {ScrollServiceService} from "./Services/helpers/scroll-service.service";
 import {CacheServiceService} from "./Services/data/cache-service.service";
-import {PictureModel} from "./Models/ApiModels/Get/PictureModel";
 import {PictureDetailsServiceService} from "./Services/data/picture-details-service.service";
+import {PictureDto} from "./Models/Dtos/PictureDto";
 
 @Component({
   selector: 'app-root',
@@ -18,7 +18,7 @@ export class AppComponent implements OnInit{
   appTitle: string = "PicturesUI";
   isLoaded: boolean = false;
   showPictureDetailsModal: boolean = false;
-  currentPictureDetailsModal: PictureModel | null = null;
+  currentPictureDetailsModal: PictureDto | null = null;
 
   constructor(
     private cacheService: CacheServiceService,
@@ -32,7 +32,7 @@ export class AppComponent implements OnInit{
 
   ngOnInit(): void {
 
-    let jwtDetails: LsJwtDetails = {
+    let jwtDetails: VerifyJwtDto = {
       jwtToken: this.cacheService.getLsJwtToken()!,
       uid: this.cacheService.getLsJwtUid()!,
     };

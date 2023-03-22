@@ -1,4 +1,4 @@
-export interface LsJwtDetails {
+export interface VerifyJwtDto {
   jwtToken: string,
   uid: string,
 }

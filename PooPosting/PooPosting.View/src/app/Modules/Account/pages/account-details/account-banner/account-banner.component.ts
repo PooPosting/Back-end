@@ -1,5 +1,5 @@
 import {Component, Input } from '@angular/core';
-import {AccountModel} from "../../../../../Models/ApiModels/Get/AccountModel";
+import {AccountDto} from "../../../../../Models/Dtos/AccountDto";
 
 @Component({
   selector: 'app-account-banner',
@@ -8,6 +8,6 @@ import {AccountModel} from "../../../../../Models/ApiModels/Get/AccountModel";
 })
 export class AccountBannerComponent {
 
-  @Input() account!: AccountModel;
+  @Input() account!: AccountDto;
 
 }

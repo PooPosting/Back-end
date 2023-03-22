@@ -1,4 +1,4 @@
-﻿export interface RegisterModel {
+﻿export interface RegisterDto {
   nickname: string;
   email: string;
   password: string;

@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {AccountModel} from "../../../../../Models/ApiModels/Get/AccountModel";
 import {SelectOption} from "../../../../../Models/QueryModels/SelectOption";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {HttpServiceService} from "../../../../../Services/http/http-service.service";
@@ -10,6 +9,7 @@ import {ChangeAccountDescModel} from "../../../../../Models/FormModels/ChangeAcc
 import {ChangeEmailModel} from "../../../../../Models/FormModels/ChangeEmailModel";
 import {concatWith} from "rxjs";
 import {CropperComponent} from "angular-cropperjs";
+import {AccountDto} from "../../../../../Models/Dtos/AccountDto";
 
 @Component({
   selector: 'app-account-settings',
@@ -18,13 +18,13 @@ import {CropperComponent} from "angular-cropperjs";
 })
 export class AccountSettingsComponent {
 
-  @Input() account!: AccountModel;
+  @Input() account!: AccountDto;
   selectOptions: SelectOption[];
   selectValue: SelectOption;
 
   blockSpace: RegExp = /[^\s]/;
 
-  @Output() onChange: EventEmitter<AccountModel> = new EventEmitter<AccountModel>();
+  @Output() onChange: EventEmitter<AccountDto> = new EventEmitter<AccountDto>();
 
   changePass: FormGroup<ChangePasswordFormModel> = new FormGroup<ChangePasswordFormModel>({
     password: new FormControl("", [
@@ -107,7 +107,7 @@ export class AccountSettingsComponent {
   }
 
   updateAccountObserver = {
-    next: (val: AccountModel) => {
+    next: (val: AccountDto) => {
       this.account.accountDescription = val.accountDescription;
       this.account.profilePicUrl = val.profilePicUrl;
       this.account.backgroundPicUrl = val.backgroundPicUrl;

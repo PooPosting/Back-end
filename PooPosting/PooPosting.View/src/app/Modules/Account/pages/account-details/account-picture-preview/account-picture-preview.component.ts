@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {PicturePreviewModel} from "../../../../../Models/ApiModels/Get/PicturePreviewModel";
+import {PicturePreviewDto} from "../../../../../Models/Dtos/PicturePreviewDto";
 import {PictureDetailsServiceService} from "../../../../../Services/data/picture-details-service.service";
 
 @Component({
@@ -9,7 +9,7 @@ import {PictureDetailsServiceService} from "../../../../../Services/data/picture
 })
 export class AccountPicturePreviewComponent {
 
-  @Input() picturePreview!: PicturePreviewModel;
+  @Input() picturePreview!: PicturePreviewDto;
   @Input() name!: string;
 
   constructor(

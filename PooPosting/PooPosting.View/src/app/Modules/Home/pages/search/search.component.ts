@@ -1,12 +1,12 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {PicturePagedResult} from "../../../../Models/ApiModels/Get/PicturePagedResult";
 import { HttpServiceService } from 'src/app/Services/http/http-service.service';
 import { HttpParamsServiceService } from 'src/app/Services/http/http-params-service.service';
 import {MessageService} from "primeng/api";
-import {AccountPagedResult} from "../../../../Models/ApiModels/Get/AccountPagedResult";
+import {AccountDtoPaged} from "../../../../Models/Dtos/AccountDtoPaged";
 import {ScrollServiceService} from "../../../../Services/helpers/scroll-service.service";
 import {Title} from "@angular/platform-browser";
 import {CacheServiceService} from "../../../../Services/data/cache-service.service";
+import {PictureDtoPaged} from "../../../../Models/Dtos/PictureDtoPaged";
 
 @Component({
   selector: 'app-search',
@@ -20,13 +20,13 @@ export class SearchComponent implements OnInit {
   picPage: number = 1;
   accPage: number = 1;
 
-  picturesResult: PicturePagedResult = {
+  picturesResult: PictureDtoPaged = {
     items:[],
     page:0,
     pageSize: 0,
     totalPages:0
   }
-  accountsResult: AccountPagedResult = {
+  accountsResult: AccountDtoPaged = {
     items:[],
     page:0,
     pageSize: 0,
@@ -53,7 +53,7 @@ export class SearchComponent implements OnInit {
   searchPictures() {
     this.clearSearch();
     this.httpService.searchPicturesRequest().subscribe({
-      next: (val: PicturePagedResult) => {
+      next: (val: PictureDtoPaged) => {
         console.log(val);
         this.picturesResult = val;
         this.messageService.add({
@@ -77,7 +77,7 @@ export class SearchComponent implements OnInit {
   searchAccounts() {
     this.clearSearch();
     this.httpService.searchAccountsRequest().subscribe({
-      next: (val: AccountPagedResult) => {
+      next: (val: AccountDtoPaged) => {
         this.accountsResult = val;
         this.messageService.add({
           severity:'success',
@@ -138,7 +138,7 @@ export class SearchComponent implements OnInit {
 
   private fetchPictures(): void {
     this.httpService.searchPicturesRequest().subscribe({
-      next: (val: PicturePagedResult) => {
+      next: (val: PictureDtoPaged) => {
         this.picturesResult = val;
         document.body.scrollTop = 0;
         this.picPaginator.updateCurrentPage(val.page);
@@ -148,7 +148,7 @@ export class SearchComponent implements OnInit {
   }
   private fetchAccounts(): void {
     this.httpService.searchAccountsRequest().subscribe({
-      next: (val: AccountPagedResult) => {
+      next: (val: AccountDtoPaged) => {
         this.accountsResult = val;
         document.body.scrollTop = 0;
         this.accPaginator.updateCurrentPage(val.page);

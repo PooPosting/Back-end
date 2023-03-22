@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {CommentModel} from "../../../../../Models/ApiModels/Get/CommentModel";
+import {CommentDto} from "../../../../../Models/Dtos/CommentDto";
 
 @Component({
   selector: 'app-comment',
@@ -7,7 +7,7 @@ import {CommentModel} from "../../../../../Models/ApiModels/Get/CommentModel";
   styleUrls: ['./comment.component.scss']
 })
 export class CommentComponent {
-  @Input() comment!: CommentModel;
+  @Input() comment!: CommentDto;
   @Output() commentDeleted: EventEmitter<void> = new EventEmitter<void>();
 
   onCommentDelete() {

@@ -1,4 +1,4 @@
-export interface PutAccountModel {
+export interface PutAccountDto {
   password?: string;
   confirmPassword?: string;
 
