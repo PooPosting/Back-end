@@ -3,13 +3,13 @@
   <div class="pb-3 d-flex align-items-center justify-content-between">
     <button pButton pRipple label="Powrót" icon="bi bi-arrow-return-left" class="px-3"
             (click)="showInfo ? showInfo = !showInfo : return()"
-            attr.aria-label="Powrót do poprzedniej strony"></button>
+            aria-label="Powrót do poprzedniej strony"></button>
 
     <div>
       <button pButton pRipple class="px-3" (click)="showInfo = !showInfo"
               label="{{showInfo ? 'Profil' : ((account.isModifiable || account.isAdminModifiable) ? 'Ustawienia' : 'Informacje')}}"
               icon="bi {{showInfo ? 'bi-person' : ((account.isModifiable || account.isAdminModifiable)  ? 'bi-gear' : 'bi-info-circle')}}"
-              attr.aria-label="Informacje o koncie"></button>
+              aria-label="Informacje o koncie"></button>
       <button pButton class="mx-1 px-2 py-2 p-button-icon-only" icon="bi bi-share"
               (click)="showShare = true" aria-label="share"></button>
     </div>
