@@ -1,0 +1,46 @@
+<div *ngIf="account" class="px-3 px-lg-0">
+
+  <div class="pb-3 d-flex align-items-center justify-content-between">
+    <button pButton pRipple label="Powrót" icon="bi bi-arrow-return-left" class="px-3"
+            (click)="showInfo ? showInfo = !showInfo : return()"
+            attr.aria-label="Powrót do poprzedniej strony"></button>
+
+    <div>
+      <button pButton pRipple class="px-3" (click)="showInfo = !showInfo"
+              label="{{showInfo ? 'Profil' : ((account.isModifiable || account.isAdminModifiable) ? 'Ustawienia' : 'Informacje')}}"
+              icon="bi {{showInfo ? 'bi-person' : ((account.isModifiable || account.isAdminModifiable)  ? 'bi-gear' : 'bi-info-circle')}}"
+              attr.aria-label="Informacje o koncie"></button>
+      <button pButton class="mx-1 px-2 py-2 p-button-icon-only" icon="bi bi-share"
+              (click)="showShare = true" aria-label="share"></button>
+    </div>
+  </div>
+
+  <div *ngIf="!showInfo">
+    <app-account-banner [account]="account"></app-account-banner>
+    <div class="mt-5" *ngIf="account.picturePreviews">
+      <div class="row row-cols-1 row-cols-sm-2 mb-3 align-items-center">
+        <app-account-picture-preview *ngFor="let picPreview of account.picturePreviews"
+                                     [picturePreview]="picPreview">
+        </app-account-picture-preview>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="showInfo" class="mb-5">
+    <app-account-info [account]="account"></app-account-info>
+
+    <div *ngIf="account.isAdminModifiable && !account.isModifiable">
+      <app-account-admin-settings [account]="account" (onBan)="banAccount()"></app-account-admin-settings>
+    </div>
+    <div *ngIf="account.isModifiable">
+      <app-account-settings [account]="account" (onChange)="updateAccount($event)"></app-account-settings>
+    </div>
+  </div>
+
+  <p-dialog [(visible)]="showShare" header="Udostępnij"
+            [modal]="true" [dismissableMask]="true" [draggable]="false">
+<!--    <app-share-modal (onCopy)="showShare = false" [id]="account.id" [itemType]="'account'"></app-share-modal>-->
+  </p-dialog>
+</div>
+
+

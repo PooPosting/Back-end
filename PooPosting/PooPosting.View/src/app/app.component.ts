@@ -1,13 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {MessageService, PrimeNGConfig} from "primeng/api";
 import {Router} from "@angular/router";
-import {UserInfoModel} from "./Models/UserInfoModel";
-import {HttpServiceService} from "./Services/http/http-service.service";
-import {VerifyJwtDto} from "./Models/Dtos/VerifyJwtDto";
-import {ScrollServiceService} from "./Services/helpers/scroll-service.service";
-import {CacheServiceService} from "./Services/data/cache-service.service";
-import {PictureDetailsServiceService} from "./Services/data/picture-details-service.service";
-import {PictureDto} from "./Models/Dtos/PictureDto";
+import {UserState} from "./shared/utils/models/userState";
+import {HttpServiceService} from "./shared/data-access/http-service.service";
+import {VerifyJwtDto} from "./shared/utils/dtos/VerifyJwtDto";
+import {ScrollServiceService} from "./shared/helpers/scroll-service.service";
+import {AppCacheService} from "./shared/state/app-cache.service";
+import {PictureDetailsServiceService} from "./shared/state/picture-details-service.service";
+import {PictureDto} from "./shared/utils/dtos/PictureDto";
 
 @Component({
   selector: 'app-root',
@@ -21,7 +21,7 @@ export class AppComponent implements OnInit{
   currentPictureDetailsModal: PictureDto | null = null;
 
   constructor(
-    private cacheService: CacheServiceService,
+    private cacheService: AppCacheService,
     private httpService: HttpServiceService,
     private messageService: MessageService,
     private scrollService: ScrollServiceService,
@@ -82,6 +82,9 @@ export class AppComponent implements OnInit{
   canShowSidebar() {
     return  !this.router.url.startsWith('/account') &&
             !this.router.url.startsWith('/error') &&
+            !this.router.url.startsWith('/404') &&
+            !this.router.url.startsWith('/500') &&
+            !this.router.url.startsWith('/0') &&
             !this.router.url.startsWith('/auth') &&
             !this.router.url.startsWith('/picture/post');
   }
@@ -92,7 +95,7 @@ export class AppComponent implements OnInit{
   }
 
   private initialLoginObserver = {
-    next: (val: UserInfoModel) => {
+    next: (val: UserState) => {
       if (val) {
         this.cacheService.cacheUserInfo(val);
         this.cacheService.updateUserAccount().then(() => {

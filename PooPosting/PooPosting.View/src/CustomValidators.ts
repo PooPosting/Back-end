@@ -1,7 +1,7 @@
 ﻿import {
   UntypedFormGroup
 } from '@angular/forms';
-import {ItemName} from "./app/Regexes/ItemName";
+import {ItemName} from "./app/shared/utils/regexes/itemName";
 
 export class CustomValidators {
   constructor() {}

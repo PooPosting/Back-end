@@ -1,0 +1,87 @@
+<nav class="bg-dark">
+  <header class="container">
+    <div class="d-flex justify-content-between align-items-center h-75">
+
+      <a class="logo-link d-flex justify-content-center align-items-center" routerLink="home" (click)="showSidebar = false;">
+        <img alt="PicturesUI" src="../../../../assets/images/title-img.webp" aria-label="Do strony głównej" class="mr-2 logo-img">
+        <div class="logo-text">{{appTitle}}</div>
+      </a>
+
+<!--      for big screens-->
+      <div class="gap d-none d-md-flex">
+        <div *ngFor="let item of menuItems">
+          <a *ngIf="item.url !== 'home'" class="menu-link" routerLink="{{item.url}}" routerLinkActive="link-active" attr.aria-label="{{item.label}}">
+            <span class="left {{item.class}}">
+              <span class="right"> {{item.label}}</span>
+            </span>
+          </a>
+          <a *ngIf="item.url === 'home'" class="menu-link" routerLink="{{item.url}}" routerLinkActive="link-active" attr.aria-label="{{item.label}}">
+            <span class="left {{item.class}}">
+              <span class="right"> {{item.label}}</span>
+            </span>
+          </a>
+        </div>
+      </div>
+
+<!--      for small screens-->
+      <div class="d-flex d-md-none">
+        <p-button styleClass="px-3" (click)="showSidebar=true">
+          <ng-template pTemplate="content">
+            <div class="d-flex justify-content-center align-items-center hamburger">
+              <span class="bi bi-list mr-1"></span>
+              <p class="ml-1">Menu</p>
+            </div>
+          </ng-template>
+        </p-button>
+      </div>
+
+    </div>
+  </header>
+</nav>
+
+<!--  for small screens - offcanvas menu -->
+<p-sidebar [(visible)]="showSidebar" [modal]="true" [position]="'right'" [appendTo]="'body'" [ariaCloseLabel]="'Zamknij menu'">
+  <div class="d-flex flex-column gap border-top py-4">
+    <span class="title">Menu Główne</span>
+    <div *ngFor="let item of menuItems">
+      <a class="side-menu-link flex-column" routerLink="{{item.url}}" attr.aria-label="{{item.label}}"
+         (click)="showSidebar=false" routerLinkActive="link-active">
+        <span class="left {{item.class}}">
+          <span class="right"> {{item.label}}</span>
+        </span>
+      </a>
+    </div>
+  </div>
+  <div class="d-flex flex-column gap-lg border-top py-4">
+    <div *ngFor="let expandableItem of menuExpandableItems"
+         [ngClass]="loggedIn === expandableItem.showWhileLoggedIn ? '' : 'd-none'">
+      <div class="border-bottom pb-4">
+        <div class="side-menu-expandable">
+          <span class="title"> {{expandableItem.label}}</span>
+        </div>
+        <div class="d-flex flex-column gap-sm">
+          <div *ngFor="let item of expandableItem.menuItems">
+            <div *ngIf="item.label !== 'Wyloguj'">
+              <a class="side-menu-link" routerLink="{{item.url}}" attr.aria-label="{{item.label}}"
+                 (click)="showSidebar=false" routerLinkActive="link-active">
+                <span class="left {{item.class}}">
+                  <span class="right"> {{item.label}}</span>
+                </span>
+              </a>
+            </div>
+            <div *ngIf="item.label === 'Wyloguj'">
+              <a class="side-menu-link" attr.aria-label="{{item.label}}"
+                 (click)="logout()" routerLinkActive="link-active">
+                <span class="left {{item.class}}">
+                  <span class="right"> {{item.label}}</span>
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-sidebar>
+
+
