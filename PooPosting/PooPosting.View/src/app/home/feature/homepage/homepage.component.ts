@@ -8,6 +8,7 @@ import {PictureDto} from "../../../shared/utils/dtos/PictureDto";
 import {AppCacheService} from "../../../shared/state/app-cache.service";
 import {PictureDtoPaged} from "../../../shared/utils/dtos/PictureDtoPaged";
 import {HomePageOption} from "../../../shared/utils/enums/homePageOption";
+import {HttpHomeService} from "../../data-access/http-home.service";
 
 @Component({
   selector: 'app-body',
@@ -23,7 +24,7 @@ export class HomepageComponent implements OnInit, OnDestroy {
   scrollSubscription!: Subscription;
 
   constructor(
-    private httpService: HttpServiceService,
+    private homeService: HttpHomeService,
     private cacheService: AppCacheService,
     private scrollService: ScrollServiceService,
     private paramsService: HttpParamsServiceService,
@@ -58,7 +59,7 @@ export class HomepageComponent implements OnInit, OnDestroy {
     switch (this.pictureFetchingOption) {
 
       case HomePageOption.PERSONALIZED: {
-        this.httpService.getPersonalizedPicturesRequest()
+        this.homeService.getPersonalizedPictures()
           .subscribe({
           next: (value: PictureDto[]) => {
             if (value.length !== 0) {
@@ -79,7 +80,7 @@ export class HomepageComponent implements OnInit, OnDestroy {
       }
 
       case HomePageOption.MOST_POPULAR: {
-        this.httpService.getPicturesRequest(
+        this.homeService.getTrendingPictures(
           this.paramsService.getGetPicParams(this.cacheService.mostPopularSite)
         ).subscribe({
           next: (value: PictureDtoPaged) => {

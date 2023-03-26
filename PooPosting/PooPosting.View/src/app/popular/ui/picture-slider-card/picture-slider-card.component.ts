@@ -22,19 +22,18 @@ export class PictureSliderCardComponent implements OnInit {
   }
 
   like(){
-    this.httpService.patchPictureLikeRequest(this.picture.id)
-      .subscribe(this.likeObserver)
+    // this.httpService.patchPictureLikeRequest(this.picture.id)
+    //   .subscribe(this.likeObserver)
   }
   dislike(){
-    this.httpService.patchPictureDislikeRequest(this.picture.id)
-      .subscribe(this.likeObserver)
+    // this.httpService.patchPictureDislikeRequest(this.picture.id)
+    //   .subscribe(this.likeObserver)
   }
 
   likeObserver = {
     next: (v: LikeResult) => {
       this.picture.likeCount = v.likeCount;
       this.picture.dislikeCount = v.dislikeCount;
-      this.picture.likes = v.likes;
       this.picture.likeState = v.likeState;
     },
   }

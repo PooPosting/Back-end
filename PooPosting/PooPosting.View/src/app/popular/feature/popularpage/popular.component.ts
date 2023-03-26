@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import {PopularDto} from "../../../shared/utils/dtos/PopularDto";
-import {HttpServiceService} from "../../../shared/data-access/http-service.service";
 import {SelectOption} from "../../../shared/utils/models/selectOption";
 import {Title} from "@angular/platform-browser";
+import {Subscription} from "rxjs";
+import {HttpPopularService} from "../../data-access/http-popular.service";
 
 @Component({
   selector: 'app-popular',
@@ -33,7 +34,7 @@ export class PopularComponent implements OnInit {
   ];
 
   constructor(
-    private httpService: HttpServiceService,
+    private popularService: HttpPopularService,
     private title: Title
   ) {
     this.title.setTitle('PicturesUI - Popularne');
@@ -56,10 +57,15 @@ export class PopularComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.httpService.getPopularRequest().subscribe({
+    let sub: Subscription = this.popularService.getPopularPictures().subscribe({
       next: (val: PopularDto) => {
         this.popular = val;
+      },
+      complete: () => {
+        sub.unsubscribe();
+        console.log("unsubscribed instantly");
       }
+
     });
   }
 

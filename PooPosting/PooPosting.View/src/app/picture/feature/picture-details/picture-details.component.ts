@@ -95,16 +95,20 @@ export class PictureDetailsComponent implements OnInit {
   }
 
   initialSubscribe() {
-    this.id.subscribe({
+    let sub: Subscription = this.id.subscribe({
       next: (val) => {
         this.httpService.getPictureRequest(val).subscribe({
           next: (pic: PictureDto) => {
             this.picture = pic;
-            this.title.setTitle(`PicturesUI - Obrazek "${this.titleCasePipe.transform(pic.name)}"`);
+            this.title.setTitle(`PooPosting - ${this.titleCasePipe.transform(pic.name)}`);
             this.cacheService.cachePictures([this.picture]);
+            sub.unsubscribe();
           },
           error: () => {
             this.router.navigate(['/error404']);
+          },
+          complete: () => {
+            sub.unsubscribe();
           }
         });
       }

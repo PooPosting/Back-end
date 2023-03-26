@@ -4,9 +4,7 @@ import {Observable} from "rxjs";
 import {HttpParamsServiceService} from "./http-params-service.service";
 import { PictureDto } from 'src/app/shared/utils/dtos/PictureDto';
 import { PictureDtoPaged } from 'src/app/shared/utils/dtos/PictureDtoPaged';
-import { LoginDto } from 'src/app/shared/utils/dtos/LoginDto';
 import { UserState } from 'src/app/shared/utils/models/userState';
-import { RegisterDto } from 'src/app/shared/utils/dtos/RegisterDto';
 import {LikeDto} from "../utils/dtos/LikeDto";
 import {AccountDtoPaged} from "../utils/dtos/AccountDtoPaged";
 import {AccountDto} from "../utils/dtos/AccountDto";
@@ -121,6 +119,14 @@ export class HttpServiceService {
       );
   }
 
+  deleteCommentRequest(picId: string, commId: string): Observable<CommentDto> {
+    return this.http
+      .delete<CommentDto>(
+        `${environment.picturesApiUrl}/api/picture/${picId}/comment/${commId}`,
+        {}
+      );
+  }
+
   postSendLogsRequest(data: PostLogsDto) {
     return this.http
       .post<boolean>(
@@ -136,14 +142,6 @@ export class HttpServiceService {
       )
   }
 
-
-  deleteCommentRequest(picId: string, commId: string): Observable<CommentDto> {
-    return this.http
-      .delete<CommentDto>(
-        `${environment.picturesApiUrl}/api/picture/${picId}/comment/${commId}`,
-        {}
-      );
-  }
   deletePictureRequest(id: string): Observable<any> {
     return this.http
       .delete(

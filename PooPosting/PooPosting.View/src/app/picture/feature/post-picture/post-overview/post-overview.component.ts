@@ -5,6 +5,7 @@ import {AppCacheService} from "../../../../shared/state/app-cache.service";
 import {HttpServiceService} from "../../../../shared/data-access/http-service.service";
 import {MessageService} from "primeng/api";
 import {PictureDto} from "../../../../shared/utils/dtos/PictureDto";
+import {HttpPictureService} from "../../../data-access/http-picture.service";
 
 @Component({
   selector: 'app-post-overview',
@@ -21,7 +22,7 @@ export class PostOverviewComponent implements OnInit {
     private postPictureService: PostPictureServiceService,
     private locationService: LocationServiceService,
     private cacheService: AppCacheService,
-    private httpService: HttpServiceService,
+    private pictureService: HttpPictureService,
     private messageService: MessageService,
   ) {
     this.picturePreview = {
@@ -70,7 +71,7 @@ export class PostOverviewComponent implements OnInit {
     }
 
     this.awaitSubmit = true;
-    this.httpService.postPictureRequest(formData)
+    this.pictureService.postPicture(formData)
       .subscribe({
         next: () => {
           this.messageService.add({

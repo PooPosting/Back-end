@@ -9,7 +9,7 @@ import {ItemName} from "../../../shared/utils/regexes/itemName";
 import {Title} from "@angular/platform-browser";
 import {environment} from "../../../../environments/environment";
 import {error} from "@angular/compiler-cli/src/transformers/util";
-import {AuthService} from "../../data-access/auth.service";
+import {HttpAuthService} from "../../data-access/http-auth.service";
 
 @Component({
   selector: 'app-register',
@@ -33,7 +33,7 @@ export class RegisterComponent implements OnInit {
   }
 
   constructor(
-    private authService: AuthService,
+    private authService: HttpAuthService,
     private message: MessageService,
     private router: Router,
     private title: Title,

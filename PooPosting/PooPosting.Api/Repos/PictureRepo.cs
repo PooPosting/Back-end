@@ -65,6 +65,7 @@ public class PictureRepo : IPictureRepo
                 .Any(j => j.Picture.Id == p.Id && j.Account.Id == accountId))
 
             .Include(p => p.Account)
+            .Include(p => p.Comments)
             .Include(p => p.PictureTags)
             .ThenInclude(j => j.Tag)
             .Include(p => p.Likes)
@@ -112,6 +113,7 @@ public class PictureRepo : IPictureRepo
         )
     {
         var query = _dbContext.Pictures
+            .Include(p => p.Comments)
             .Include(p => p.Account)
             .Include(p => p.PictureTags)
             .ThenInclude(j => j.Tag)

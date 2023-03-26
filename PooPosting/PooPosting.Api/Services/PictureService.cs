@@ -15,9 +15,9 @@ using PooPosting.Api.Services.Interfaces;
 
 namespace PooPosting.Api.Services;
 
-public class PictureService : IPictureService
+public class HttpPictureService : IPictureService
 {
-    private readonly ILogger<PictureService> _logger;
+    private readonly ILogger<HttpPictureService> _logger;
     private readonly IMapper _mapper;
     private readonly IAuthorizationService _authorizationService;
     private readonly IAccountContextService _accountContextService;
@@ -26,8 +26,8 @@ public class PictureService : IPictureService
     private readonly ITagRepo _tagRepo;
     private readonly ITagHelper _tagHelper;
 
-    public PictureService(
-        ILogger<PictureService> logger,
+    public HttpPictureService(
+        ILogger<HttpPictureService> logger,
         IAuthorizationService authorizationService,
         IAccountContextService accountContextService,
         IPictureRepo pictureRepo,

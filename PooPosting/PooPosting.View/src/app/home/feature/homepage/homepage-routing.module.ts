@@ -5,7 +5,14 @@ import {HomepageComponent} from "./homepage.component";
 const routes: Routes = [
   {
     path: "",
-    component: HomepageComponent
+    component: HomepageComponent,
+    children: [
+      {
+        path: "popup",
+        loadChildren: () => import('../../../popup/feature/popup-shell/popup-shell-routing.module')
+          .then(m => m.PopupShellRoutingModule)
+      },
+    ]
   },
   {
     path: "**",

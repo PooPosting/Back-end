@@ -7,7 +7,7 @@ import {Component, OnDestroy, OnInit} from "@angular/core";
 import {PictureDetailsServiceService} from "../../../shared/state/picture-details-service.service";
 import {LocationServiceService} from "../../../shared/helpers/location-service.service";
 import {AccountDto} from "../../../shared/utils/dtos/AccountDto";
-import {AccountService} from "../../data-access/account.service";
+import {HttpAccountService} from "../../data-access/http-account.service";
 
 @Component({
   selector: 'app-account-details',
@@ -25,7 +25,7 @@ export class AccountDetailsComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private accountService: AccountService,
+    private accountService: HttpAccountService,
     private messageService: MessageService,
     private locationService: LocationServiceService,
     private pictureDetailsService: PictureDetailsServiceService,

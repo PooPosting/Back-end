@@ -10,6 +10,9 @@ import {AppCacheService} from "../../../shared/state/app-cache.service";
 import {environment} from "../../../../environments/environment";
 import {PictureDto} from "../../../shared/utils/dtos/PictureDto";
 import {CommentDto} from "../../../shared/utils/dtos/CommentDto";
+import {map, Observable, Subscription} from "rxjs";
+import {ActivatedRoute} from "@angular/router";
+import {LocationServiceService} from "../../../shared/helpers/location-service.service";
 
 @Component({
   selector: 'app-picture-details-modal',
@@ -17,13 +20,14 @@ import {CommentDto} from "../../../shared/utils/dtos/CommentDto";
   styleUrls: ['./picture-details-modal.component.scss']
 })
 export class PictureDetailsModalComponent implements OnInit {
-  @Input() picture: PictureDto | null = null;
-  @Input() isLoggedOn!: boolean;
 
-  @Output() pictureChanged: EventEmitter<PictureDto> = new EventEmitter<PictureDto>();
-  @Output() modalClose: EventEmitter<void> = new EventEmitter<void>()
+  id: Observable<string>;
+  picture: PictureDto | null = null;
+  comments: CommentDto[] = [];
+  visible: boolean = true;
+  isLoggedOn: boolean = false;
 
-  shareUrl!: string;
+  shareUrl: string = `${environment.appWebUrl}/picture/`;
   showSettings: boolean = false;
   deletePhrase: string = "";
 
@@ -76,25 +80,29 @@ export class PictureDetailsModalComponent implements OnInit {
     private pictureDetailsService: PictureDetailsServiceService,
     private clipboard: Clipboard,
     private cacheService: AppCacheService,
+    private route: ActivatedRoute,
+    private locationService: LocationServiceService
   ) {
-
+    this.id = route.params.pipe(map(p => p['id']));
   }
 
   ngOnInit(): void {
-    this.pictureDetailsService.modalTriggerSubject.subscribe({
-      next: () => {
-        this.showSettings = false;
-        this.selectValue = {name: "none", class: "none"};
-        this.editValue = {name: "none", class: "none"};
-        this.resetForms();
-      }
-    });
-    this.pictureDetailsService.showModalSubject.subscribe({
-      next: (val) => {
-        this.shareUrl = `${environment.appWebUrl}/picture/${val!.id}`;
-        this.isLoggedOn = this.cacheService.getUserLoggedOnState();
-        this.picture = val;
-      }
+    this.isLoggedOn = this.cacheService.cachedUserInfo != undefined;
+    let sub: Subscription = this.id.subscribe({
+      next: (id) => {
+        this.shareUrl += id;
+        let sub: Subscription = this.httpService.getPictureRequest(id)
+          .subscribe({
+            next: (pic) => {
+              this.picture = pic;
+              // this.comments$ = []
+            },
+            error: () => this.locationService.goError404(),
+            complete: () => sub.unsubscribe()
+          });
+      },
+      error: () => this.locationService.goError404(),
+      complete: () => sub.unsubscribe()
     });
   }
 
@@ -117,7 +125,6 @@ export class PictureDetailsModalComponent implements OnInit {
     this.httpService.deleteCommentRequest(this.picture!.id, commId)
       .subscribe({
         next: () => {
-          this.picture!.comments = this.picture!.comments.filter(c => c.id != commId);
           this.messageService.add({
             severity:'warn',
             summary:'Sukces',
@@ -198,21 +205,13 @@ export class PictureDetailsModalComponent implements OnInit {
       .subscribe(this.likeObserver)
   }
 
-  closeModal(event: any) {
-    if (!event.ctrlKey) {
-      this.modalClose.emit();
-    }
-  }
-
   likeObserver = {
     next: (v: PictureDto) => {
       this.picture = v;
-      this.pictureChanged.emit(v);
     },
   }
   commentObserver = {
     next: (v: CommentDto) => {
-      this.picture!.comments.unshift(v);
       this.commentForm.reset();
       this.awaitSubmit = false;
       this.messageService.add({
@@ -249,7 +248,6 @@ export class PictureDetailsModalComponent implements OnInit {
           detail: 'Post został usunięty'
         });
         this.pictureDetailsService.pictureDeletedSubject.next(this.picture!.id);
-        this.modalClose.emit();
         this.awaitSubmit = false;
       },
       error: () => {

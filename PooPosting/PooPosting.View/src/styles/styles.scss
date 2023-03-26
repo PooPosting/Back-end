@@ -23,6 +23,14 @@
 
 $navbar-height: 75px;
 
+.popup {
+  background-color: white;
+  @media screen and (max-width: 767px) {
+    width: 100vw;
+    height: 100vh;
+  }
+}
+
 body {
   overflow-y: scroll !important;
 }
@@ -203,3 +211,4 @@ a:hover {
 .p-overlaypanel-content {
   padding: 0 !important;
 }
+

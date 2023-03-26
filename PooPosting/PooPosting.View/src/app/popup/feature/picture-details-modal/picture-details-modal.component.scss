@@ -6,8 +6,8 @@
   }
 }
 .img-fluid {
-  aspect-ratio: 4/3;
-  width: 100%;
+  aspect-ratio: 4/3 !important;
+  width: 100% !important;
 
   @media screen and (min-width: 768px) {
     border-left: none !important;

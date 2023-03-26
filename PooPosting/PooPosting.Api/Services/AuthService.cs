@@ -15,13 +15,13 @@ using PooPosting.Api.Models.Dtos;
 
 namespace PooPosting.Api.Services;
 
-public class AuthService: IAuthService
+public class HttpAuthService: IAuthService
 {
     private readonly IPasswordHasher<Account> _passwordHasher;
     private readonly AuthenticationSettings _authenticationSettings;
     private readonly IAccountRepo _accountRepo;
 
-    public AuthService(
+    public HttpAuthService(
         IPasswordHasher<Account> passwordHasher,
         AuthenticationSettings authenticationSettings,
         IAccountRepo accountRepo

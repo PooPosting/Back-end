@@ -116,12 +116,12 @@ builder.Services.AddScoped<IsUserAdminFilter>();
 // builder.Services
 builder.Services.AddScoped<IAccountContextService, AccountContextService>();
 builder.Services.AddScoped<IPictureLikingService, PictureLikingService>();
-builder.Services.AddScoped<IAccountService, AccountService>();
-builder.Services.AddScoped<IPictureService, PictureService>();
-builder.Services.AddScoped<IPopularService, PopularService>();
+builder.Services.AddScoped<IAccountService, HttpAccountService>();
+builder.Services.AddScoped<IPictureService, HttpPictureService>();
+builder.Services.AddScoped<IPopularService, HttpPopularService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ILikeService, LikeService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAuthService, HttpAuthService>();
 builder.Services.AddScoped<ILogsService, LogsService>();
 builder.Services.AddScoped<IRestrictedIpsService, RestrictedIpsService>();
 

@@ -310,3 +310,39 @@
 2023-03-24 11:13:22.6415 Info Configuration initialized.
 2023-03-24 11:13:22.6415 Info NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c. File version: 5.1.2.1561. Product version: 5.1.2+f57745d9fb1124b8629db879019db120a57698ab. GlobalAssemblyCache: False
 2023-03-24 11:13:22.6415 Info Validating config: Targets=6, ConfigItems=108, FilePath=C:\Users\mrgra\Documents\GitHub\PooPosting\PooPosting\PooPosting.Api\bin\Debug\net7.0\NLog.config
+2023-03-26 12:21:51.3770 Info Message Template Auto Format enabled
+2023-03-26 12:21:51.3770 Info Loading assembly: NLog.Web.AspNetCore
+2023-03-26 12:21:51.4021 Info Registered target NLog.Targets.FileTarget(Name=allfile)
+2023-03-26 12:21:51.4049 Info Registered target NLog.Targets.FileTarget(Name=warnings)
+2023-03-26 12:21:51.4049 Info Registered target NLog.Targets.FileTarget(Name=exceptions)
+2023-03-26 12:21:51.4049 Info Registered target NLog.Targets.FileTarget(Name=request-time)
+2023-03-26 12:21:51.4049 Info Registered target NLog.Targets.FileTarget(Name=userdata)
+2023-03-26 12:21:51.4049 Info Registered target NLog.Targets.FileTarget(Name=userdata-warn)
+2023-03-26 12:21:51.4049 Info Validating config: Targets=6, ConfigItems=108, FilePath=C:\Users\mrgra\Documents\GitHub\PooPosting\PooPosting\PooPosting.Api\bin\Debug\net7.0\NLog.config
+2023-03-26 12:21:51.4219 Info Configuration initialized.
+2023-03-26 12:21:51.4219 Info NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c. File version: 5.1.2.1561. Product version: 5.1.2+f57745d9fb1124b8629db879019db120a57698ab. GlobalAssemblyCache: False
+2023-03-26 12:21:51.4219 Info Validating config: Targets=6, ConfigItems=108, FilePath=C:\Users\mrgra\Documents\GitHub\PooPosting\PooPosting\PooPosting.Api\bin\Debug\net7.0\NLog.config
+2023-03-26 12:22:49.1110 Info Message Template Auto Format enabled
+2023-03-26 12:22:49.1110 Info Loading assembly: NLog.Web.AspNetCore
+2023-03-26 12:22:49.1372 Info Registered target NLog.Targets.FileTarget(Name=allfile)
+2023-03-26 12:22:49.1372 Info Registered target NLog.Targets.FileTarget(Name=warnings)
+2023-03-26 12:22:49.1372 Info Registered target NLog.Targets.FileTarget(Name=exceptions)
+2023-03-26 12:22:49.1372 Info Registered target NLog.Targets.FileTarget(Name=request-time)
+2023-03-26 12:22:49.1372 Info Registered target NLog.Targets.FileTarget(Name=userdata)
+2023-03-26 12:22:49.1372 Info Registered target NLog.Targets.FileTarget(Name=userdata-warn)
+2023-03-26 12:22:49.1372 Info Validating config: Targets=6, ConfigItems=108, FilePath=C:\Users\mrgra\Documents\GitHub\PooPosting\PooPosting\PooPosting.Api\bin\Debug\net7.0\NLog.config
+2023-03-26 12:22:49.1587 Info Configuration initialized.
+2023-03-26 12:22:49.1587 Info NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c. File version: 5.1.2.1561. Product version: 5.1.2+f57745d9fb1124b8629db879019db120a57698ab. GlobalAssemblyCache: False
+2023-03-26 12:22:49.1587 Info Validating config: Targets=6, ConfigItems=108, FilePath=C:\Users\mrgra\Documents\GitHub\PooPosting\PooPosting\PooPosting.Api\bin\Debug\net7.0\NLog.config
+2023-03-26 15:15:20.5361 Info Message Template Auto Format enabled
+2023-03-26 15:15:20.5416 Info Loading assembly: NLog.Web.AspNetCore
+2023-03-26 15:15:20.5606 Info Registered target NLog.Targets.FileTarget(Name=allfile)
+2023-03-26 15:15:20.5606 Info Registered target NLog.Targets.FileTarget(Name=warnings)
+2023-03-26 15:15:20.5606 Info Registered target NLog.Targets.FileTarget(Name=exceptions)
+2023-03-26 15:15:20.5606 Info Registered target NLog.Targets.FileTarget(Name=request-time)
+2023-03-26 15:15:20.5606 Info Registered target NLog.Targets.FileTarget(Name=userdata)
+2023-03-26 15:15:20.5606 Info Registered target NLog.Targets.FileTarget(Name=userdata-warn)
+2023-03-26 15:15:20.5729 Info Validating config: Targets=6, ConfigItems=108, FilePath=C:\Users\mrgra\Documents\GitHub\PooPosting\PooPosting\PooPosting.Api\bin\Debug\net7.0\NLog.config
+2023-03-26 15:15:20.5729 Info Configuration initialized.
+2023-03-26 15:15:20.5729 Info NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c. File version: 5.1.2.1561. Product version: 5.1.2+f57745d9fb1124b8629db879019db120a57698ab. GlobalAssemblyCache: False
+2023-03-26 15:15:20.5729 Info Validating config: Targets=6, ConfigItems=108, FilePath=C:\Users\mrgra\Documents\GitHub\PooPosting\PooPosting\PooPosting.Api\bin\Debug\net7.0\NLog.config

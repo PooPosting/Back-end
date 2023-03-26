@@ -6,6 +6,7 @@ import {DateAgoModule} from "../../utils/pipes/date-ago/date-ago.module";
 import {CardModule} from "primeng/card";
 import {ButtonModule} from "primeng/button";
 import {DialogModule} from "primeng/dialog";
+import {ShareModalModule} from "../../../popup/feature/share-modal/share-modal.module";
 
 
 
@@ -22,7 +23,8 @@ import {DialogModule} from "primeng/dialog";
     DateAgoModule,
     CardModule,
     ButtonModule,
-    DialogModule
+    DialogModule,
+    ShareModalModule
   ]
 })
 export class PicturePreviewModule { }

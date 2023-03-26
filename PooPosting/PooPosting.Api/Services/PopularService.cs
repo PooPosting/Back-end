@@ -7,12 +7,12 @@ using PooPosting.Api.Models.Dtos;
 
 namespace PooPosting.Api.Services;
 
-public class PopularService : IPopularService
+public class HttpPopularService : IPopularService
 {
     private readonly IPopularRepo _popularRepo;
     private readonly IMapper _mapper;
 
-    public PopularService(
+    public HttpPopularService(
         IPopularRepo popularRepo,
         IMapper mapper)
     {

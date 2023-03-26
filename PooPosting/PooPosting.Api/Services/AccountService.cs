@@ -21,18 +21,18 @@ using PooPosting.Api.Models.Validators;
 
 namespace PooPosting.Api.Services;
 
-public class AccountService : IAccountService
+public class HttpAccountService : IAccountService
 {
     private readonly IMapper _mapper;
-    private readonly ILogger<AccountService> _logger;
+    private readonly ILogger<HttpAccountService> _logger;
     private readonly IAccountContextService _accountContextService;
     private readonly IAccountRepo _accountRepo;
     private readonly IAuthorizationService _authorizationService;
     private readonly IPasswordHasher<Account> _passwordHasher;
 
-    public AccountService(
+    public HttpAccountService(
         IMapper mapper,
-        ILogger<AccountService> logger,
+        ILogger<HttpAccountService> logger,
         IAccountContextService accountContextService,
         IAccountRepo accountRepo,
         IAuthorizationService authorizationService,

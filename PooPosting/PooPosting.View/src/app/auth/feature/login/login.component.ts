@@ -6,7 +6,7 @@ import {UserState} from "../../../shared/utils/models/userState";
 import {LocationServiceService} from "../../../shared/helpers/location-service.service";
 import {Title} from "@angular/platform-browser";
 import {AppCacheService} from "../../../shared/state/app-cache.service";
-import {AuthService} from "../../data-access/auth.service";
+import {HttpAuthService} from "../../data-access/http-auth.service";
 
 @Component({
   selector: 'app-login',
@@ -20,7 +20,7 @@ export class LoginComponent implements OnInit {
   constructor(
     private cacheService: AppCacheService,
     private locationService: LocationServiceService,
-    private authService: AuthService,
+    private authService: HttpAuthService,
     private messageService: MessageService,
     private title: Title
   ) {

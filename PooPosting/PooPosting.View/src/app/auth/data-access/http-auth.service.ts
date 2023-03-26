@@ -9,7 +9,7 @@ import {RegisterDto} from "../../shared/utils/dtos/RegisterDto";
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService {
+export class HttpAuthService {
 
   constructor(
     private httpClient: HttpClient
