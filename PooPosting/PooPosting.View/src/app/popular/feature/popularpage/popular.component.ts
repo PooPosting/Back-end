@@ -3,7 +3,7 @@ import {PopularDto} from "../../../shared/utils/dtos/PopularDto";
 import {SelectOption} from "../../../shared/utils/models/selectOption";
 import {Title} from "@angular/platform-browser";
 import {Subscription} from "rxjs";
-import {HttpPopularService} from "../../data-access/http-popular.service";
+import {PopularService} from "../../../shared/data-access/popular/popular.service";
 
 @Component({
   selector: 'app-popular',
@@ -34,7 +34,7 @@ export class PopularComponent implements OnInit {
   ];
 
   constructor(
-    private popularService: HttpPopularService,
+    private popularService: PopularService,
     private title: Title
   ) {
     this.title.setTitle('PicturesUI - Popularne');

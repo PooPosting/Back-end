@@ -2,10 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import {PostPictureServiceService} from "../../../../shared/helpers/post-picture-service.service";
 import {LocationServiceService} from "../../../../shared/helpers/location-service.service";
 import {AppCacheService} from "../../../../shared/state/app-cache.service";
-import {HttpServiceService} from "../../../../shared/data-access/http-service.service";
 import {MessageService} from "primeng/api";
 import {PictureDto} from "../../../../shared/utils/dtos/PictureDto";
-import {HttpPictureService} from "../../../data-access/http-picture.service";
+import {PictureService} from "../../../../shared/data-access/picture/picture.service";
 
 @Component({
   selector: 'app-post-overview',
@@ -22,7 +21,7 @@ export class PostOverviewComponent implements OnInit {
     private postPictureService: PostPictureServiceService,
     private locationService: LocationServiceService,
     private cacheService: AppCacheService,
-    private pictureService: HttpPictureService,
+    private pictureService: PictureService,
     private messageService: MessageService,
   ) {
     this.picturePreview = {
@@ -37,8 +36,7 @@ export class PostOverviewComponent implements OnInit {
       tags: this.postPictureService.tags ? this.postPictureService.tags : [],
       url: this.imgDataUrl,
       pictureAdded: Date.now().toString(),
-      likes: [],
-      comments: [],
+      commentCount: Math.floor(Math.random() * 20),
       likeCount: Math.floor(Math.random() * 100) + 50,
       dislikeCount: Math.floor(Math.random() * 30),
       likeState: 0,

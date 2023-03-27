@@ -41,8 +41,8 @@
       <div class="d-flex justify-content-between py-3">
 
         <div class="d-flex ml-3">
-          <button pButton class="mx-1 px-2 py-2 p-button-icon-only" disabled
-                  icon="bi bi-share" aria-label="share">
+          <button class="mx-1 px-2 py-2 p-button" pButton disabled aria-label="details"
+                  icon="bi bi-chat-text" label="{{picturePreview.commentCount}}">
           </button>
         </div>
 
@@ -54,9 +54,6 @@
           <button class="mx-1 py-2 button-strong" pButton disabled aria-label="dislike"
                   icon="bi {{picturePreview.likeState === 2 ? 'bi-hand-thumbs-down-fill' : 'bi-hand-thumbs-down'}}"
                   label="{{picturePreview.dislikeCount}}">
-          </button>
-          <button class="mx-1 px-2 py-2 p-button-icon-only" pButton disabled aria-label="details"
-                  icon="bi bi-chat-text">
           </button>
         </div>
 

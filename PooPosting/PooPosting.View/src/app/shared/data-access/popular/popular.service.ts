@@ -13,7 +13,7 @@ export class PopularService {
     private httpClient: HttpClient
   ) { }
 
-  getPopularRequest(): Observable<PopularDto> {
+  getPopularPictures(): Observable<PopularDto> {
     return this.httpClient
       .get<PopularDto>(
         `${environment.picturesApiUrl}/api/popular`,

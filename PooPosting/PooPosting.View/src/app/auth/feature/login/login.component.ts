@@ -1,12 +1,11 @@
 import {Component, OnInit} from '@angular/core';
 import {UntypedFormControl, UntypedFormGroup, Validators} from "@angular/forms";
-import { HttpServiceService } from 'src/app/shared/data-access/http-service.service';
 import {MessageService} from "primeng/api";
 import {UserState} from "../../../shared/utils/models/userState";
 import {LocationServiceService} from "../../../shared/helpers/location-service.service";
 import {Title} from "@angular/platform-browser";
 import {AppCacheService} from "../../../shared/state/app-cache.service";
-import {HttpAuthService} from "../../data-access/http-auth.service";
+import {AccountAuthService} from "../../../shared/data-access/account/account-auth.service";
 
 @Component({
   selector: 'app-login',
@@ -20,7 +19,7 @@ export class LoginComponent implements OnInit {
   constructor(
     private cacheService: AppCacheService,
     private locationService: LocationServiceService,
-    private authService: HttpAuthService,
+    private authService: AccountAuthService,
     private messageService: MessageService,
     private title: Title
   ) {

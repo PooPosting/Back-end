@@ -1,5 +1,4 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {HttpServiceService} from 'src/app/shared/data-access/http-service.service';
 import {Title} from "@angular/platform-browser";
 import {Subscription} from "rxjs";
 import {ScrollServiceService} from "../../../shared/helpers/scroll-service.service";

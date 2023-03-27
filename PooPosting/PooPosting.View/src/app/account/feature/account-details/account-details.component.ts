@@ -1,4 +1,3 @@
-import {HttpServiceService} from "../../../shared/data-access/http-service.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {Title} from "@angular/platform-browser";
 import {map, Observable, Subscription} from "rxjs";
@@ -7,7 +6,7 @@ import {Component, OnDestroy, OnInit} from "@angular/core";
 import {PictureDetailsServiceService} from "../../../shared/state/picture-details-service.service";
 import {LocationServiceService} from "../../../shared/helpers/location-service.service";
 import {AccountDto} from "../../../shared/utils/dtos/AccountDto";
-import {HttpAccountService} from "../../data-access/http-account.service";
+import {AccountService} from "../../../shared/data-access/account/account.service";
 
 @Component({
   selector: 'app-account-details',
@@ -25,7 +24,7 @@ export class AccountDetailsComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private accountService: HttpAccountService,
+    private accountService: AccountService,
     private messageService: MessageService,
     private locationService: LocationServiceService,
     private pictureDetailsService: PictureDetailsServiceService,

@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import {UntypedFormControl, UntypedFormGroup, Validators} from "@angular/forms";
-import { HttpServiceService } from 'src/app/shared/data-access/http-service.service';
 import { CustomValidators } from 'src/CustomValidators';
 import {MessageService} from "primeng/api";
 import {Router} from "@angular/router";
@@ -8,8 +7,7 @@ import {BlockSpace} from "../../../shared/utils/regexes/blockSpace";
 import {ItemName} from "../../../shared/utils/regexes/itemName";
 import {Title} from "@angular/platform-browser";
 import {environment} from "../../../../environments/environment";
-import {error} from "@angular/compiler-cli/src/transformers/util";
-import {HttpAuthService} from "../../data-access/http-auth.service";
+import {AccountAuthService} from "../../../shared/data-access/account/account-auth.service";
 
 @Component({
   selector: 'app-register',
@@ -33,7 +31,7 @@ export class RegisterComponent implements OnInit {
   }
 
   constructor(
-    private authService: HttpAuthService,
+    private authService: AccountAuthService,
     private message: MessageService,
     private router: Router,
     private title: Title,
@@ -92,9 +90,6 @@ export class RegisterComponent implements OnInit {
     });
   }
 
-  openLink(url: string){
-    window.open(url, "_blank");
-  }
   private disableForm() {
     this.form.disable();
     this.formDisabled = true;
