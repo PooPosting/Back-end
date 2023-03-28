@@ -103,7 +103,6 @@ export class PictureDetailsComponent implements OnInit {
           next: (pic: PictureDto) => {
             this.picture = pic;
             this.title.setTitle(`PooPosting - ${this.titleCasePipe.transform(pic.name)}`);
-            this.cacheService.cachePictures([this.picture]);
             sub.unsubscribe();
           },
           error: () => {
@@ -127,4 +126,14 @@ export class PictureDetailsComponent implements OnInit {
       })
     }
   }
+
+  pictureChanged(dto: PictureDto) {
+    this.picture = dto;
+    this.showSettingsFlag = false;
+  }
+
+  pictureDeleted() {
+    this.locationService.goBack();
+  }
+
 }

@@ -16,6 +16,7 @@ public class BgPicUrlResolver:
 
     public string Resolve(Account source, AccountDto destination, string destMember, ResolutionContext context)
     {
+        if (source.BackgroundPicUrl is null) return null;
         return source.BackgroundPicUrl.StartsWith("http") ? source.BackgroundPicUrl : Path.Combine(_appOrigin, source.BackgroundPicUrl);
     }
 

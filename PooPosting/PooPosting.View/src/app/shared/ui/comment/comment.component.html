@@ -1,8 +1,8 @@
 
-<div class="px-0 py-2 border-top">
+<div class="p-2 border-top">
   <div class="d-flex w-100 flex-row align-items-center justify-content-between">
     <div class="d-flex w-100 flex-row align-items-center justify-content-start">
-<!--      <img src="{{comment.accountPreview.profilePicUrl}}" alt="{{comment.accountPreview.nickname}}">-->
+      <img class="account-img" src="{{comment.accountPreview.profilePicUrl}}" alt="{{comment.accountPreview.nickname}}">
       <b class="account-link" [routerLink]="'/account/'+comment.accountPreview.id"
          attr.aria-label="Konto {{comment.accountPreview.nickname}}">
         {{comment.accountPreview.nickname}}

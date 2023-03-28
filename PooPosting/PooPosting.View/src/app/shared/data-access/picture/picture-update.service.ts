@@ -17,7 +17,7 @@ export class PictureUpdateService {
 
   updatePictureName(data: UpdatePictureNameDto, id: string) {
     return this.httpClient
-      .post<PictureDto>(
+      .patch<PictureDto>(
         `${environment.picturesApiUrl}/api/picture/${id}/update/name`,
         data,
         { responseType: "json" }
@@ -26,7 +26,7 @@ export class PictureUpdateService {
 
   updatePictureDescription(data: UpdatePictureDescriptionDto, id: string) {
     return this.httpClient
-      .post<PictureDto>(
+      .patch<PictureDto>(
         `${environment.picturesApiUrl}/api/picture/${id}/update/description`,
         data,
         { responseType: "json" }
@@ -35,7 +35,7 @@ export class PictureUpdateService {
 
   updatePictureTags(data: UpdatePictureTagsDto, id: string) {
     return this.httpClient
-      .post<PictureDto>(
+      .patch<PictureDto>(
         `${environment.picturesApiUrl}/api/picture/${id}/update/tags`,
         data,
         { responseType: "json" }

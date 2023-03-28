@@ -37,10 +37,12 @@
   .pic-desc {
     font-size: 0.875rem;
   }
-  .pic-date {
-    font-size: 0.875rem;
-    font-weight: 400;
-  }
+
+}
+.pic-date {
+  font-size: 0.75rem !important;
+  font-weight: 400;
+  align-self: end;
 }
 .comment {
   display: block;

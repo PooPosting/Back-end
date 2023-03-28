@@ -1,4 +1,3 @@
-
 <p-dialog styleClass="modal"
           header="Udostępnij"
           [(visible)]="visible"
@@ -13,10 +12,14 @@
     <div class="d-flex justify-content-start flex-column-reverse flex-md-row modal-container">
 
       <div class="left-box">
-        <img src="{{picture.url}}" alt="{{picture.name}}"
-             class="img-fluid border">
+        <h2 class="pic-name d-flex flex-column justify-content-center align-items-center bg-surface-gray p-2 h2 m-0 font-weight-bold">
+          <span>{{picture.name | titlecase}}</span>
+        </h2>
 
-        <div class="d-flex gap-2 m-2 flex-wrap justify-content-between">
+        <img src="{{picture.url}}" alt="{{picture.name}}"
+             class="img-fluid">
+
+        <div class="d-flex gap-2 p-2 flex-wrap justify-content-between bg-surface-gray">
           <div class="d-flex justify-content-center flex-wrap gap-2">
             <p-tag *ngFor="let tag of picture.tags">{{tag}}</p-tag>
             <p-tag *ngIf="!picture.tags.length">brak_tagów_:(</p-tag>
@@ -38,6 +41,19 @@
               [isLoggedOn]="isLoggedOn"
               (voted)="$event === 0 ? like() : dislike()">
             </app-vote-button>
+          </div>
+        </div>
+
+        <div class="px-2 pb-3 mb-3 bg-surface-gray">
+          <div class="d-flex flex-row gap-1 justify-content-start align-items-center mb-2">
+            <a routerLink="/account/{{picture.accountPreview.id}}" class="prof-link">
+              <img src="{{picture.accountPreview.profilePicUrl}}" class="prof-pic border" alt="{{picture.accountPreview.nickname}}">
+              <span class="prof-name" attr.aria-label="Konto {{picture.accountPreview.nickname}}">{{picture.accountPreview.nickname}}</span>
+            </a>
+            <span class="pic-date text-muted">{{picture.pictureAdded | date:'dd.MM.YYYY'}}</span>
+          </div>
+          <div class="d-flex w-100 flex-column">
+            <i class="pic-desc text-muted">{{picture.description ? picture.description : 'Brak opisu obrazka.'}}</i>
           </div>
         </div>
 
@@ -86,7 +102,7 @@
                 pButton
                 icon="bi bi-arrow-90deg-left"
                 class="p-button-danger p-button-icon-only"
-                routerLink="../../../"></button>
+                (click)="close()"></button>
             </div>
 
           </div>
@@ -103,151 +119,30 @@
 
 
         <div *ngIf="!showSettings" class="flex-md-column flex-column-reverse">
+
           <div>
-            <p class="pic-name d-flex flex-column">
-              <span>{{picture.name | titlecase}}</span>
-            </p>
+            <h3>Inne zdjęcia tego użytkownika</h3>
+            <p class="text-muted">tutaj bedzie kilka zdjec tego uzytkownika</p>
           </div>
-          <div>
-            <div class="d-flex flex-row gap-1 justify-content-start align-items-center mb-2">
-              <a routerLink="/account/{{picture.accountPreview.id}}" class="prof-link">
-                <img src="{{picture.accountPreview.profilePicUrl}}" class="prof-pic border" alt="{{picture.accountPreview.nickname}}">
-                <span class="prof-name" attr.aria-label="Konto {{picture.accountPreview.nickname}}">{{picture.accountPreview.nickname}}</span>
-              </a>
-              ,<span class="pic-date">{{picture.pictureAdded | date:'dd.MM.YYYY'}}</span>
-            </div>
+
+          <div class="my-4">
+            <h3>Powiązane zdjęcia</h3>
+            <p class="text-muted">tutaj bedzie kilka podobnych zdjec</p>
           </div>
-          <i class="pic-desc mt-2">{{picture.description ? picture.description : 'Brak opisu obrazka.'}}</i>
 
         </div>
 
         <div *ngIf="showSettings">
 
-          <div *ngIf="picture.isAdminModifiable && !picture.isModifiable">
-
-            <div class="w-100">
-              <div class="mb-3 text-center text-muted">
-                <p>Jako administrator, możesz usunąć obrazek jeżeli narusza on politykę strony.</p>
-              </div>
-              <input type="text" pInputText class="w-100 mb-2" placeholder="Wpisz nazwę obrazka, aby usunąć" [(ngModel)]="deletePhrase">
-              <button pButton class="p-button-danger mb-2 w-100" label="Usuń ten obrazek"
-                      (click)="submitDelete()" [disabled]="deletePhrase.toLowerCase() !== picture.name.toLowerCase()"></button>
-            </div>
-
-          </div>
-
-          <div *ngIf="picture.isModifiable">
-
-            <div>
-              <p class="text-muted text-center mb-3">Jako właściciel obrazka, możesz go edytować lub usunąć.</p>
-
-              <div class="d-flex justify-content-center mb-3">
-                <p-selectButton [options]="selectOptions" [(ngModel)]="selectValue" optionLabel="name">
-                  <ng-template let-item>
-                    <p class="select-item {{item.class}}"><span class="ml-1">{{item.name}}</span></p>
-                  </ng-template>
-                </p-selectButton>
-              </div>
-              <div class="d-flex flex-column align-items-center w-100 justify-content-center mb-2" *ngIf="selectValue.name === 'Edytuj'">
-
-                <p-selectButton [options]="editOptions" [(ngModel)]="editValue" optionLabel="name">
-                  <ng-template let-item>
-                    <p class="select-item {{item.class}}"><span class="ml-1">{{item.name}}</span></p>
-                  </ng-template>
-                </p-selectButton>
-
-                <div class="w-100">
-                  <form [formGroup]="changeTags" (ngSubmit)="submitTags()"
-                        *ngIf="editValue.name === 'Tagi' && selectValue.name === 'Edytuj'">
-                    <h3 class="my-4">Zmień tagi obrazka</h3>
-                    <div class="mb-4 w-100 text-left">
-                      <div class="p-float-label w-100">
-                        <p-chips #pChips
-                                 id="chips"
-                                 formControlName="tags"
-                                 [allowDuplicate]="false"
-                                 [addOnTab]="true"
-                                 (onAdd)="trimChips()" (onRemove)="popChips()" (keydown)="onKeyDown($event)" (touchend)="onKeyDown($event)" [addOnBlur]="true">
-                          <ng-template let-item pTemplate="item">
-                            <span class="bi bi-tag">{{item}}</span>
-                          </ng-template>
-                        </p-chips>
-                        <label for="chips">Tagi</label>
-                      </div>
-                      <p class="lh15 mt-1"><small id="chips-help" class="mx-1 text-muted">Możesz wprowadzić maksymalnie 4 tagi.</small></p>
-                    </div>
-                    <div class="d-flex justify-content-center mb-3">
-                      <button pButton pRipple type="submit" label="Zatwierdź zmiany"
-                              class="p-button-primary px-5 py-2" [disabled]="changeTags.invalid || awaitSubmit"></button>
-                    </div>
-                  </form>
-                  <form [formGroup]="changeName" (ngSubmit)="submitName()"
-                        *ngIf="editValue.name === 'Nazwa' && selectValue.name === 'Edytuj'">
-                    <h3 class="my-4">Zmień nazwę obrazka</h3>
-                    <div class="text-left w-100 mb-4">
-          <span class="p-float-label">
-            <input id="name-input" class="w-100" type="text"
-                   [ngClass]="changeName.get('name')!.touched ? 'ng-dirty' : ''"
-                   formControlName="name" pInputText>
-            <label for="name-input">Nazwa obrazka</label>
-          </span>
-                      <span *ngIf="changeName.get('name')!.touched && changeName.get('name')!.invalid">
-            <small id="name-input-error-required" class="px-1 p-error block"
-                   *ngIf="changeName.get('name')!.errors!['required']">
-              Nazwa obrazka jest wymagana
-            </small>
-            <small id="name-input-error-minlength" class="px-1 p-error block"
-                   *ngIf="changeName.get('name')!.errors!['minlength']">
-              Nazwa obrazka powinna zawierać co najmniej 4 znaki
-            </small>
-            <small id="name-input-error-maxlength" class="px-1 p-error block"
-                   *ngIf="changeName.get('name')!.errors!['maxlength']">
-              Nazwa obrazka powinna zawierać maksymalnie 40 znaków
-            </small>
-          <small id="name-input-error-regex-mismatch" class="px-1 p-error block"
-                 *ngIf="changeName.get('name')!.errors!['pattern']">
-              Nazwa obrazka nie może zaczynać i kończyć się spacją, oraz nie może posiadać wielu spacji obok siebie
-            </small>
-          </span>
-                    </div>
-                    <div class="d-flex justify-content-center mb-3">
-                      <button pButton pRipple type="submit" label="Zatwierdź zmiany"
-                              class="p-button-primary px-5 py-2" [disabled]="changeName.invalid || awaitSubmit"></button>
-                    </div>
-                  </form>
-                  <form [formGroup]="changeDesc" (ngSubmit)="submitDesc()"
-                        *ngIf="editValue.name === 'Opis' && selectValue.name === 'Edytuj'">
-                    <h3 class="my-4">Zmień opis obrazka</h3>
-                    <div class="w-100 mb-3">
-              <span class="p-float-label">
-              <textarea id="pic-desc-input" class="w-100" formControlName="desc" pInputTextarea></textarea>
-              <label for="pic-desc-input">Opis obrazka</label>
-                </span>
-                      <span *ngIf="changeDesc.get('desc')!.touched && changeDesc.get('desc')!.invalid">
-                <small id="desc-input-error-maxlength" class="px-1 p-error block"
-                       *ngIf="changeDesc.get('desc')!.errors!['maxlength']">
-                  Opis obrazka powinien zawierać maksymalnie 500 znaków
-                </small>
-              </span>
-                    </div>
-                    <div class="d-flex justify-content-center mb-3">
-                      <button pButton pRipple type="submit" label="Zatwierdź zmiany"
-                              class="p-button-primary px-5 py-2" [disabled]="changeDesc.invalid || awaitSubmit"></button>
-                    </div>
-                  </form>
-                </div>
-
-              </div>
-
-              <div class="w-100" *ngIf="selectValue.name === 'Usuń'">
-                <h3 class="my-4">Usuń obrazek</h3>
-                <input type="text" pInputText class="w-100 mb-2" placeholder="Wpisz nazwę obrazka, aby usunąć" [(ngModel)]="deletePhrase">
-                <button pButton class="p-button-danger mb-2 w-100" label="Usuń ten obrazek"
-                        (click)="submitDelete()" [disabled]="deletePhrase.toLowerCase() !== picture.name.toLowerCase()"></button>
-              </div>
-            </div>
-
-          </div>
+          <app-edit-picture
+            [pictureId]="picture.id"
+            [pictureName]="picture.name"
+            [isAdminModifiable]="picture.isAdminModifiable"
+            [isModifiable]="picture.isModifiable"
+            (pictureChangedEvent)="pictureChanged($event)"
+            (pictureDeletedEvent)="pictureDeleted()"
+          >
+          </app-edit-picture>
 
         </div>
 

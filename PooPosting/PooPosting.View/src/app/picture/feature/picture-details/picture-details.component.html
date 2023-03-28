@@ -1,7 +1,35 @@
-<div class="px-3 px-md-0 mb-5" *ngIf="picture">
-  <div class="mb-3 d-flex align-items-center justify-content-between">
-    <button pButton label="Powrót" icon="bi bi-arrow-return-left" class="px-3" (click)="return()"></button>
+<div class="px-3 px-md-0 mb-5 d-flex flex-column gap-3" *ngIf="picture">
+
+  <div class="d-flex align-items-center justify-content-between">
+    <button
+      pButton
+      label="Powrót"
+      icon="bi bi-arrow-return-left"
+      class="px-3"
+      (click)="return()">
+    </button>
+    <button
+      pButton
+      icon="bi bi-gear"
+      class="px-3 p-button-icon-only"
+      (click)="showSettingsFlag = !showSettingsFlag"
+      *ngIf="picture.isAdminModifiable || picture.isModifiable">
+    </button>
   </div>
+
+  <p-card *ngIf="showSettingsFlag">
+    <div class="p-4">
+      <app-edit-picture
+        [pictureId]="picture.id"
+        [pictureName]="picture.name"
+        [isAdminModifiable]="picture.isAdminModifiable"
+        [isModifiable]="picture.isModifiable"
+        (pictureChangedEvent)="pictureChanged($event)"
+        (pictureDeletedEvent)="pictureDeleted()"
+      >
+      </app-edit-picture>
+    </div>
+  </p-card>
 
   <p-card class="text-center">
 
@@ -75,5 +103,6 @@
   (commentDeleted)="picture.commentCount = picture.commentCount-1"
   (commentAdded)="picture.commentCount = picture.commentCount+1">
 </app-comment-section>
+
 
 

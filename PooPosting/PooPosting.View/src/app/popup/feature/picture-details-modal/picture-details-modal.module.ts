@@ -13,7 +13,8 @@ import {SelectButtonModule} from "primeng/selectbutton";
 import {RippleModule} from "primeng/ripple";
 import {DialogModule} from "primeng/dialog";
 import {CommentSectionModule} from "../../../shared/feature/comment-section/comment-section.module";
-import {VoteButtonModule} from "../../../shared/ui/vote-button/vote-button.module";
+import {VoteButtonModule} from "../../../shared/feature/vote-button/vote-button.module";
+import {EditPictureModule} from "../../../shared/feature/edit-picture/edit-picture.module";
 
 
 @NgModule({
@@ -37,7 +38,8 @@ import {VoteButtonModule} from "../../../shared/ui/vote-button/vote-button.modul
     RippleModule,
     DialogModule,
     CommentSectionModule,
-    VoteButtonModule
+    VoteButtonModule,
+    EditPictureModule
   ]
 })
 export class PictureDetailsModalModule { }

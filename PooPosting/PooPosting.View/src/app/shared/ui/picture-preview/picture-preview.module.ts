@@ -7,7 +7,7 @@ import {CardModule} from "primeng/card";
 import {ButtonModule} from "primeng/button";
 import {DialogModule} from "primeng/dialog";
 import {ShareModalModule} from "../../../popup/feature/share-modal/share-modal.module";
-import {VoteButtonModule} from "../vote-button/vote-button.module";
+import {VoteButtonModule} from "../../feature/vote-button/vote-button.module";
 
 
 

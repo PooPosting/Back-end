@@ -16,8 +16,6 @@ export class VoteButtonComponent  {
   @Input() likeCount: number = 0;
   @Input() dislikeCount: number = 0;
 
-  constructor() { }
-
   vote() {
     this.voted.emit(this.voteType);
   }

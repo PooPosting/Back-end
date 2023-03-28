@@ -8,6 +8,11 @@ const routes: Routes = [
     component: PictureDetailsComponent
   },
   {
+    path: "popup",
+    loadChildren: () => import('../../../popup/feature/popup-shell/popup-shell.module')
+      .then(m => m.PopupShellModule)
+  },
+  {
     path: "**",
     redirectTo: "/404"
   }
