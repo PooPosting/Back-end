@@ -2,6 +2,8 @@ import {Component, Input, OnInit} from '@angular/core';
 import { HttpServiceService } from 'src/app/shared/data-access/http-service.service';
 import {PictureDetailsServiceService} from "../../state/picture-details-service.service";
 import {PictureDto} from "../../utils/dtos/PictureDto";
+import {PictureService} from "../../data-access/picture/picture.service";
+import {PictureLikesService} from "../../data-access/picture/picture-likes.service";
 
 @Component({
   selector: 'app-picture-preview',
@@ -16,8 +18,8 @@ export class PicturePreviewComponent implements OnInit {
   showShare: boolean = false;
 
   constructor(
-    private httpService: HttpServiceService,
     private pictureDetailsService: PictureDetailsServiceService,
+    private likeService: PictureLikesService
   ) { }
 
   ngOnInit(): void {
@@ -39,11 +41,11 @@ export class PicturePreviewComponent implements OnInit {
 
 
   like(){
-    this.httpService.patchPictureLikeRequest(this.picture.id)
+    this.likeService.likePicture(this.picture.id)
       .subscribe(this.likeObserver)
   }
   dislike(){
-    this.httpService.patchPictureDislikeRequest(this.picture.id)
+    this.likeService.dislikePicture(this.picture.id)
       .subscribe(this.likeObserver)
   }
 

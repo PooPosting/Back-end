@@ -83,7 +83,7 @@ export class AccountDetailsComponent implements OnInit, OnDestroy {
       this.title.setTitle(`PicturesUI - ${acc.nickname}`);
     },
     error: () => {
-      this.router.navigate(['/error404']);
+      this.locationService.goBack();
     }
   }
 

@@ -4,6 +4,7 @@ import {PutPostCommentDto} from "../../utils/dtos/PutPostCommentDto";
 import {Observable} from "rxjs";
 import {CommentDto} from "../../utils/dtos/CommentDto";
 import {environment} from "../../../../environments/environment";
+import {CommentDtoPaged} from "../../utils/dtos/CommentDtoPaged";
 
 @Injectable({
   providedIn: 'root'
@@ -14,9 +15,9 @@ export class PictureCommentsService {
     private httpClient: HttpClient
   ) { }
 
-  getPictureComments(picId: string, pageSize: number, pageNumber: number): Observable<CommentDto> {
+  getPictureComments(picId: string, pageSize: number, pageNumber: number): Observable<CommentDtoPaged> {
     return this.httpClient
-      .get<CommentDto>(
+      .get<CommentDtoPaged>(
         `${environment.picturesApiUrl}/api/picture/${picId}/comment`,
         {
           params: new HttpParams()

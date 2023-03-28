@@ -30,7 +30,7 @@ export class PictureLikesService {
   likePicture(id: string): Observable<PictureDto> {
     return this.httpClient
       .patch<PictureDto>(
-        `${environment.picturesApiUrl}/api/picture/${id}/vote-up`,
+        `${environment.picturesApiUrl}/api/picture/${id}/like/vote-up`,
         {},
         { responseType: "json" }
       );
@@ -38,7 +38,7 @@ export class PictureLikesService {
   dislikePicture(id: string): Observable<PictureDto> {
     return this.httpClient
       .patch<PictureDto>(
-        `${environment.picturesApiUrl}/api/picture/${id}/vote-down`,
+        `${environment.picturesApiUrl}/api/picture/${id}/like/vote-down`,
         {},
         { responseType: "json" }
       );

@@ -10,6 +10,7 @@ import {AppCacheService} from "../../../shared/state/app-cache.service";
 import {TitleCasePipe} from "@angular/common";
 import {PictureDetailsServiceService} from "../../../shared/state/picture-details-service.service";
 import {PictureDto} from "../../../shared/utils/dtos/PictureDto";
+import {PictureLikesService} from "../../../shared/data-access/picture/picture-likes.service";
 
 @Component({
   selector: 'app-picture-details',
@@ -38,6 +39,7 @@ export class PictureDetailsComponent implements OnInit {
   picChangedSubscription: Subscription = new Subscription();
 
   constructor(
+    private likeService: PictureLikesService,
     private cacheService: AppCacheService,
     private locationService: LocationServiceService,
     private pictureDetailsService: PictureDetailsServiceService,
@@ -76,11 +78,11 @@ export class PictureDetailsComponent implements OnInit {
   }
 
   like() {
-    this.httpService.patchPictureLikeRequest(this.picture.id)
+    this.likeService.likePicture(this.picture.id)
       .subscribe(this.likeObserver)
   }
   dislike(){
-    this.httpService.patchPictureDislikeRequest(this.picture.id)
+    this.likeService.dislikePicture(this.picture.id)
       .subscribe(this.likeObserver)
   }
 
@@ -117,18 +119,12 @@ export class PictureDetailsComponent implements OnInit {
 
   likeObserver = {
     next: () => {
-      this.httpService.getPictureRequest(this.picture.id).subscribe({
-        next: (value: PictureDto) => {
-          this.picture = value;
-        }
+      this.httpService.getPictureRequest(this.picture.id)
+        .subscribe({
+          next: (value: PictureDto) => {
+            this.picture = value;
+          }
       })
-    },
-    error: () => {
-      this.messageService.add({
-        severity:'error',
-        summary: 'Niepowodzenie',
-        detail: `Coś poszło nie tak.`
-      });
     }
   }
 }

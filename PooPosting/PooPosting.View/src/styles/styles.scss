@@ -211,4 +211,23 @@ a:hover {
 .p-overlaypanel-content {
   padding: 0 !important;
 }
-
+.prof-link {
+  .prof-pic {
+    width: 1.5rem;
+    aspect-ratio: 1;
+    border-radius: 40%;
+    object-fit: cover;
+    font-size: 6px;
+  }
+  .prof-name {
+    color: #424242;
+    cursor: pointer;
+  }
+  transition: 0.1s ease-in-out;
+  &:hover {
+    opacity: 0.85;
+    .prof-name {
+      color: $primary-active-color;
+    }
+  }
+}

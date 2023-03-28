@@ -7,6 +7,8 @@ import {CardModule} from "primeng/card";
 import {TagModule} from "primeng/tag";
 import {ButtonModule} from "primeng/button";
 import {DialogModule} from "primeng/dialog";
+import {VoteButtonModule} from "../../../shared/ui/vote-button/vote-button.module";
+import {CommentSectionModule} from "../../../shared/feature/comment-section/comment-section.module";
 
 
 @NgModule({
@@ -22,7 +24,9 @@ import {DialogModule} from "primeng/dialog";
     CardModule,
     TagModule,
     ButtonModule,
-    DialogModule
+    DialogModule,
+    VoteButtonModule,
+    CommentSectionModule
   ]
 })
 export class PictureDetailsModule { }

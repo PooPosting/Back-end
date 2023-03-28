@@ -1,0 +1,21 @@
+<button
+  *ngIf="voteType === 0"
+  class="mx-1 py-2 button-strong"
+  pButton
+  (click)="vote()"
+  [disabled]="!isLoggedOn"
+  aria-label="dislike"
+  icon="bi {{likeState === 1 ? 'bi-hand-thumbs-up-fill' : 'bi-hand-thumbs-up'}}"
+  label="{{likeCount}}">
+</button>
+
+<button
+  *ngIf="voteType === 1"
+  class="mx-1 py-2 button-strong"
+  pButton
+  (click)="vote()"
+  [disabled]="!isLoggedOn"
+  aria-label="dislike"
+  icon="bi {{likeState === 2 ? 'bi-hand-thumbs-down-fill' : 'bi-hand-thumbs-down'}}"
+  label="{{dislikeCount}}">
+</button>

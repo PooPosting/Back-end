@@ -1,7 +1,7 @@
 import {Component, ViewChild} from '@angular/core';
 import {LocationServiceService} from "../../../../shared/helpers/location-service.service";
 import {UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators} from "@angular/forms";
-import {ItemName} from "../../../../shared/utils/regexes/itemName";
+import {BlockSpaceOnStartEnd} from "../../../../shared/utils/regexes/blockSpaceOnStartEnd";
 import {PostPictureServiceService} from "../../../../shared/helpers/post-picture-service.service";
 import {Router} from "@angular/router";
 
@@ -18,7 +18,7 @@ export class PostDetailsComponent {
       Validators.required,
       Validators.minLength(4),
       Validators.maxLength(40),
-      Validators.pattern(ItemName)
+      Validators.pattern(BlockSpaceOnStartEnd)
     ]),
     description: new UntypedFormControl(this.postPictureService.description, [
       Validators.maxLength(500)

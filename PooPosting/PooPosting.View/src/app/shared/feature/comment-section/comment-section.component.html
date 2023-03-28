@@ -1,0 +1,67 @@
+<div class="w-100 mb-3 px-2 d-flex justify-content-center align-items-center">
+  <form
+    (ngSubmit)="comment()"
+    [formGroup]="commentForm"
+    class="w-100 d-flex flex-column justify-content-center">
+
+    <div class="d-flex flex-column text-center">
+
+        <textarea id="comment-input"
+                  class="w-100 border"
+                  [autoResize]="true"
+                  formControlName="text"
+                  cols="30"
+                  placeholder="Napisz komentarz!" pInputTextarea>
+        </textarea>
+
+      <span *ngIf="commentForm.invalid">
+          <small *ngIf="commentForm.get('text')!.errors!['minlength']" class="p-error d-block">
+            Komentarz musi zawierać co najmniej 4 znaki
+          </small>
+          <small *ngIf="commentForm.get('text')!.errors!['maxlength']" class="p-error d-block">
+            Maksymalna długość komentarza to 250 znaków
+          </small>
+          <small class="p-error d-block"
+                 *ngIf="commentForm.get('text')!.errors!['pattern']">
+          Komentarz nie może zaczynać i kończyć się spacją, oraz nie może posiadać wielu spacji obok siebie
+        </small>
+        </span>
+
+    </div>
+
+    <div class="text-right">
+
+      <button pButton label="{{!awaitSubmit ? 'Zatwierdź' : 'Wysyłanie...'}}"
+              class="px-5 mt-2"
+              type="submit"
+              [disabled]="commentForm.invalid || awaitSubmit || !isLoggedOn || picId === null">
+      </button>
+
+    </div>
+
+  </form>
+</div>
+
+<div class="comment-box d-flex flex-column p-2" *ngIf="comments">
+  <app-comment
+    *ngFor="let comment of comments"
+    [comment]="comment"
+    (commentDeleted)="deleteComment(comment.id)"
+    class="comment">
+  </app-comment>
+</div>
+
+<div
+  *ngIf="moreCommentsAvailable"
+  class="d-flex justify-content-center align-items-center pb-4"
+  (click)="fetchComments()">
+
+  <button pButton label="Załaduj więcej komentarzy" [disabled]="fetchingComments"></button>
+
+</div>
+
+<div
+  *ngIf="!moreCommentsAvailable && comments.length"
+  class="d-flex justify-content-center align-items-center pb-4">
+  <p class="text-muted">To już wszystkie komentarze...</p>
+</div>

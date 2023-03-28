@@ -1,8 +1,8 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component,OnInit} from '@angular/core';
 import {HttpServiceService} from "../../../shared/data-access/http-service.service";
 import {MessageService} from "primeng/api";
-import {ItemName} from "../../../shared/utils/regexes/itemName";
-import {UntypedFormControl, UntypedFormGroup, Validators} from "@angular/forms";
+import {BlockSpaceOnStartEnd} from "../../../shared/utils/regexes/blockSpaceOnStartEnd";
+import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {Clipboard} from "@angular/cdk/clipboard";
 import {SelectOption} from "../../../shared/utils/models/selectOption";
 import {PictureDetailsServiceService} from "../../../shared/state/picture-details-service.service";
@@ -13,6 +13,7 @@ import {CommentDto} from "../../../shared/utils/dtos/CommentDto";
 import {map, Observable, Subscription} from "rxjs";
 import {ActivatedRoute} from "@angular/router";
 import {LocationServiceService} from "../../../shared/helpers/location-service.service";
+import {PictureLikesService} from "../../../shared/data-access/picture/picture-likes.service";
 
 @Component({
   selector: 'app-picture-details-modal',
@@ -26,6 +27,7 @@ export class PictureDetailsModalComponent implements OnInit {
   comments: CommentDto[] = [];
   visible: boolean = true;
   isLoggedOn: boolean = false;
+  recentlyRefreshed: boolean = false;
 
   shareUrl: string = `${environment.appWebUrl}/picture/`;
   showSettings: boolean = false;
@@ -46,36 +48,29 @@ export class PictureDetailsModalComponent implements OnInit {
   awaitSubmit: boolean = false;
 
   tags: string[] = [];
-  changeTags: UntypedFormGroup = new UntypedFormGroup({
-    tags: new UntypedFormControl("", [
+  changeTags: FormGroup = new FormGroup({
+    tags: new FormControl<string>("", [
       Validators.required
     ])
   });
-  changeName: UntypedFormGroup = new UntypedFormGroup({
-    name: new UntypedFormControl("", [
+  changeName: FormGroup = new FormGroup({
+    name: new FormControl<string>("", [
       Validators.required,
       Validators.minLength(4),
       Validators.maxLength(40),
-      Validators.pattern(ItemName)
+      Validators.pattern(BlockSpaceOnStartEnd)
     ])
   });
-  changeDesc: UntypedFormGroup = new UntypedFormGroup({
-    desc: new UntypedFormControl("", [
+  changeDesc: FormGroup = new FormGroup({
+    desc: new FormControl<string>("", [
       Validators.required,
       Validators.maxLength(500),
     ])
   })
-  commentForm: UntypedFormGroup = new UntypedFormGroup({
-    text: new UntypedFormControl("", [
-      Validators.required,
-      Validators.minLength(4),
-      Validators.maxLength(250),
-      Validators.pattern(ItemName)
-    ]),
-  });
 
   constructor(
     private httpService: HttpServiceService,
+    private likeService: PictureLikesService,
     private messageService: MessageService,
     private pictureDetailsService: PictureDetailsServiceService,
     private clipboard: Clipboard,
@@ -88,22 +83,7 @@ export class PictureDetailsModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.isLoggedOn = this.cacheService.cachedUserInfo != undefined;
-    let sub: Subscription = this.id.subscribe({
-      next: (id) => {
-        this.shareUrl += id;
-        let sub: Subscription = this.httpService.getPictureRequest(id)
-          .subscribe({
-            next: (pic) => {
-              this.picture = pic;
-              // this.comments$ = []
-            },
-            error: () => this.locationService.goError404(),
-            complete: () => sub.unsubscribe()
-          });
-      },
-      error: () => this.locationService.goError404(),
-      complete: () => sub.unsubscribe()
-    });
+    this.refreshPicture();
   }
 
 
@@ -115,23 +95,6 @@ export class PictureDetailsModalComponent implements OnInit {
       summary: 'Sukces!',
       detail: 'Pomyślnie skopiowano adres obrazka!',
     })
-  }
-  comment() {
-    this.awaitSubmit = true;
-    this.httpService.postCommentRequest(this.picture!.id, this.commentForm.getRawValue())
-      .subscribe(this.commentObserver);
-  }
-  deleteComment(commId: string) {
-    this.httpService.deleteCommentRequest(this.picture!.id, commId)
-      .subscribe({
-        next: () => {
-          this.messageService.add({
-            severity:'warn',
-            summary:'Sukces',
-            detail:'Pomyślnie usunięto komentarz!'
-          });
-        }
-      });
   }
 
   trimChips() {
@@ -196,12 +159,12 @@ export class PictureDetailsModalComponent implements OnInit {
     this.postChanges(formData);
   }
 
-  like(){
-    this.httpService.patchPictureLikeRequest(this.picture!.id)
+  like() {
+    this.likeService.likePicture(this.picture!.id)
       .subscribe(this.likeObserver)
   }
-  dislike(){
-    this.httpService.patchPictureDislikeRequest(this.picture!.id)
+  dislike() {
+    this.likeService.dislikePicture(this.picture!.id)
       .subscribe(this.likeObserver)
   }
 
@@ -209,18 +172,6 @@ export class PictureDetailsModalComponent implements OnInit {
     next: (v: PictureDto) => {
       this.picture = v;
     },
-  }
-  commentObserver = {
-    next: (v: CommentDto) => {
-      this.commentForm.reset();
-      this.awaitSubmit = false;
-      this.messageService.add({
-        severity:'success',
-        summary:'Sukces',
-        detail:'Pomyślnie skomentowano!'
-      });
-      this.commentForm.reset();
-    }
   }
 
   private postChanges(model: FormData) {
@@ -253,6 +204,32 @@ export class PictureDetailsModalComponent implements OnInit {
       error: () => {
         this.awaitSubmit = false;
       }
+    });
+  }
+
+  refreshPicture() {
+    this.recentlyRefreshed = true;
+    this.fetchPicture();
+    setTimeout(() => {
+      this.recentlyRefreshed = false;
+    }, 10000)
+  }
+
+  fetchPicture() {
+    let sub: Subscription = this.id.subscribe({
+      next: (id) => {
+        this.shareUrl = `${environment.appWebUrl}/picture/${id}`;
+        let sub: Subscription = this.httpService.getPictureRequest(id)
+          .subscribe({
+            next: (pic) => {
+              this.picture = pic;
+            },
+            error: () => this.locationService.goError404(),
+            complete: () => sub.unsubscribe()
+          });
+      },
+      error: () => this.locationService.goError404(),
+      complete: () => sub.unsubscribe()
     });
   }
 

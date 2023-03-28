@@ -3,6 +3,6 @@
 export interface AccountDtoPaged {
   items: AccountDto[];
   totalPages: number;
-  pageSize: number;
+  totalItems: number;
   page: number;
 }

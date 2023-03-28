@@ -7,6 +7,7 @@ import {CardModule} from "primeng/card";
 import {ButtonModule} from "primeng/button";
 import {DialogModule} from "primeng/dialog";
 import {ShareModalModule} from "../../../popup/feature/share-modal/share-modal.module";
+import {VoteButtonModule} from "../vote-button/vote-button.module";
 
 
 
@@ -17,14 +18,15 @@ import {ShareModalModule} from "../../../popup/feature/share-modal/share-modal.m
   exports: [
     PicturePreviewComponent
   ],
-  imports: [
-    CommonModule,
-    RouterModule,
-    DateAgoModule,
-    CardModule,
-    ButtonModule,
-    DialogModule,
-    ShareModalModule
-  ]
+    imports: [
+        CommonModule,
+        RouterModule,
+        DateAgoModule,
+        CardModule,
+        ButtonModule,
+        DialogModule,
+        ShareModalModule,
+        VoteButtonModule
+    ]
 })
 export class PicturePreviewModule { }

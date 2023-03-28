@@ -23,13 +23,13 @@ export class SearchComponent implements OnInit {
   picturesResult: PictureDtoPaged = {
     items:[],
     page:0,
-    pageSize: 0,
+    totalItems: 0,
     totalPages:0
   }
   accountsResult: AccountDtoPaged = {
     items:[],
     page:0,
-    pageSize: 0,
+    totalItems: 0,
     totalPages:0
   }
 
@@ -123,7 +123,7 @@ export class SearchComponent implements OnInit {
     this.picturesResult = {
       items:[],
       page:0,
-      pageSize: 0,
+      totalItems: 0,
       totalPages:0
     }
   }
@@ -131,7 +131,7 @@ export class SearchComponent implements OnInit {
     this.accountsResult = {
       items:[],
       page:0,
-      pageSize: 0,
+      totalItems: 0,
       totalPages:0
     }
   }

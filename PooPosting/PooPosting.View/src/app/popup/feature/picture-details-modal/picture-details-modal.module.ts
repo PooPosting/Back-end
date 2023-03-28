@@ -7,11 +7,13 @@ import {TagModule} from "primeng/tag";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {InputTextareaModule} from "primeng/inputtextarea";
 import {ButtonModule} from "primeng/button";
-import {CommentModule} from "../../ui/comment/comment.module";
+import {CommentModule} from "../../../shared/ui/comment/comment.module";
 import {ChipsModule} from "primeng/chips";
 import {SelectButtonModule} from "primeng/selectbutton";
 import {RippleModule} from "primeng/ripple";
 import {DialogModule} from "primeng/dialog";
+import {CommentSectionModule} from "../../../shared/feature/comment-section/comment-section.module";
+import {VoteButtonModule} from "../../../shared/ui/vote-button/vote-button.module";
 
 
 @NgModule({
@@ -33,7 +35,9 @@ import {DialogModule} from "primeng/dialog";
     SelectButtonModule,
     FormsModule,
     RippleModule,
-    DialogModule
+    DialogModule,
+    CommentSectionModule,
+    VoteButtonModule
   ]
 })
 export class PictureDetailsModalModule { }

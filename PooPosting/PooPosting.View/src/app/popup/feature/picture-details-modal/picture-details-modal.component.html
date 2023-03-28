@@ -10,16 +10,6 @@
 
   <div *ngIf="picture">
 
-    <div class="d-flex justify-content-between p-2 bg-surface-gray">
-      <h2
-        class="p-2 h2 font-weight-bold">
-        {{picture.name | titlecase}}
-      </h2>
-      <div class="d-flex justify-content-center align-items-center p-0 px-1 m-0">
-        <p-button icon="bi bi-arrow-90deg-left" styleClass="p-button-danger p-button-icon-only" routerLink="../../../"></p-button>
-      </div>
-    </div>
-
     <div class="d-flex justify-content-start flex-column-reverse flex-md-row modal-container">
 
       <div class="left-box">
@@ -32,84 +22,110 @@
             <p-tag *ngIf="!picture.tags.length">brak_tagów_:(</p-tag>
           </div>
           <div class="ml-auto">
-            <button class="mx-1 py-2 button-strong" pButton (click)="like()" [disabled]="!isLoggedOn" aria-label="like"
-                    icon="bi {{picture.likeState === 1 ? 'bi-hand-thumbs-up-fill' : 'bi-hand-thumbs-up'}}"
-                    label="{{picture.likeCount}}">
-            </button>
-            <button class="mx-1 py-2 button-strong" pButton (click)="dislike()" [disabled]="!isLoggedOn" aria-label="dislike"
-                    icon="bi {{picture.likeState === 2 ? 'bi-hand-thumbs-down-fill' : 'bi-hand-thumbs-down'}}"
-                    label="{{picture.dislikeCount}}">
-            </button>
+            <app-vote-button
+              [voteType]="0"
+              [likeState]="picture.likeState"
+              [likeCount]="picture.likeCount"
+              [dislikeCount]="picture.dislikeCount"
+              [isLoggedOn]="isLoggedOn"
+              (voted)="$event === 0 ? like() : dislike()">
+            </app-vote-button>
+            <app-vote-button
+              [voteType]="1"
+              [likeState]="picture.likeState"
+              [likeCount]="picture.likeCount"
+              [dislikeCount]="picture.dislikeCount"
+              [isLoggedOn]="isLoggedOn"
+              (voted)="$event === 0 ? like() : dislike()">
+            </app-vote-button>
           </div>
         </div>
 
         <div class="comment-section d-flex flex-column">
 
-          <div class="w-100 mb-3 px-2 d-flex justify-content-center align-items-center">
-            <form (ngSubmit)="comment()" [formGroup]="commentForm" class="w-100 d-flex flex-column justify-content-center">
-              <div class="d-flex flex-column text-center">
-        <textarea id="comment-input" class="w-100 border" [autoResize]="true" formControlName="text" cols="30"
-                  placeholder="Napisz komentarz!" pInputTextarea></textarea>
-                <span *ngIf="commentForm.invalid">
-          <small *ngIf="commentForm.get('text')!.errors!['minlength']" class="p-error d-block">
-            Komentarz musi zawierać co najmniej 4 znaki
-          </small>
-          <small *ngIf="commentForm.get('text')!.errors!['maxlength']" class="p-error d-block">
-            Maksymalna długość komentarza to 250 znaków
-          </small>
-          <small class="p-error d-block"
-                 *ngIf="commentForm.get('text')!.errors!['pattern']">
-          Komentarz nie może zaczynać i kończyć się spacją, oraz nie może posiadać wielu spacji obok siebie
-        </small>
-        </span>
+          <app-comment-section
+            [picId]="picture.id"
+            [isLoggedOn]="isLoggedOn"
+            (commentDeleted)="picture.commentCount = picture.commentCount-1"
+            (commentAdded)="picture.commentCount = picture.commentCount+1">
+          </app-comment-section>
 
-              </div>
-              <div class="text-right">
-                <button pButton label="{{!awaitSubmit ? 'Zatwierdź' : 'Wysyłanie...'}}" class="px-5 mt-2" type="submit"
-                        [disabled]="commentForm.invalid || awaitSubmit || !isLoggedOn"></button>
-              </div>
-            </form>
-          </div>
-
-          <div class="comment-box d-flex flex-column gap-2 p-2" *ngIf="comments">
-            <app-comment *ngFor="let comment of comments" [comment]="comment" (commentDeleted)="deleteComment(comment.id)" class="comment"></app-comment>
-          </div>
         </div>
+
       </div>
 
       <div class="info-box d-flex flex-column px-3 py-2">
-        <div class="d-flex mt-2 justify-content-start" *ngIf="picture.isModifiable || picture.isAdminModifiable">
-          <button pButton (click)="showSettings = !showSettings"
-                  label="{{showSettings ? 'Informacje' : 'Ustawienia'}}"
-                  icon="{{showSettings ? 'bi bi-info-circle' : 'bi bi-gear'}}"></button>
-        </div>
 
-        <div *ngIf="!showSettings" class="flex-md-column flex-column-reverse">
-          <div>
-            <div class="p-inputgroup my-3">
+        <div class="mt-2 mb-md-4">
+
+          <div
+            class="d-flex align-items-center gap-2"
+            [ngClass]="(picture.isModifiable || picture.isAdminModifiable) ? 'justify-content-between' : 'justify-content-end'">
+
+            <div
+              *ngIf="!(picture.isModifiable || picture.isAdminModifiable)"
+              class="p-inputgroup my-3">
               <input type="text" pInputText value="{{shareUrl}}" class="w-100 border" [disabled]="true">
               <button type="button" pButton pRipple icon="bi bi-link-45deg" (click)="copyUrl(shareUrl)"></button>
             </div>
-            <div class="d-flex flex-row gap-2 justify-content-start align-items-center mb-2">
-              <img src="{{picture.accountPreview.profilePicUrl}}" class="prof-pic border" alt="{{picture.accountPreview.nickname}}">
-              <a class="prof-name" routerLink="/account/{{picture.accountPreview.id}}"
-                 attr.aria-label="Konto {{picture.accountPreview.nickname}}">{{picture.accountPreview.nickname}}</a>
+
+            <button
+              pButton
+              (click)="showSettings = !showSettings"
+              *ngIf="picture.isModifiable || picture.isAdminModifiable"
+              label="{{showSettings ? 'Informacje' : 'Edytuj'}}"
+              icon="{{showSettings ? 'bi bi-info-circle' : 'bi bi-pencil'}}"></button>
+
+            <div class="d-flex gap-2">
+              <button
+                pButton
+                icon="bi bi-arrow-clockwise"
+                (click)="refreshPicture()"
+                [disabled]="recentlyRefreshed"></button>
+              <button
+                pButton
+                icon="bi bi-arrow-90deg-left"
+                class="p-button-danger p-button-icon-only"
+                routerLink="../../../"></button>
             </div>
+
+          </div>
+
+          <div
+            *ngIf="(picture.isModifiable || picture.isAdminModifiable)"
+            class="p-inputgroup my-3">
+            <input type="text" pInputText value="{{shareUrl}}" class="w-100 border" [disabled]="true">
+            <button type="button" pButton pRipple icon="bi bi-link-45deg" (click)="copyUrl(shareUrl)"></button>
+          </div>
+        </div>
+
+
+
+
+        <div *ngIf="!showSettings" class="flex-md-column flex-column-reverse">
+          <div>
+            <p class="pic-name d-flex flex-column">
+              <span>{{picture.name | titlecase}}</span>
+            </p>
           </div>
           <div>
-            <p class="pic-name">
-              <span>{{picture.name | titlecase}}</span>
-              <span class="pic-date">, {{picture.pictureAdded | date:'dd.MM.YYYY'}}</span>
-            </p>
-            <p class="pic-desc">{{picture.description ? picture.description : 'Brak opisu obrazka.'}}</p>
+            <div class="d-flex flex-row gap-1 justify-content-start align-items-center mb-2">
+              <a routerLink="/account/{{picture.accountPreview.id}}" class="prof-link">
+                <img src="{{picture.accountPreview.profilePicUrl}}" class="prof-pic border" alt="{{picture.accountPreview.nickname}}">
+                <span class="prof-name" attr.aria-label="Konto {{picture.accountPreview.nickname}}">{{picture.accountPreview.nickname}}</span>
+              </a>
+              ,<span class="pic-date">{{picture.pictureAdded | date:'dd.MM.YYYY'}}</span>
+            </div>
           </div>
+          <i class="pic-desc mt-2">{{picture.description ? picture.description : 'Brak opisu obrazka.'}}</i>
+
         </div>
 
         <div *ngIf="showSettings">
 
           <div *ngIf="picture.isAdminModifiable && !picture.isModifiable">
 
-            <div class="w-100 mt-4 mt-md-5">
+            <div class="w-100">
               <div class="mb-3 text-center text-muted">
                 <p>Jako administrator, możesz usunąć obrazek jeżeli narusza on politykę strony.</p>
               </div>
@@ -123,7 +139,7 @@
           <div *ngIf="picture.isModifiable">
 
             <div>
-              <p class="text-muted text-center mb-3 mt-4 mt-md-5">Jako właściciel obrazka, możesz go edytować lub usunąć.</p>
+              <p class="text-muted text-center mb-3">Jako właściciel obrazka, możesz go edytować lub usunąć.</p>
 
               <div class="d-flex justify-content-center mb-3">
                 <p-selectButton [options]="selectOptions" [(ngModel)]="selectValue" optionLabel="name">

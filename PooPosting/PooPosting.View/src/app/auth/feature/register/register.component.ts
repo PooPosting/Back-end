@@ -4,7 +4,7 @@ import { CustomValidators } from 'src/CustomValidators';
 import {MessageService} from "primeng/api";
 import {Router} from "@angular/router";
 import {BlockSpace} from "../../../shared/utils/regexes/blockSpace";
-import {ItemName} from "../../../shared/utils/regexes/itemName";
+import {BlockSpaceOnStartEnd} from "../../../shared/utils/regexes/blockSpaceOnStartEnd";
 import {Title} from "@angular/platform-browser";
 import {environment} from "../../../../environments/environment";
 import {AccountAuthService} from "../../../shared/data-access/account/account-auth.service";
@@ -17,7 +17,7 @@ import {AccountAuthService} from "../../../shared/data-access/account/account-au
 export class RegisterComponent implements OnInit {
   form!: UntypedFormGroup;
   blockSpace: RegExp = BlockSpace;
-  isName: RegExp = ItemName;
+  isName: RegExp = BlockSpaceOnStartEnd;
   formDisabled: boolean = false;
 
   siteKey!: string;

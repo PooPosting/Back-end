@@ -3,6 +3,6 @@
 export interface PictureDtoPaged {
   items: PictureDto[];
   totalPages: number;
-  pageSize: number;
+  totalItems: number;
   page: number;
 }
