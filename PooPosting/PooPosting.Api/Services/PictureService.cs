@@ -232,22 +232,22 @@ public class HttpPictureService : IPictureService
     {
         if (dto.File is not { Length: > 0 }) throw new BadRequestException("invalid picture");
 
-        using var ms = new MemoryStream();
-        await dto.File.CopyToAsync(ms);
-        var fileBytes = ms.ToArray();
-        var result = await NsfwClassifier.ClassifyAsync(fileBytes, CancellationToken.None);
-
-        var errors = new List<string>();
-
-        if (result.Adult > Likelihood.Possible) errors.Add("Adult");
-        if (result.Racy > Likelihood.Likely) errors.Add("Racy");
-        if (result.Medical > Likelihood.Likely) errors.Add("Medical");
-        if (result.Violence > Likelihood.Likely) errors.Add("Violence");
-
-        if (errors.Any())
-        {
-            throw new BadRequestException($"inappropriate picture: [{string.Join(", ", errors)}]");
-        }
+        // using var ms = new MemoryStream();
+        // await dto.File.CopyToAsync(ms);
+        // var fileBytes = ms.ToArray();
+        // var result = await NsfwClassifier.ClassifyAsync(fileBytes, CancellationToken.None);
+        //
+        // var errors = new List<string>();
+        //
+        // if (result.Adult > Likelihood.Possible) errors.Add("Adult");
+        // if (result.Racy > Likelihood.Likely) errors.Add("Racy");
+        // if (result.Medical > Likelihood.Likely) errors.Add("Medical");
+        // if (result.Violence > Likelihood.Likely) errors.Add("Violence");
+        //
+        // if (errors.Any())
+        // {
+        //     throw new BadRequestException($"inappropriate picture: [{string.Join(", ", errors)}]");
+        // }
 
         var accountId = _accountContextService.GetAccountId();
         var picture = _mapper.Map<Picture>(dto);
