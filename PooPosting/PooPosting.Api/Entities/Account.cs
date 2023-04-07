@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Google.Type;
 using PooPosting.Api.Entities.Joins;
+using DateTime = System.DateTime;
 
 namespace PooPosting.Api.Entities;
 
@@ -13,7 +15,7 @@ public class Account
     [AllowNull] public string ProfilePicUrl { get; set; }
     [AllowNull] public string BackgroundPicUrl { get; set; }
     [AllowNull] public string AccountDescription { get; set; }
-    public DateTime AccountCreated { get; set; }
+    public DateTime AccountCreated { get; set; } = DateTime.Now;
     public bool IsDeleted { get; set; }
     public int RoleId { get; set; }
 

@@ -24,10 +24,6 @@ public class PictureConfiguration: IEntityTypeConfiguration<Picture>
             .HasMaxLength(250)
             .IsRequired();
         builder
-            .Property(p => p.PictureAdded)
-            .HasDefaultValueSql("now()")
-            .IsRequired();
-        builder
             .Property(p => p.IsDeleted)
             .HasDefaultValue(false)
             .IsRequired();

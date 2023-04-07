@@ -9,7 +9,7 @@ public class Picture
     public string Name { get; set; }
     public string Description { get; set; }
     public string Url { get; set; }
-    public DateTime PictureAdded { get; set; }
+    public DateTime PictureAdded { get; set; } = DateTime.Now;
     public bool IsDeleted { get; set; }
     public long PopularityScore { get; set; } = 36500;
 
