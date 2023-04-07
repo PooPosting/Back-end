@@ -20,10 +20,8 @@ public class SitemapController : ControllerBase
 
     [HttpGet]
     [Route("sitemap.xml")]
-    [Consumes(MediaTypeNames.Application.Xml)]
     public async Task<IActionResult> Get()
     {
-        var sitemap = await _sitemapFactory.GenerateSitemap();
-        return Ok(Encoding.UTF8.GetBytes(sitemap.ToXml()));
+        return Ok(await _sitemapFactory.GenerateSitemap());
     }
 }

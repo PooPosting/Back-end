@@ -16,19 +16,17 @@ namespace PooPosting.Api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.1")
+                .HasAnnotation("ProductVersion", "7.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("PicturesAPI.Entities.Account", b =>
+            modelBuilder.Entity("PooPosting.Api.Entities.Account", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     b.Property<DateTime>("AccountCreated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("now()");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("AccountDescription")
                         .HasMaxLength(500)
@@ -81,7 +79,7 @@ namespace PooPosting.Api.Migrations
                     b.ToTable("Accounts");
                 });
 
-            modelBuilder.Entity("PicturesAPI.Entities.Comment", b =>
+            modelBuilder.Entity("PooPosting.Api.Entities.Comment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -91,9 +89,7 @@ namespace PooPosting.Api.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CommentAdded")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("now()");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -117,7 +113,7 @@ namespace PooPosting.Api.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("PicturesAPI.Entities.Joins.AccountLikedTag", b =>
+            modelBuilder.Entity("PooPosting.Api.Entities.Joins.AccountLikedTag", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -138,7 +134,7 @@ namespace PooPosting.Api.Migrations
                     b.ToTable("AccountsLikedTags");
                 });
 
-            modelBuilder.Entity("PicturesAPI.Entities.Joins.PictureSeenByAccount", b =>
+            modelBuilder.Entity("PooPosting.Api.Entities.Joins.PictureSeenByAccount", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -159,7 +155,7 @@ namespace PooPosting.Api.Migrations
                     b.ToTable("PicturesSeenByAccounts");
                 });
 
-            modelBuilder.Entity("PicturesAPI.Entities.Joins.PictureTag", b =>
+            modelBuilder.Entity("PooPosting.Api.Entities.Joins.PictureTag", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -180,7 +176,7 @@ namespace PooPosting.Api.Migrations
                     b.ToTable("PictureTags");
                 });
 
-            modelBuilder.Entity("PicturesAPI.Entities.Like", b =>
+            modelBuilder.Entity("PooPosting.Api.Entities.Like", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -204,7 +200,7 @@ namespace PooPosting.Api.Migrations
                     b.ToTable("Likes");
                 });
 
-            modelBuilder.Entity("PicturesAPI.Entities.Picture", b =>
+            modelBuilder.Entity("PooPosting.Api.Entities.Picture", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -228,9 +224,7 @@ namespace PooPosting.Api.Migrations
                         .HasColumnType("varchar(40)");
 
                     b.Property<DateTime>("PictureAdded")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("now()");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<long>("PopularityScore")
                         .ValueGeneratedOnAdd()
@@ -253,7 +247,7 @@ namespace PooPosting.Api.Migrations
                     b.ToTable("Pictures");
                 });
 
-            modelBuilder.Entity("PicturesAPI.Entities.RestrictedIp", b =>
+            modelBuilder.Entity("PooPosting.Api.Entities.RestrictedIp", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -275,7 +269,7 @@ namespace PooPosting.Api.Migrations
                     b.ToTable("RestrictedIps");
                 });
 
-            modelBuilder.Entity("PicturesAPI.Entities.Role", b =>
+            modelBuilder.Entity("PooPosting.Api.Entities.Role", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -291,7 +285,7 @@ namespace PooPosting.Api.Migrations
                     b.ToTable("Roles");
                 });
 
-            modelBuilder.Entity("PicturesAPI.Entities.Tag", b =>
+            modelBuilder.Entity("PooPosting.Api.Entities.Tag", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -306,9 +300,9 @@ namespace PooPosting.Api.Migrations
                     b.ToTable("Tags");
                 });
 
-            modelBuilder.Entity("PicturesAPI.Entities.Account", b =>
+            modelBuilder.Entity("PooPosting.Api.Entities.Account", b =>
                 {
-                    b.HasOne("PicturesAPI.Entities.Role", "Role")
+                    b.HasOne("PooPosting.Api.Entities.Role", "Role")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -317,15 +311,15 @@ namespace PooPosting.Api.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("PicturesAPI.Entities.Comment", b =>
+            modelBuilder.Entity("PooPosting.Api.Entities.Comment", b =>
                 {
-                    b.HasOne("PicturesAPI.Entities.Account", "Account")
+                    b.HasOne("PooPosting.Api.Entities.Account", "Account")
                         .WithMany("Comments")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PicturesAPI.Entities.Picture", "Picture")
+                    b.HasOne("PooPosting.Api.Entities.Picture", "Picture")
                         .WithMany("Comments")
                         .HasForeignKey("PictureId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -336,15 +330,15 @@ namespace PooPosting.Api.Migrations
                     b.Navigation("Picture");
                 });
 
-            modelBuilder.Entity("PicturesAPI.Entities.Joins.AccountLikedTag", b =>
+            modelBuilder.Entity("PooPosting.Api.Entities.Joins.AccountLikedTag", b =>
                 {
-                    b.HasOne("PicturesAPI.Entities.Account", "Account")
+                    b.HasOne("PooPosting.Api.Entities.Account", "Account")
                         .WithMany("LikedTags")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PicturesAPI.Entities.Tag", "Tag")
+                    b.HasOne("PooPosting.Api.Entities.Tag", "Tag")
                         .WithMany("AccountLikedTags")
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -355,15 +349,15 @@ namespace PooPosting.Api.Migrations
                     b.Navigation("Tag");
                 });
 
-            modelBuilder.Entity("PicturesAPI.Entities.Joins.PictureSeenByAccount", b =>
+            modelBuilder.Entity("PooPosting.Api.Entities.Joins.PictureSeenByAccount", b =>
                 {
-                    b.HasOne("PicturesAPI.Entities.Account", "Account")
+                    b.HasOne("PooPosting.Api.Entities.Account", "Account")
                         .WithMany("PicturesSeen")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PicturesAPI.Entities.Picture", "Picture")
+                    b.HasOne("PooPosting.Api.Entities.Picture", "Picture")
                         .WithMany("SeenByAccount")
                         .HasForeignKey("PictureId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -374,15 +368,15 @@ namespace PooPosting.Api.Migrations
                     b.Navigation("Picture");
                 });
 
-            modelBuilder.Entity("PicturesAPI.Entities.Joins.PictureTag", b =>
+            modelBuilder.Entity("PooPosting.Api.Entities.Joins.PictureTag", b =>
                 {
-                    b.HasOne("PicturesAPI.Entities.Picture", "Picture")
+                    b.HasOne("PooPosting.Api.Entities.Picture", "Picture")
                         .WithMany("PictureTags")
                         .HasForeignKey("PictureId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PicturesAPI.Entities.Tag", "Tag")
+                    b.HasOne("PooPosting.Api.Entities.Tag", "Tag")
                         .WithMany("PictureTags")
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -393,15 +387,15 @@ namespace PooPosting.Api.Migrations
                     b.Navigation("Tag");
                 });
 
-            modelBuilder.Entity("PicturesAPI.Entities.Like", b =>
+            modelBuilder.Entity("PooPosting.Api.Entities.Like", b =>
                 {
-                    b.HasOne("PicturesAPI.Entities.Account", "Account")
+                    b.HasOne("PooPosting.Api.Entities.Account", "Account")
                         .WithMany("Likes")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PicturesAPI.Entities.Picture", "Picture")
+                    b.HasOne("PooPosting.Api.Entities.Picture", "Picture")
                         .WithMany("Likes")
                         .HasForeignKey("PictureId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -412,9 +406,9 @@ namespace PooPosting.Api.Migrations
                     b.Navigation("Picture");
                 });
 
-            modelBuilder.Entity("PicturesAPI.Entities.Picture", b =>
+            modelBuilder.Entity("PooPosting.Api.Entities.Picture", b =>
                 {
-                    b.HasOne("PicturesAPI.Entities.Account", "Account")
+                    b.HasOne("PooPosting.Api.Entities.Account", "Account")
                         .WithMany("Pictures")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -423,7 +417,7 @@ namespace PooPosting.Api.Migrations
                     b.Navigation("Account");
                 });
 
-            modelBuilder.Entity("PicturesAPI.Entities.Account", b =>
+            modelBuilder.Entity("PooPosting.Api.Entities.Account", b =>
                 {
                     b.Navigation("Comments");
 
@@ -436,7 +430,7 @@ namespace PooPosting.Api.Migrations
                     b.Navigation("PicturesSeen");
                 });
 
-            modelBuilder.Entity("PicturesAPI.Entities.Picture", b =>
+            modelBuilder.Entity("PooPosting.Api.Entities.Picture", b =>
                 {
                     b.Navigation("Comments");
 
@@ -447,7 +441,7 @@ namespace PooPosting.Api.Migrations
                     b.Navigation("SeenByAccount");
                 });
 
-            modelBuilder.Entity("PicturesAPI.Entities.Tag", b =>
+            modelBuilder.Entity("PooPosting.Api.Entities.Tag", b =>
                 {
                     b.Navigation("AccountLikedTags");
 

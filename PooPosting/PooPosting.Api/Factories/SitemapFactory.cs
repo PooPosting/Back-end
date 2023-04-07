@@ -23,7 +23,7 @@ public class SitemapFactory : ISitemapFactory
         _sitemapSettings = sitemapSettings;
     }
 
-    public async Task<Sitemap> GenerateSitemap()
+    public async Task<string> GenerateSitemap()
     {
         var sitemap = new Sitemap();
         foreach (var site in _sitemapSettings.Sites)
@@ -52,7 +52,7 @@ public class SitemapFactory : ISitemapFactory
                 account.AccountCreated)
             );
         }
-        return sitemap;
+        return sitemap.ToXml();
     }
 
     private static Url CreateUrl(string url)

@@ -43,7 +43,9 @@ builder.Host.UseNLog();
 
 // Configure builder.Services
 
-builder.Services.AddControllers().AddFluentValidation()
+builder.Services.AddControllers()
+    .AddFluentValidation()
+    .AddXmlSerializerFormatters()
     .AddOData(options => options.Select().Filter().OrderBy());
 
 var sitemapSettings = new SitemapSettings();
@@ -123,7 +125,6 @@ builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ILikeService, LikeService>();
 builder.Services.AddScoped<IAuthService, HttpAuthService>();
 builder.Services.AddScoped<ILogsService, LogsService>();
-builder.Services.AddScoped<IRestrictedIpsService, RestrictedIpsService>();
 
 // Helpers
 builder.Services.AddScoped<ITagHelper, TagHelper>();
@@ -155,7 +156,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("FrontEndClient", policyBuilder =>
         {
             var originList = new List<string>();
-            foreach (var origin in builder.Configuration["AllowedOrigins"].Split(','))
+            foreach (var origin in builder.Configuration["AllowedOrigins"]?.Split(',')!)
             {
                 originList.Add(origin);
                 Console.WriteLine($"Built with CORS origin: {origin}");

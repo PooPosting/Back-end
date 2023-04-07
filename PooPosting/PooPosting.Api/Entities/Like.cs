@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace PooPosting.Api.Entities;
+﻿namespace PooPosting.Api.Entities;
 
 public class Like
 {
