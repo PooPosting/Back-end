@@ -68,6 +68,20 @@
 
         </div>
 
+        <div *ngIf="!showSettings" class="d-block d-md-none flex-md-column flex-column-reverse px-3 py-2">
+
+          <div>
+            <h3>Inne zdjęcia tego użytkownika</h3>
+            <p class="text-muted">tutaj bedzie kilka zdjec tego uzytkownika</p>
+          </div>
+
+          <div class="my-4">
+            <h3>Powiązane zdjęcia</h3>
+            <p class="text-muted">tutaj bedzie kilka podobnych zdjec</p>
+          </div>
+
+        </div>
+
       </div>
 
       <div class="info-box d-flex flex-column px-3 py-2">
@@ -115,10 +129,7 @@
           </div>
         </div>
 
-
-
-
-        <div *ngIf="!showSettings" class="flex-md-column flex-column-reverse">
+        <div *ngIf="!showSettings" class="d-none d-md-block flex-md-column flex-column-reverse">
 
           <div>
             <h3>Inne zdjęcia tego użytkownika</h3>
@@ -145,7 +156,6 @@
           </app-edit-picture>
 
         </div>
-
 
       </div>
 

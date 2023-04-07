@@ -1,4 +1,4 @@
-import {Component,OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {MessageService} from "primeng/api";
 import {Clipboard} from "@angular/cdk/clipboard";
 import {PictureDetailsServiceService} from "../../../shared/state/picture-details-service.service";
@@ -17,7 +17,7 @@ import {PictureService} from "../../../shared/data-access/picture/picture.servic
   templateUrl: './picture-details-modal.component.html',
   styleUrls: ['./picture-details-modal.component.scss']
 })
-export class PictureDetailsModalComponent implements OnInit {
+export class PictureDetailsModalComponent implements OnInit, OnDestroy {
 
   id: Observable<string>;
   picture: PictureDto | null = null;
@@ -28,6 +28,8 @@ export class PictureDetailsModalComponent implements OnInit {
 
   shareUrl: string = `${environment.appWebUrl}/picture/`;
   showSettings: boolean = false;
+
+  private readonly subs = new Subscription();
 
 
   constructor(
@@ -42,6 +44,10 @@ export class PictureDetailsModalComponent implements OnInit {
     private router: Router
   ) {
     this.id = route.params.pipe(map(p => p['id']));
+  }
+
+  ngOnDestroy(): void {
+      this.subs.unsubscribe();
   }
 
   ngOnInit(): void {
@@ -59,12 +65,16 @@ export class PictureDetailsModalComponent implements OnInit {
     })
   }
   like() {
-    this.likeService.likePicture(this.picture!.id)
-      .subscribe(this.likeObserver)
+    this.subs.add(
+      this.likeService.likePicture(this.picture!.id)
+        .subscribe(this.likeObserver)
+    );
   }
   dislike() {
-    this.likeService.dislikePicture(this.picture!.id)
-      .subscribe(this.likeObserver)
+    this.subs.add(
+      this.likeService.dislikePicture(this.picture!.id)
+        .subscribe(this.likeObserver)
+    );
   }
 
   likeObserver = {
@@ -82,21 +92,22 @@ export class PictureDetailsModalComponent implements OnInit {
   }
 
   fetchPicture() {
-    let sub: Subscription = this.id.subscribe({
-      next: (id) => {
-        this.shareUrl = `${environment.appWebUrl}/picture/${id}`;
-        let sub: Subscription = this.pictureService.getPictureById(id)
-          .subscribe({
-            next: (pic) => {
-              this.picture = pic;
-            },
-            error: () => this.locationService.goError404(),
-            complete: () => sub.unsubscribe()
-          });
-      },
-      error: () => this.locationService.goError404(),
-      complete: () => sub.unsubscribe()
-    });
+    this.subs.add(
+      this.id.subscribe({
+        next: (id) => {
+          this.shareUrl = `${environment.appWebUrl}/picture/${id}`;
+          this.subs.add(
+            this.pictureService.getPictureById(id)
+              .subscribe({
+                next: (pic) => {
+                  this.picture = pic;
+                },
+                error: () => this.locationService.goError404(),
+              })
+          );
+        },
+      })
+    );
   }
 
   pictureChanged(dto: PictureDto) {

@@ -1,5 +1,4 @@
-import {Component, OnInit} from '@angular/core';
-import {UntypedFormControl, UntypedFormGroup, Validators} from "@angular/forms";
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {MessageService} from "primeng/api";
 import {map, Observable, Subscription} from "rxjs";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -17,26 +16,14 @@ import {PictureLikesService} from "../../../shared/data-access/picture/picture-l
   templateUrl: './picture-details.component.html',
   styleUrls: ['./picture-details.component.scss']
 })
-export class PictureDetailsComponent implements OnInit {
+export class PictureDetailsComponent implements OnInit, OnDestroy {
   picture!: PictureDto;
   id: Observable<string>;
   isLoggedOn: boolean = false;
 
-  commentForm: UntypedFormGroup = new UntypedFormGroup({
-    text: new UntypedFormControl("", [
-      Validators.required,
-      Validators.minLength(4),
-      Validators.maxLength(250)
-    ])
-  })
-  awaitSubmit: boolean = false;
-
   showSettingsFlag: boolean = false;
-  showAdminSettingsFlag: boolean = false;
-  showShareFlag: boolean = false;
 
-  picDeletedSubscription: Subscription = new Subscription();
-  picChangedSubscription: Subscription = new Subscription();
+  private readonly subs = new Subscription();
 
   constructor(
     private likeService: PictureLikesService,
@@ -56,64 +43,63 @@ export class PictureDetailsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.picDeletedSubscription = this.pictureDetailsService.pictureDeletedSubject.subscribe({
-      next: (val: string) => {
-        if (val === this.picture.id) {
-          this.cacheService.cachedPictures = this.cacheService.getCachedPictures().filter(p => p.id !== this.picture.id);
-          this.locationService.goBack();
+    this.subs.add(
+      this.pictureDetailsService.pictureDeletedSubject.subscribe({
+        next: (val: string) => {
+          if (val === this.picture.id) {
+            this.cacheService.cachedPictures = this.cacheService.getCachedPictures().filter(p => p.id !== this.picture.id);
+            this.locationService.goBack();
+          }
         }
-      }
-    })
-    this.picChangedSubscription = this.pictureDetailsService.pictureChangedSubject.subscribe({
-      next: (val: PictureDto) => {
-        if (val.id === this.picture.id) {
-          this.picture = val;
+      })
+    );
+    this.subs.add(
+      this.pictureDetailsService.pictureChangedSubject.subscribe({
+        next: (val: PictureDto) => {
+          if (val.id === this.picture.id) {
+            this.picture = val;
+          }
         }
-      }
-    });
+      })
+    );
   }
   ngOnDestroy() {
-    this.picDeletedSubscription.unsubscribe();
-    this.picChangedSubscription.unsubscribe();
+    this.subs.unsubscribe();
   }
 
   like() {
-    this.likeService.likePicture(this.picture.id)
-      .subscribe(this.likeObserver)
+    this.subs.add(
+      this.likeService.likePicture(this.picture.id)
+        .subscribe(this.likeObserver)
+    );
   }
   dislike(){
-    this.likeService.dislikePicture(this.picture.id)
-      .subscribe(this.likeObserver)
+    this.subs.add(
+      this.likeService.dislikePicture(this.picture.id)
+        .subscribe(this.likeObserver)
+    );
   }
 
-  showShare() {
-    this.showShareFlag = true;
-  }
-  showDetails() {
-    this.pictureDetailsService.modalTriggerSubject.next(this.picture.id);
-  }
   return() {
     this.locationService.goBack();
   }
 
   initialSubscribe() {
-    let sub: Subscription = this.id.subscribe({
-      next: (val) => {
-        this.httpService.getPictureRequest(val).subscribe({
-          next: (pic: PictureDto) => {
-            this.picture = pic;
-            this.title.setTitle(`PooPosting - ${this.titleCasePipe.transform(pic.name)}`);
-            sub.unsubscribe();
-          },
-          error: () => {
-            this.router.navigate(['/error404']);
-          },
-          complete: () => {
-            sub.unsubscribe();
-          }
-        });
-      }
-    })
+    this.subs.add(
+      this.id.subscribe({
+        next: (val) => {
+          this.httpService.getPictureRequest(val).subscribe({
+            next: (pic: PictureDto) => {
+              this.picture = pic;
+              this.title.setTitle(`PooPosting - ${this.titleCasePipe.transform(pic.name)}`);
+            },
+            error: () => {
+              this.router.navigate(['/error404']);
+            },
+          });
+        }
+      })
+    );
   }
 
   likeObserver = {

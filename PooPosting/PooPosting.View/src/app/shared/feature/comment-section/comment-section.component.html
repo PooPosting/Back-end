@@ -6,12 +6,13 @@
 
     <div class="d-flex flex-column text-center">
 
-        <textarea id="comment-input"
+        <textarea pInputTextarea
+                  id="comment-input"
                   class="w-100 border"
                   [autoResize]="true"
                   formControlName="text"
                   cols="30"
-                  placeholder="Napisz komentarz!" pInputTextarea>
+                  placeholder="{{!isLoggedOn ? 'Zaloguj się, aby dodać komentarz' : 'Napisz komentarz...'}}">
         </textarea>
 
       <span *ngIf="commentForm.invalid">
