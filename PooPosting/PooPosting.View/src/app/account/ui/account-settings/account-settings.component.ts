@@ -7,8 +7,6 @@ import {CustomValidators} from "../../../../CustomValidators";
 import {ChangePasswordModel} from "../../utils/models/changePasswordModel";
 import {ChangeAccountDescModel} from "../../utils/models/changeAccountDescModel";
 import {ChangeEmailModel} from "../../utils/models/changeEmailModel";
-import {concatWith} from "rxjs";
-import {CropperComponent} from "angular-cropperjs";
 import {AccountDto} from "../../../shared/utils/dtos/AccountDto";
 
 @Component({

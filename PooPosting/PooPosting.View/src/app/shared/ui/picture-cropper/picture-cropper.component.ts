@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {CropperComponent} from "angular-cropperjs";
 import {CropperSettings} from "ngx-image-cropper/lib/interfaces/cropper.settings";
 
 @Component({
@@ -8,7 +7,7 @@ import {CropperSettings} from "ngx-image-cropper/lib/interfaces/cropper.settings
   styleUrls: ['./picture-cropper.component.scss']
 })
 export class PictureCropperComponent implements OnInit {
-  @ViewChild("cropper") cropperComponent!: CropperComponent;
+  // @ViewChild("cropper") cropperComponent!: CropperComponent;
   @Output() onCroppedFileSubmit: EventEmitter<Blob> = new EventEmitter<Blob>();
   @Output() onReadyChange: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() onCropperDataChanged: EventEmitter<string> = new EventEmitter<string>();
@@ -46,12 +45,12 @@ export class PictureCropperComponent implements OnInit {
   }
 
   public crop() {
-    this.awaitSubmit = true;
-    this.cropperComponent.cropper.crop()
-    const blob = this.dataURItoBlob(this.cropperComponent.cropper.getCroppedCanvas().toDataURL());
-    this.onCroppedFileSubmit.emit(blob);
-    this.cropperComponent.cropper.disable();
-    this.onReadyChange.emit(false);
+    // this.awaitSubmit = true;
+    // this.cropperComponent.cropper.crop()
+    // const blob = this.dataURItoBlob(this.cropperComponent.cropper.getCroppedCanvas().toDataURL());
+    // this.onCroppedFileSubmit.emit(blob);
+    // this.cropperComponent.cropper.disable();
+    // this.onReadyChange.emit(false);
   }
 
   private dataURItoBlob(dataURI: string) {
