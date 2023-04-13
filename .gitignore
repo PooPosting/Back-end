@@ -2,10 +2,10 @@ appsettings.json
 appsettings.Development.json
 authKey.json
 *.editorconfig
-PicturesApi/PicturesApi/wwwroot/pictures/*
-PicturesApi/PicturesApi/wwwroot/accounts/profile_pictures/*
-PicturesApi/PicturesApi/wwwroot/accounts/background_pictures/*
-PicturesApi/PicturesApi/Logs/
+PooPosting/PooPosting.Api/wwwroot/pictures/
+PooPosting/PooPosting.Api/wwwroot/accounts/profile_pictures/
+PooPosting/PooPosting.Api/wwwroot/accounts/background_pictures/
+PooPosting/PooPosting.Api/Logs/
 bin/
 obj/
 .idea/
