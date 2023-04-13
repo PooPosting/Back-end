@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {UntypedFormControl, UntypedFormGroup, Validators} from "@angular/forms";
 import {MessageService} from "primeng/api";
 import {UserState} from "../../../shared/utils/models/userState";
@@ -6,15 +6,18 @@ import {LocationServiceService} from "../../../shared/helpers/location-service.s
 import {Title} from "@angular/platform-browser";
 import {AppCacheService} from "../../../shared/state/app-cache.service";
 import {AccountAuthService} from "../../../shared/data-access/account/account-auth.service";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
   form!: UntypedFormGroup;
   formDisabled: boolean = false;
+
+  private readonly subs = new Subscription();
 
   constructor(
     private cacheService: AppCacheService,
@@ -36,29 +39,33 @@ export class LoginComponent implements OnInit {
   onSubmit(): void {
     this.messageService.clear();
     this.disableForm();
-    this.authService
-      .login(this.form.getRawValue())
-      .subscribe({
-        next: (v: UserState) => {
-          if (v) {
-            this.cacheService.cacheUserInfo(v);
-            this.messageService.add({severity:'success', summary: 'Sukces', detail: 'Zalogowano pomyślnie.'});
-            this.cacheService.loggedOnSubject.next(true);
-            this.cacheService.updateUserAccount();
-            this.locationService.goBack();
+
+    this.subs.add(
+      this.authService
+        .login(this.form.getRawValue())
+        .subscribe({
+          next: (v: UserState) => {
+            if (v) {
+              this.cacheService.cacheUserInfo(v);
+              this.messageService.add({severity:'success', summary: 'Sukces', detail: 'Zalogowano pomyślnie.'});
+              this.cacheService.loggedOnSubject.next(true);
+              this.cacheService.updateUserAccount();
+              this.locationService.goBack();
+            }
+          },
+          error: (err) => {
+            this.messageService.add(
+              {
+                severity:'error',
+                summary: 'Niepowodzenie',
+                detail: err.error,
+                key: "login-failed"}
+            );
+            this.enableForm();
           }
-        },
-        error: (err) => {
-          this.messageService.add(
-            {
-              severity:'error',
-              summary: 'Niepowodzenie',
-              detail: err.error,
-              key: "login-failed"}
-          );
-          this.enableForm();
-        }
-      })
+        })
+    );
+
   }
 
   private disableForm() {
@@ -68,6 +75,10 @@ export class LoginComponent implements OnInit {
   private enableForm() {
     this.form.enable();
     this.formDisabled = false;
+  }
+
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
   }
 
 }

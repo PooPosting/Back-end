@@ -19,7 +19,7 @@ export class AccountDetailsComponent implements OnInit, OnDestroy {
   showInfo: boolean = false;
   showShare: boolean = false;
 
-  picDeletedSubscription: Subscription = new Subscription();
+  private readonly subs = new Subscription();
 
   constructor(
     private router: Router,
@@ -34,20 +34,24 @@ export class AccountDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.id.subscribe({
-      next: (id) => {
-        this.accountService.getAccountById(id)
-          .subscribe(this.initialObserver);
-      }
-    });
-    this.picDeletedSubscription = this.pictureDetailsService.pictureDeletedSubject.subscribe({
-      next: (val) => {
-        this.account.picturePreviews = this.account.picturePreviews.filter(p => p.id !== val);
-      }
-    });
+    this.subs.add(
+      this.id.subscribe({
+        next: (id) => {
+          this.accountService.getAccountById(id)
+            .subscribe(this.initialObserver);
+        }
+      })
+    );
+    this.subs.add(
+      this.pictureDetailsService.pictureDeletedSubject.subscribe({
+        next: (val) => {
+          this.account.picturePreviews = this.account.picturePreviews.filter(p => p.id !== val);
+        }
+      })
+    );
   }
   ngOnDestroy() {
-    this.picDeletedSubscription.unsubscribe();
+    this.subs.unsubscribe();
   }
 
   return(): void {
@@ -55,26 +59,25 @@ export class AccountDetailsComponent implements OnInit, OnDestroy {
   }
 
   updateAccount(account: AccountDto) {
-    this.account.accountDescription = account.accountDescription;
-    this.account.profilePicUrl = account.profilePicUrl;
-    this.account.backgroundPicUrl = account.backgroundPicUrl;
-    this.account.email = account.email;
+    this.account = account;
   }
 
   banAccount() {
-    this.accountService.deleteAccount(this.account.id)
-      .subscribe({
-        next: (val) => {
-          if(val) {
-            this.messageService.add({
-              severity: "warn",
-              summary: `Sukces`,
-              detail: `Konto ${this.account.nickname} zostało zbanowane.`
-            });
-            this.locationService.goBack();
-          }
-        },
-      })
+    this.subs.add(
+      this.accountService.deleteAccount(this.account.id)
+        .subscribe({
+          next: (val) => {
+            if(val) {
+              this.messageService.add({
+                severity: "warn",
+                summary: `Sukces`,
+                detail: `Konto ${this.account.nickname} zostało zbanowane.`
+              });
+              this.locationService.goBack();
+            }
+          },
+        })
+    );
   }
 
   private initialObserver = {

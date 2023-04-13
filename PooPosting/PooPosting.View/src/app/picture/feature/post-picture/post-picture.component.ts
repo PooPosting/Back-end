@@ -1,5 +1,6 @@
 import {Component} from '@angular/core';
 import {MenuItem} from "primeng/api";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-post-picture',
@@ -24,7 +25,11 @@ export class PostPictureComponent {
   ];
 
   constructor(
+    private router: Router
   ) {
+    if (this.router.url.endsWith('post')) {
+      this.router.navigate([this.router.url + '/crop'])
+    }
   }
 
 }

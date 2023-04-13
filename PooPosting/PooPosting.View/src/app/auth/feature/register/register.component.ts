@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {UntypedFormControl, UntypedFormGroup, Validators} from "@angular/forms";
 import { CustomValidators } from 'src/CustomValidators';
 import {MessageService} from "primeng/api";
@@ -8,13 +8,14 @@ import {BlockSpaceOnStartEnd} from "../../../shared/utils/regexes/blockSpaceOnSt
 import {Title} from "@angular/platform-browser";
 import {environment} from "../../../../environments/environment";
 import {AccountAuthService} from "../../../shared/data-access/account/account-auth.service";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
-export class RegisterComponent implements OnInit {
+export class RegisterComponent implements OnInit, OnDestroy {
   form!: UntypedFormGroup;
   blockSpace: RegExp = BlockSpace;
   isName: RegExp = BlockSpaceOnStartEnd;
@@ -24,7 +25,7 @@ export class RegisterComponent implements OnInit {
   captchaPassed: boolean = false;
   isNickNameTaken: boolean = false;
 
-  appUrl: string = "";
+  private readonly subs = new Subscription();
 
   passCaptcha() {
     this.captchaPassed = true;
@@ -41,7 +42,6 @@ export class RegisterComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.appUrl = environment.appWebUrl;
     this.isNickNameTaken = false;
     this.form = new UntypedFormGroup({
       nickname: new UntypedFormControl(null, [
@@ -71,23 +71,27 @@ export class RegisterComponent implements OnInit {
     this.disableForm();
     this.isNickNameTaken = false;
     this.message.clear();
-    this.authService.register(this.form.getRawValue()).subscribe({
-      next: () => {
-        this.router.navigate(["/auth/login"]);
-        this.message.add({severity:'success', summary: 'Sukces', detail: 'Zarejestrowano pomyślnie. Przeniesiono cię na stronę logowania.'});
-      },
-      error: (err) => {
-        if (err.error.errors && err.error.errors.Nickname) {
-          this.message.add({
-            severity:'error',
-            summary: 'Niepowodzenie',
-            detail: err.error.errors.Nickname
-          });
-          this.isNickNameTaken = true;
-        }
-        this.enableForm();
-      }
-    });
+
+    this.subs.add(
+      this.authService.register(this.form.getRawValue())
+        .subscribe({
+          next: () => {
+            this.router.navigate(["/auth/login"]);
+            this.message.add({severity:'success', summary: 'Sukces', detail: 'Zarejestrowano pomyślnie. Przeniesiono cię na stronę logowania.'});
+          },
+          error: (err) => {
+            if (err.error.errors && err.error.errors.Nickname) {
+              this.message.add({
+                severity:'error',
+                summary: 'Niepowodzenie',
+                detail: err.error.errors.Nickname
+              });
+              this.isNickNameTaken = true;
+            }
+            this.enableForm();
+          }
+        })
+    );
   }
 
   private disableForm() {
@@ -97,5 +101,9 @@ export class RegisterComponent implements OnInit {
   private enableForm() {
     this.form.enable();
     this.formDisabled = false;
+  }
+
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
   }
 }

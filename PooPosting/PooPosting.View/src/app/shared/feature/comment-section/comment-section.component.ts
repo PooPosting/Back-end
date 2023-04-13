@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {CommentDto} from "../../utils/dtos/CommentDto";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {BlockSpaceOnStartEnd} from "../../utils/regexes/blockSpaceOnStartEnd";
@@ -14,7 +14,7 @@ import {MessageService} from "primeng/api";
   templateUrl: './comment-section.component.html',
   styleUrls: ['./comment-section.component.scss']
 })
-export class CommentSectionComponent implements OnInit {
+export class CommentSectionComponent implements OnInit, OnDestroy {
 
   constructor(
     private commentService: CommentService,
@@ -28,6 +28,8 @@ export class CommentSectionComponent implements OnInit {
   @Output() commentAdded: EventEmitter<null> = new EventEmitter<null>();
   awaitSubmit: boolean = false;
   fetchingComments: boolean = true;
+
+  private readonly subs = new Subscription();
 
   commentForm = new FormGroup({
     text: new FormControl<string>(
@@ -50,60 +52,67 @@ export class CommentSectionComponent implements OnInit {
   }
 
   deleteComment(commId: string) {
-    let sub: Subscription = this.commentService.deleteComment(commId)
-      .subscribe({
-        next: () => {
-          this.comments = this.comments.filter(c => c.id != commId);
-          this.messageService.add({
-            severity:'warn',
-            summary:'Sukces',
-            detail:'Pomyślnie usunięto komentarz!'
-          });
-          this.commentDeleted.emit();
-        },
-        complete: () => sub.unsubscribe()
-      })
+    this.subs.add(
+      this.commentService.deleteComment(commId)
+        .subscribe({
+          next: () => {
+            this.comments = this.comments.filter(c => c.id != commId);
+            this.messageService.add({
+              severity:'warn',
+              summary:'Sukces',
+              detail:'Pomyślnie usunięto komentarz!'
+            });
+            this.commentDeleted.emit();
+          },
+        })
+    );
   }
 
   comment() {
     let postCommDto: PutPostCommentDto = {
       text: this.commentForm.getRawValue().text!
     }
-    let sub: Subscription = this.pictureCommentService
-      .postComment(this.picId, postCommDto)
-      .subscribe({
-        next: (dto: CommentDto) => {
-          this.commentAdded.emit();
-          this.comments.unshift(dto);
-          this.commentForm.reset();
-          this.messageService.add({
-            severity:'success',
-            summary:'Sukces',
-            detail:'Pomyślnie skomentowano!'
-          });
-        },
-        complete: () => sub.unsubscribe()
-    })
+    this.subs.add(
+      this.pictureCommentService
+        .postComment(this.picId, postCommDto)
+        .subscribe({
+          next: (dto: CommentDto) => {
+            this.commentAdded.emit();
+            this.comments.unshift(dto);
+            this.commentForm.reset();
+            this.messageService.add({
+              severity:'success',
+              summary:'Sukces',
+              detail:'Pomyślnie skomentowano!'
+            });
+          }
+        })
+    );
   }
 
   fetchComments() {
     this.fetchingComments = true;
-    let sub: Subscription = this.pictureCommentService
-      .getPictureComments(
-        this.picId,
-        this.pageSize,
-        this.pageNumber)
-      .subscribe({
-        next: (resultDto: CommentDtoPaged ) => {
-          resultDto.items.forEach(i => this.comments.push(i));
-          this.pageNumber = resultDto.page+1;
-          this.moreCommentsAvailable = resultDto.totalPages > resultDto.page;
-        },
-        complete: () => {
-          sub.unsubscribe();
-          this.fetchingComments = false;
-        }
-      })
+    this.subs.add(
+      this.pictureCommentService
+        .getPictureComments(
+          this.picId,
+          this.pageSize,
+          this.pageNumber)
+        .subscribe({
+          next: (resultDto: CommentDtoPaged ) => {
+            resultDto.items.forEach(i => this.comments.push(i));
+            this.pageNumber = resultDto.page+1;
+            this.moreCommentsAvailable = resultDto.totalPages > resultDto.page;
+          },
+          complete: () => {
+            this.fetchingComments = false;
+          }
+        })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
   }
 
 }
