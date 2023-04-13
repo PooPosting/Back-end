@@ -1,5 +1,5 @@
 <div class="w-100 banner"
-     [style.background]='"url(" + account.backgroundPicUrl + ")"'
+     [ngStyle]="{'background-image': 'url(' + account.backgroundPicUrl + ')' }"
      [style.padding]="account.accountDescription ? '' : '5rem 0'">
   <div class="banner-header"
        [style.margin-bottom]="!account.accountDescription ? '' : '4rem'">

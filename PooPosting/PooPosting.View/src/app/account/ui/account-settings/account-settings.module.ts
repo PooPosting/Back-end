@@ -8,6 +8,7 @@ import {ButtonModule} from "primeng/button";
 import {KeyFilterModule} from "primeng/keyfilter";
 import {OverlayPanelModule} from "primeng/overlaypanel";
 import {ListboxModule} from "primeng/listbox";
+import {ChipsModule} from "primeng/chips";
 
 
 
@@ -18,16 +19,17 @@ import {ListboxModule} from "primeng/listbox";
   exports: [
     AccountSettingsComponent
   ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    PictureCropperModule,
-    InputTextareaModule,
-    ButtonModule,
-    KeyFilterModule,
-    OverlayPanelModule,
-    ListboxModule
-  ]
+    imports: [
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        PictureCropperModule,
+        InputTextareaModule,
+        ButtonModule,
+        KeyFilterModule,
+        OverlayPanelModule,
+        ListboxModule,
+        ChipsModule
+    ]
 })
 export class AccountSettingsModule { }

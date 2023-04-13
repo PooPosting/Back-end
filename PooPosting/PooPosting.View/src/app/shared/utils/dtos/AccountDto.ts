@@ -1,6 +1,4 @@
-﻿import {PicturePreviewDto} from "./PicturePreviewDto";
-
-export interface AccountDto {
+﻿export interface AccountDto {
   id: string;
   roleId: string;
   nickname: string;
@@ -8,7 +6,6 @@ export interface AccountDto {
   profilePicUrl: string;
   backgroundPicUrl: string;
   accountDescription: string;
-  picturePreviews: PicturePreviewDto[];
   accountCreated: string;
 
   isModifiable: boolean;
