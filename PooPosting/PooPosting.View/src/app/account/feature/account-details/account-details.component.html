@@ -17,9 +17,9 @@
 
   <div *ngIf="!showInfo">
     <app-account-banner [account]="account"></app-account-banner>
-    <div class="mt-5" *ngIf="account.picturePreviews">
+    <div class="mt-5" *ngIf="picturePreviews">
       <div class="row row-cols-1 row-cols-sm-2 mb-3 align-items-center">
-        <app-account-picture-preview *ngFor="let picPreview of account.picturePreviews"
+        <app-account-picture-preview *ngFor="let picPreview of picturePreviews"
                                      [picturePreview]="picPreview">
         </app-account-picture-preview>
       </div>

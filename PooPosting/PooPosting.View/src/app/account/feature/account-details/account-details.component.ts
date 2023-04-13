@@ -7,6 +7,7 @@ import {PictureDetailsServiceService} from "../../../shared/state/picture-detail
 import {LocationServiceService} from "../../../shared/helpers/location-service.service";
 import {AccountDto} from "../../../shared/utils/dtos/AccountDto";
 import {AccountService} from "../../../shared/data-access/account/account.service";
+import {PicturePreviewDto} from "../../../shared/utils/dtos/PicturePreviewDto";
 
 @Component({
   selector: 'app-account-details',
@@ -18,6 +19,8 @@ export class AccountDetailsComponent implements OnInit, OnDestroy {
   account!: AccountDto;
   showInfo: boolean = false;
   showShare: boolean = false;
+
+  picturePreviews: PicturePreviewDto[] = [];
 
   private readonly subs = new Subscription();
 
@@ -45,7 +48,7 @@ export class AccountDetailsComponent implements OnInit, OnDestroy {
     this.subs.add(
       this.pictureDetailsService.pictureDeletedSubject.subscribe({
         next: (val) => {
-          this.account.picturePreviews = this.account.picturePreviews.filter(p => p.id !== val);
+          this.picturePreviews = this.picturePreviews.filter(p => p.id !== val);
         }
       })
     );

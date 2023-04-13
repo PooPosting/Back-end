@@ -1,4 +1,4 @@
-import {Component, Input } from '@angular/core';
+import {Component,Input} from '@angular/core';
 import {AccountDto} from "../../../shared/utils/dtos/AccountDto";
 
 @Component({
@@ -9,5 +9,7 @@ import {AccountDto} from "../../../shared/utils/dtos/AccountDto";
 export class AccountBannerComponent {
 
   @Input() account!: AccountDto;
+
+  constructor() {}
 
 }

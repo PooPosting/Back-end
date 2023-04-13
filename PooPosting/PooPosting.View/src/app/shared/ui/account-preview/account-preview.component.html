@@ -9,11 +9,11 @@
 
     <div class="d-flex p-2">
       <div class="img-container">
-        <div class="img" *ngFor="let picture of account.picturePreviews | slice:0:5">
+        <div class="img" *ngFor="let picture of picturePreviews | slice:0:5">
           <img src="{{picture.url}}" alt="{{picture.id}}" class="img-fluid border">
         </div>
       </div>
-      <div *ngIf="!account.picturePreviews.length" class="col-12">
+      <div *ngIf="!picturePreviews.length" class="col-12">
         <div class="d-flex justify-content-center">
           <span class="text-muted text-center">Brak obrazków</span>
         </div>
