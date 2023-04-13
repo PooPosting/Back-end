@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {PictureCropperComponent} from "./picture-cropper.component";
 import {FileUploadModule} from "primeng/fileupload";
+import {ImageCropperModule} from "ngx-image-cropper";
 
 
 
@@ -12,9 +13,10 @@ import {FileUploadModule} from "primeng/fileupload";
   exports: [
     PictureCropperComponent
   ],
-  imports: [
-    CommonModule,
-    FileUploadModule
-  ]
+    imports: [
+        CommonModule,
+        FileUploadModule,
+        ImageCropperModule
+    ]
 })
 export class PictureCropperModule { }
