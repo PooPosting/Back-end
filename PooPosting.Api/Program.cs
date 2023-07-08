@@ -80,7 +80,7 @@ builder.Services.AddScoped<IAuthorizationHandler, CommentOperationRequirementHan
 // DbContext
 builder.Services.AddDbContext<PictureDbContext>(options =>
 {
-    var connString = builder.Configuration.GetConnectionString("PictureDbConnection");
+    var connString = builder.Configuration.GetConnectionString("DefaultConnection");
     options
         .UseMySql(connString, ServerVersion.AutoDetect(connString),
             (optionBuilder) =>
@@ -113,7 +113,7 @@ builder.Services.AddScoped<RequestTimeMiddleware>();
 builder.Services.AddScoped<UserDataMiddleware>();
 builder.Services.AddScoped<IsUserAdminFilter>();
 
-// builder.Services
+// Services
 builder.Services.AddScoped<IAccountContextService, AccountContextService>();
 builder.Services.AddScoped<IPictureLikingService, PictureLikingService>();
 builder.Services.AddScoped<IAccountService, HttpAccountService>();
@@ -155,7 +155,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("FrontEndClient", policyBuilder =>
         {
             var originList = new List<string>();
-            foreach (var origin in builder.Configuration["AllowedOrigins"].Split(','))
+            foreach (var origin in builder.Configuration["AllowedOrigins"]?.Split(',')!)
             {
                 originList.Add(origin);
                 Console.WriteLine($"Built with CORS origin: {origin}");
@@ -201,7 +201,7 @@ app.UseHttpsRedirection();
 app.UseSwagger();
 
 app.UseSwaggerUI(c =>
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "PicturesAPI v3.2.0"));
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "PooPostingAPI"));
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {

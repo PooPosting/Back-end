@@ -1,3 +1,0 @@
-User-agent: *
-Allow: /
-Sitemap: https://pictures.migra.ml/api/sitemap.xml
