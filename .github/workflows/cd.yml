@@ -7,26 +7,26 @@ on:
       - develop
 
 jobs:
-  deploy-production:
-    runs-on: ubuntu-latest
+  # deploy-production:
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v2
 
-      - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.PRODUCTION_SSH_PRIVATE_KEY }}
+  #     - name: Setup SSH
+  #       uses: webfactory/ssh-agent@v0.5.3
+  #       with:
+  #         ssh-private-key: ${{ secrets.PRODUCTION_SSH_PRIVATE_KEY }}
 
-      - name: Install SSH client
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y openssh-client
+  #     - name: Install SSH client
+  #       run: |
+  #         sudo apt-get update
+  #         sudo apt-get install -y openssh-client
 
-      - name: Deploy to Production
-        run: |
-          ssh -o StrictHostKeyChecking=no -p ${{ secrets.PRODUCTION_SSH_PORT }} ${{ secrets.PRODUCTION_SSH_USERNAME }}@${{ secrets.PRODUCTION_SSH_HOST }} 'cd /var/www/pooposting-api-prod/PooPostingApi/ && git pull && dotnet publish --configuration Release && sudo systemctl restart your-app-service'
+  #     - name: Deploy to Production
+  #       run: |
+  #         ssh -o StrictHostKeyChecking=no -p ${{ secrets.PRODUCTION_SSH_PORT }} ${{ secrets.PRODUCTION_SSH_USERNAME }}@${{ secrets.PRODUCTION_SSH_HOST }} 'cd /var/www/pooposting-api-prod/PooPostingApi/ && git pull && dotnet publish --configuration Release && sudo systemctl restart your-app-service'
 
   deploy-development:
     runs-on: ubuntu-latest
@@ -47,4 +47,4 @@ jobs:
 
       - name: Deploy to Development
         run: |
-          ssh -o StrictHostKeyChecking=no -p ${{ secrets.DEVELOPMENT_SSH_PORT }} ${{ secrets.DEVELOPMENT_SSH_USERNAME }}@${{ secrets.DEVELOPMENT_SSH_HOST }} 'cd /var/www/pooposting-api-dev/PooPostingApi/ && git pull && dotnet publish --configuration Release && sudo systemctl restart your-app-service'
+          ssh -o StrictHostKeyChecking=no -p ${{ secrets.DEVELOPMENT_SSH_PORT }} ${{ secrets.DEVELOPMENT_SSH_USERNAME }}@${{ secrets.DEVELOPMENT_SSH_HOST }} 'cd ${{ vars.REPO_PATH }} && git checkout development && git pull && dotnet publish --output ${{ vars.OUTPUT_DIR_DEV }} --configuration Release && sudo systemctl restart pooposting-api-dev'
