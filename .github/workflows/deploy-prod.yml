@@ -1,21 +1,20 @@
-name: Deploy
+name: Deploy Production
 
 on:
   push:
     branches:
       - main
-      - develop
 
 jobs:
-  ci:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.5.3
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v1.5.0
         with:
           dotnet-version: '7.0.x'
 
@@ -29,15 +28,15 @@ jobs:
         run: dotnet test --configuration Release --no-build
 
   deploy-production:
-    needs: ci
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.5.3
 
       - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.5.3
+        uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: ${{ secrets.PRODUCTION_SSH_PRIVATE_KEY }}
 
@@ -49,25 +48,3 @@ jobs:
       - name: Deploy to Production
         run: |
           ssh -o StrictHostKeyChecking=no -p ${{ secrets.PRODUCTION_SSH_PORT }} ${{ secrets.PRODUCTION_SSH_USERNAME }}@${{ secrets.PRODUCTION_SSH_HOST }} 'cd ${{ vars.REPO_PATH }} && git checkout main && git pull && dotnet publish --output ${{ vars.OUTPUT_DIR_PROD }} --configuration Release && sudo systemctl restart pooposting-api-prod'
-
-  deploy-development:
-    needs: ci
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.DEVELOPMENT_SSH_PRIVATE_KEY }}
-
-      - name: Install SSH client
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y openssh-client
-
-      - name: Deploy to Development
-        run: |
-          ssh -o StrictHostKeyChecking=no -p ${{ secrets.DEVELOPMENT_SSH_PORT }} ${{ secrets.DEVELOPMENT_SSH_USERNAME }}@${{ secrets.DEVELOPMENT_SSH_HOST }} 'cd ${{ vars.REPO_PATH }} && git checkout development && git pull && dotnet publish --output ${{ vars.OUTPUT_DIR_DEV }} --configuration Release && sudo systemctl restart pooposting-api-dev'
