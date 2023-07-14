@@ -7,30 +7,29 @@ on:
       - develop
 
 jobs:
-  
-  build:
+  ci:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      
-      - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v1.9.0 
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 7.0.x
-      
+          dotnet-version: '7.0.x'
+
       - name: Restore dependencies
         run: dotnet restore
-    
+
       - name: Build
-        run: dotnet build --no-restore
-  
+        run: dotnet build --configuration Release
+
       - name: Run tests
-        run: dotnet test
+        run: dotnet test --configuration Release --no-build
 
   deploy-production:
-    needs: build
+    needs: ci
     runs-on: ubuntu-latest
 
     steps:
@@ -52,7 +51,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no -p ${{ secrets.PRODUCTION_SSH_PORT }} ${{ secrets.PRODUCTION_SSH_USERNAME }}@${{ secrets.PRODUCTION_SSH_HOST }} 'cd ${{ vars.REPO_PATH }} && git checkout main && git pull && dotnet publish --output ${{ vars.OUTPUT_DIR_PROD }} --configuration Release && sudo systemctl restart pooposting-api-prod'
 
   deploy-development:
-    needs: build
+    needs: ci
     runs-on: ubuntu-latest
 
     steps:
