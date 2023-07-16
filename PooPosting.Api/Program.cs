@@ -10,13 +10,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using NLog.Extensions.Logging;
-using NLog.Web;
 using PooPosting.Api;
 using PooPosting.Api.ActionFilters;
 using PooPosting.Api.Authorization;
 using PooPosting.Api.Entities;
-using PooPosting.Api.Factories;
-using PooPosting.Api.Factories.Interfaces;
 using PooPosting.Api.Middleware;
 using PooPosting.Api.Models.Configuration;
 using PooPosting.Api.Models.Dtos;
@@ -37,15 +34,9 @@ using PooPosting.Api.Services.Startup;
 
 var builder = WebApplication.CreateBuilder();
 
-// Configure builder.Services
-
 builder.Services
     .AddControllers()
     .AddOData(options => options.Select().Filter().OrderBy());
-
-var sitemapSettings = new SitemapSettings();
-builder.Configuration.GetSection("SitemapSettings").Bind(sitemapSettings);
-builder.Services.AddSingleton(sitemapSettings);
 
 // Auth
 var authenticationSettings = new AuthenticationSettings();
@@ -121,7 +112,6 @@ builder.Services.AddScoped<IPopularService, HttpPopularService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ILikeService, LikeService>();
 builder.Services.AddScoped<IAuthService, HttpAuthService>();
-builder.Services.AddScoped<ILogsService, LogsService>();
 builder.Services.AddScoped<IRestrictedIpsService, RestrictedIpsService>();
 
 // Helpers
@@ -139,9 +129,6 @@ builder.Services.AddScoped<IRoleRepo, RoleRepo>();
 builder.Services.AddScoped<ITagRepo, TagRepo>();
 builder.Services.AddScoped<IPopularRepo, PopularRepo>();
 
-// Factories
-builder.Services.AddScoped<ISitemapFactory, SitemapFactory>();
-
 // Other stuff
 builder.Services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
 builder.Services.AddScoped<PictureSeeder>();
@@ -149,6 +136,8 @@ builder.Services.AddScoped<EnvironmentVariableSetter>();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSwaggerGen();
+
+IdHasher.Configure(builder.Configuration);
 
 builder.Logging.SetMinimumLevel(LogLevel.Trace);
 builder.Logging.ClearProviders();
