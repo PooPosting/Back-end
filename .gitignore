@@ -3,6 +3,7 @@ appsettings.Development.json
 *.editorconfig
 bin/
 obj/
+wwwroot/
 .idea/
 *.user
 internal-nlog.txt
