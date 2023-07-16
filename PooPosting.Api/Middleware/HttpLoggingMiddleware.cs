@@ -2,12 +2,13 @@
 
 namespace PooPosting.Api.Middleware;
 
-public class UserDataMiddleware: IMiddleware
+public class HttpLoggingMiddleware: IMiddleware
 {
-    private readonly ILogger<UserDataMiddleware> _logger;
+    private readonly ILogger<HttpLoggingMiddleware> _logger;
 
-    public UserDataMiddleware(
-        ILogger<UserDataMiddleware> logger)
+    public HttpLoggingMiddleware(
+        ILogger<HttpLoggingMiddleware> logger
+        )
     {
         _logger = logger;
     }
