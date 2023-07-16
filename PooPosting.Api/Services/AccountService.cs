@@ -1,7 +1,4 @@
-﻿using System.Globalization;
-using AutoMapper;
-using FluentValidation;
-using Google.Cloud.Vision.V1;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using PooPosting.Api.Authorization;
@@ -14,10 +11,6 @@ using PooPosting.Api.Models.Queries;
 using PooPosting.Api.Repos.Interfaces;
 using PooPosting.Api.Services.Helpers;
 using PooPosting.Api.Services.Interfaces;
-using PooPosting.Api.Models.Dtos;
-using PooPosting.Api.Models.Dtos.Like;
-using PooPosting.Api.Models.Dtos.Picture;
-using PooPosting.Api.Models.Validators;
 
 namespace PooPosting.Api.Services;
 
@@ -115,37 +108,37 @@ public class HttpAccountService : IAccountService
         if (!dto.File.ContentType.StartsWith("image")) throw new BadRequestException("invalid picture");
         var fileExt = dto.File.ContentType.EndsWith("gif") ? "gif" : "webp";
         var bgName = $"{IdHasher.EncodeAccountId(account.Id)}-{DateTime.Now.ToFileTimeUtc()}-bgp.{fileExt}";
-        var rootPath = Directory.GetCurrentDirectory();
-        var fullBgPath = Path.Combine(rootPath, "wwwroot", "accounts", "background_pictures", $"{bgName}");
+        // var rootPath = Directory.GetCurrentDirectory();
+        // var fullBgPath = Path.Combine(rootPath, "wwwroot", "accounts", "background_pictures", $"{bgName}");
 
-        try
-        {
-            using var ms = new MemoryStream();
-            await dto.File.CopyToAsync(ms);
-            var fileBytes = ms.ToArray();
-            var result = await NsfwClassifier.ClassifyAsync(fileBytes, CancellationToken.None);
-
-            var errors = new List<string>();
-
-            if (result.Adult > Likelihood.Possible) errors.Add("Adult");
-            if (result.Racy > Likelihood.Likely) errors.Add("Racy");
-            if (result.Medical > Likelihood.Likely) errors.Add("Medical");
-            if (result.Violence > Likelihood.Likely) errors.Add("Violence");
-
-            if (errors.Any())
-            {
-                throw new BadRequestException($"inappropriate picture: [{string.Join(", ", errors)}]");
-            }
-
-            await using var stream = new FileStream(fullBgPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
-            await dto.File.CopyToAsync(stream);
-            await stream.DisposeAsync();
-        }
-        catch (Exception)
-        {
-            if (File.Exists(fullBgPath)) File.Delete(fullBgPath);
-            throw;
-        }
+        // try
+        // {
+        //     using var ms = new MemoryStream();
+        //     await dto.File.CopyToAsync(ms);
+        //     var fileBytes = ms.ToArray();
+        //     var result = await NsfwClassifier.ClassifyAsync(fileBytes, CancellationToken.None);
+        //
+        //     var errors = new List<string>();
+        //
+        //     if (result.Adult > Likelihood.Possible) errors.Add("Adult");
+        //     if (result.Racy > Likelihood.Likely) errors.Add("Racy");
+        //     if (result.Medical > Likelihood.Likely) errors.Add("Medical");
+        //     if (result.Violence > Likelihood.Likely) errors.Add("Violence");
+        //
+        //     if (errors.Any())
+        //     {
+        //         throw new BadRequestException($"inappropriate picture: [{string.Join(", ", errors)}]");
+        //     }
+        //
+        //     await using var stream = new FileStream(fullBgPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+        //     await dto.File.CopyToAsync(stream);
+        //     await stream.DisposeAsync();
+        // }
+        // catch (Exception)
+        // {
+        //     if (File.Exists(fullBgPath)) File.Delete(fullBgPath);
+        //     throw;
+        // }
         account.BackgroundPicUrl = Path.Combine("wwwroot", "accounts", "background_pictures", $"{bgName}");
         account = await _accountRepo.UpdateAsync(account);
         return _mapper.Map<AccountDto>(account);
@@ -159,37 +152,37 @@ public class HttpAccountService : IAccountService
         if (!dto.File.ContentType.StartsWith("image")) throw new BadRequestException("invalid picture");
         var fileExt = dto.File.ContentType.EndsWith("gif") ? "gif" : "webp";
         var pfpName = $"{IdHasher.EncodeAccountId(account.Id)}-{DateTime.Now.ToFileTimeUtc()}-pfp.{fileExt}";
-        var rootPath = Directory.GetCurrentDirectory();
-        var fullPfpPath = Path.Combine(rootPath, "wwwroot", "accounts", "profile_pictures", $"{pfpName}");
-
-        try
-        {
-            using var ms = new MemoryStream();
-            await dto.File.CopyToAsync(ms);
-            var fileBytes = ms.ToArray();
-            var result = await NsfwClassifier.ClassifyAsync(fileBytes, CancellationToken.None);
-
-            var errors = new List<string>();
-
-            if (result.Adult > Likelihood.Possible) errors.Add("Adult");
-            if (result.Racy > Likelihood.Likely) errors.Add("Racy");
-            if (result.Medical > Likelihood.Likely) errors.Add("Medical");
-            if (result.Violence > Likelihood.Likely) errors.Add("Violence");
-
-            if (errors.Any())
-            {
-                throw new BadRequestException($"inappropriate picture: [{string.Join(", ", errors)}]");
-            }
-
-            await using var stream = new FileStream(fullPfpPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
-            await dto.File.CopyToAsync(stream);
-            await stream.DisposeAsync();
-        }
-        catch (Exception)
-        {
-            if (File.Exists(fullPfpPath)) File.Delete(fullPfpPath);
-            throw;
-        }
+        // var rootPath = Directory.GetCurrentDirectory();
+        // var fullPfpPath = Path.Combine(rootPath, "wwwroot", "accounts", "profile_pictures", $"{pfpName}");
+        //
+        // try
+        // {
+        //     using var ms = new MemoryStream();
+        //     await dto.File.CopyToAsync(ms);
+        //     var fileBytes = ms.ToArray();
+        //     var result = await NsfwClassifier.ClassifyAsync(fileBytes, CancellationToken.None);
+        //
+        //     var errors = new List<string>();
+        //
+        //     if (result.Adult > Likelihood.Possible) errors.Add("Adult");
+        //     if (result.Racy > Likelihood.Likely) errors.Add("Racy");
+        //     if (result.Medical > Likelihood.Likely) errors.Add("Medical");
+        //     if (result.Violence > Likelihood.Likely) errors.Add("Violence");
+        //
+        //     if (errors.Any())
+        //     {
+        //         throw new BadRequestException($"inappropriate picture: [{string.Join(", ", errors)}]");
+        //     }
+        //
+        //     await using var stream = new FileStream(fullPfpPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+        //     await dto.File.CopyToAsync(stream);
+        //     await stream.DisposeAsync();
+        // }
+        // catch (Exception)
+        // {
+        //     if (File.Exists(fullPfpPath)) File.Delete(fullPfpPath);
+        //     throw;
+        // }
         account.ProfilePicUrl = Path.Combine("wwwroot", "accounts", "profile_pictures", $"{pfpName}");
         account = await _accountRepo.UpdateAsync(account);
         return _mapper.Map<AccountDto>(account);

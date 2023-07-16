@@ -10,8 +10,7 @@ public static class IdHasher
     private static readonly Hashids PictureHasher = new("p!c700re$", MinHashLength, HashAlphabet);
     private static readonly Hashids AccountHasher = new("a$$0un70Z", MinHashLength, HashAlphabet);
     private static readonly Hashids CommentHasher = new("C00m3n700", MinHashLength, HashAlphabet);
-
-
+    
     public static string EncodePictureId(int id)
     {
         return PictureHasher.Encode(id);

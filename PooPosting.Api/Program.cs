@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using NLog.Extensions.Logging;
 using NLog.Web;
 using PooPosting.Api;
 using PooPosting.Api.ActionFilters;
@@ -36,14 +37,10 @@ using PooPosting.Api.Services.Startup;
 
 var builder = WebApplication.CreateBuilder();
 
-// NLog: Setup NLog to Dependency injection
-
-builder.Logging.SetMinimumLevel(LogLevel.Trace);
-builder.Host.UseNLog();
-
 // Configure builder.Services
 
-builder.Services.AddControllers().AddFluentValidation()
+builder.Services
+    .AddControllers()
     .AddOData(options => options.Select().Filter().OrderBy());
 
 var sitemapSettings = new SitemapSettings();
@@ -91,6 +88,7 @@ builder.Services.AddDbContext<PictureDbContext>(options =>
 });
 
 // Validators
+builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddScoped<IValidator<CustomQuery>, CustomQueryValidator>();
 builder.Services.AddScoped<IValidator<Query>, QueryValidator>();
 builder.Services.AddScoped<IValidator<PersonalizedQuery>, PersonalizedQueryValidator>();
@@ -110,7 +108,8 @@ builder.Services.AddScoped<IValidator<UpdatePictureTagsDto>, UpdatePictureTagsDt
 // Middleware
 builder.Services.AddScoped<ErrorHandlingMiddleware>();
 builder.Services.AddScoped<RequestTimeMiddleware>();
-builder.Services.AddScoped<UserDataMiddleware>();
+builder.Services.AddScoped<HttpLoggingMiddleware>();
+
 builder.Services.AddScoped<IsUserAdminFilter>();
 
 // Services
@@ -150,39 +149,26 @@ builder.Services.AddScoped<EnvironmentVariableSetter>();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSwaggerGen();
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("FrontEndClient", policyBuilder =>
-        {
-            var originList = new List<string>();
-            foreach (var origin in builder.Configuration["AllowedOrigins"]?.Split(',')!)
-            {
-                originList.Add(origin);
-                Console.WriteLine($"Built with CORS origin: {origin}");
-            }
-            policyBuilder
-                .WithOrigins(originList.ToArray())
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowCredentials();
-        }
-    );
-});
+
+builder.Logging.SetMinimumLevel(LogLevel.Trace);
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddNLog();
 
 var app = builder.Build();
 // Configure
-app.UseCors("FrontEndClient");
 DirectoryManager.EnsureAllDirectoriesAreCreated();
-app.UseFileServer(new FileServerOptions
-{
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
-    RequestPath = "/api/wwwroot",
-    EnableDefaultFiles = true
-});
+app.UseFileServer(
+    new FileServerOptions 
+    {
+        FileProvider = new PhysicalFileProvider(
+            Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
+        RequestPath = "/api/wwwroot",
+        EnableDefaultFiles = true
+    });
 
 using (var scope = app.Services.CreateScope()) {
-    if (app.Environment.IsDevelopment())
+    if (!app.Environment.IsProduction())
     {
         var seeder = scope.ServiceProvider.GetRequiredService<PictureSeeder>();
         seeder.Seed();
@@ -195,7 +181,7 @@ using (var scope = app.Services.CreateScope()) {
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseMiddleware<RequestTimeMiddleware>();
-app.UseMiddleware<UserDataMiddleware>();
+app.UseMiddleware<HttpLoggingMiddleware>();
 app.UseAuthentication();
 app.UseHttpsRedirection();
 app.UseSwagger();

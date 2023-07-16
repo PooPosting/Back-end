@@ -97,14 +97,14 @@ public class HttpAuthService: IAuthService
         var handler = new JwtSecurityTokenHandler();
         try
         {
-            var jwtToken = handler.ReadToken(dto.JwtToken) as JwtSecurityToken ?? throw new InvalidAuthTokenException();
+            var jwtToken = handler.ReadToken(dto.JwtToken) as JwtSecurityToken ?? throw new UnauthorizedException();
             var id = jwtToken.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var account = await _accountRepo.GetByIdAsync(int.Parse(id)) ?? throw new InvalidAuthTokenException();
+            var account = await _accountRepo.GetByIdAsync(int.Parse(id)) ?? throw new UnauthorizedException();
             var claims = new List<Claim>()
             {
-                new Claim(ClaimTypes.NameIdentifier, (account.Id.ToString())),
-                new Claim(ClaimTypes.Name, account.Nickname),
-                new Claim(ClaimTypes.Role, account.Role.Id.ToString()),
+                new(ClaimTypes.NameIdentifier, (account.Id.ToString())),
+                new(ClaimTypes.Name, account.Nickname),
+                new(ClaimTypes.Role, account.Role.Id.ToString()),
             };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authenticationSettings.JwtKey));
             var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -126,7 +126,7 @@ public class HttpAuthService: IAuthService
         }
         catch (Exception)
         {
-            throw new InvalidAuthTokenException();
+            throw new UnauthorizedException();
         }
 
 

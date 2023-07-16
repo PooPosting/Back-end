@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Google.Cloud.Vision.V1;
 using Microsoft.AspNetCore.Authorization;
 using PooPosting.Api.Authorization;
 using PooPosting.Api.Entities;

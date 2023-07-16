@@ -86,7 +86,7 @@ public class AccountContextService : IAccountContextService
             (TimeSpan.FromSeconds(int.Parse(User.FindFirst(c => c.Type == "exp")!.Value)) < TimeSpan.FromMinutes(0))
         )
         {
-            throw new ExpiredJwtException("jwt token has expired.");
+            throw new UnauthorizedException("jwt token has expired.");
         }
 
     }

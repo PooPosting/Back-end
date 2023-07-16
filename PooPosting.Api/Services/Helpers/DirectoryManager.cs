@@ -2,21 +2,37 @@
 
 public static class DirectoryManager
 {
+    private static readonly string[] DirectoryPaths = {
+        "wwwroot",
+        Path.Combine("wwwroot", "pictures"),
+        Path.Combine("wwwroot", "accounts"),
+        Path.Combine("wwwroot", "accounts", "profile_pictures"),
+        Path.Combine("wwwroot", "accounts", "background_pictures"),
+        "logs",
+        Path.Combine("logs", "all"),
+        Path.Combine("logs", "exceptions"),
+        Path.Combine("logs", "request-time"),
+        Path.Combine("logs", "requests"),
+        Path.Combine("logs", "requests-warn"),
+        Path.Combine("logs", "warnings")
+    };
+
     public static void EnsureAllDirectoriesAreCreated()
     {
-        var wwwRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-        if (!Directory.Exists(wwwRootPath)) Directory.CreateDirectory(wwwRootPath);
+        foreach (var directoryPath in DirectoryPaths)
+        {
+            var absolutePath = GetAbsolutePath(directoryPath);
+            EnsureDirectory(absolutePath);
+        }
+    }
 
-        var picturesPath = Path.Combine(wwwRootPath, "pictures");
-        if (!Directory.Exists(picturesPath)) Directory.CreateDirectory(picturesPath);
+    private static string GetAbsolutePath(string path)
+    {
+        return Path.Combine(Directory.GetCurrentDirectory(), path);
+    }
 
-        var accountsPath = Path.Combine(wwwRootPath, "accounts");
-        if (!Directory.Exists(accountsPath)) Directory.CreateDirectory(accountsPath);
-
-        var accountPfpsPath = Path.Combine(accountsPath, "profile_pictures");
-        if (!Directory.Exists(accountPfpsPath)) Directory.CreateDirectory(accountPfpsPath);
-
-        var accountBgpsPath = Path.Combine(accountsPath, "background_pictures");
-        if (!Directory.Exists(accountBgpsPath)) Directory.CreateDirectory(accountBgpsPath);
+    private static void EnsureDirectory(string path)
+    {
+        if (!Directory.Exists(path)) Directory.CreateDirectory(path!);
     }
 }

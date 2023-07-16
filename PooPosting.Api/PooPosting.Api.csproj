@@ -22,14 +22,37 @@
         </PackageReference>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="NLog.Web.AspNetCore" Version="5.2.2" />
+        <PackageReference Include="NLog" Version="5.2.2" />
         <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
         <PackageReference Include="xsitemap" Version="2.8.0" />
     </ItemGroup>
 
     <ItemGroup>
+        <Folder Include="bin\Debug\net7.0\logs\all\" />
+        <Folder Include="bin\Debug\net7.0\logs\exceptions\" />
+        <Folder Include="bin\Debug\net7.0\logs\request-time\" />
+        <Folder Include="bin\Debug\net7.0\logs\requests-warn\" />
+        <Folder Include="bin\Debug\net7.0\logs\requests\" />
+        <Folder Include="bin\Debug\net7.0\logs\warnings\" />
         <Folder Include="wwwroot\pictures" />
         <Folder Include="wwwroot\accounts" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Update="nlog.config">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="bin\Debug\net7.0\logs\all\.gitkeep" />
+      <None Include="bin\Debug\net7.0\logs\exceptions\.gitkeep" />
+      <None Include="bin\Debug\net7.0\logs\internal-nlog.txt" />
+      <None Include="bin\Debug\net7.0\logs\request-time\.gitkeep" />
+      <None Include="bin\Debug\net7.0\logs\requests-warn\.gitkeep" />
+      <None Include="bin\Debug\net7.0\logs\requests\.gitkeep" />
+      <None Include="bin\Debug\net7.0\logs\warnings\.gitkeep" />
     </ItemGroup>
 
 </Project>

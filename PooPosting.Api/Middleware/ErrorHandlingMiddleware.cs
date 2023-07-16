@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using System.Globalization;
+using FluentValidation;
 using HashidsNet;
 using PooPosting.Api.Exceptions;
 
@@ -21,63 +22,36 @@ public class ErrorHandlingMiddleware : IMiddleware
         {
             await next.Invoke(context);
         }
-
-        catch (BadRequestException badRequestException)
+        catch (BadRequestException e)
         {
             context.Response.StatusCode = 400;
-            await context.Response.WriteAsync(badRequestException.Message);
+            await context.Response.WriteAsync(e.Message);
         }
-        catch (ValidationException validationException)
-        {
-            context.Response.StatusCode = 400;
-            await context.Response.WriteAsync(validationException.Message);
-        }
-
-        catch (InvalidAuthTokenException invalidAuthTokenException)
+        catch (UnauthorizedException e)
         {
             context.Response.StatusCode = 401;
-            await context.Response.WriteAsync(invalidAuthTokenException.Message);
+            await context.Response.WriteAsync(e.Message);
         }
-        catch (UnauthorizedException unauthorizedException)
-        {
-            context.Response.StatusCode = 401;
-            await context.Response.WriteAsync(unauthorizedException.Message);
-        }
-
-        catch (ForbidException forbidException)
+        catch (ForbidException e)
         {
             context.Response.StatusCode = 403;
-            await context.Response.WriteAsync(forbidException.Message);
-        }
-        catch (RestrictedException restrictedException)
-        {
-            context.Response.StatusCode = 403;
-            await context.Response.WriteAsync(restrictedException.Message);
-        }
-
-        catch (NoResultException)
-        {
-            context.Response.StatusCode = 404;
-            await context.Response.WriteAsync("Resource not found");
+            await context.Response.WriteAsync(e.Message);
         }
         catch (NotFoundException)
         {
             context.Response.StatusCode = 404;
             await context.Response.WriteAsync("Resource not found");
         }
-
-        catch (NotImplementedException)
+        catch (NoResultException)
         {
-            context.Response.StatusCode = 500;
-            await context.Response.WriteAsync("Not implemented");
+            context.Response.StatusCode = 404;
+            await context.Response.WriteAsync("Resource not found");
         }
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-
             context.Response.StatusCode = 500;
             await context.Response.WriteAsync("Something went wrong");
         }
     }
-        
 }
