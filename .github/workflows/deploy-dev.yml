@@ -46,9 +46,9 @@ jobs:
       - name: Deploy to Development
         run: |
           ssh -o StrictHostKeyChecking=no -p ${{ secrets.DEVELOPMENT_SSH_PORT }} ${{ secrets.DEVELOPMENT_SSH_USERNAME }}@${{ secrets.DEVELOPMENT_SSH_HOST }} <<- 'EOF'
-            cd ${{ env.REPO_PATH }}
+            cd ${{ vars.REPO_PATH }}
             git checkout development
             git pull
-            dotnet publish --output ${{ env.OUTPUT_DIR_DEV }} --configuration Release
+            dotnet publish --output ${{ vars.OUTPUT_DIR_DEV }} --configuration Release
             sudo systemctl restart pooposting-api-dev
           EOF
