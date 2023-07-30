@@ -46,9 +46,9 @@ jobs:
       - name: Deploy to Production
         run: |
           ssh -o StrictHostKeyChecking=no -p ${{ secrets.PRODUCTION_SSH_PORT }} ${{ secrets.PRODUCTION_SSH_USERNAME }}@${{ secrets.PRODUCTION_SSH_HOST }} <<- 'EOF'
-            cd ${{ vars.REPO_PATH }}
+            cd $REPO_PATH
             git checkout main
             git pull
-            dotnet publish --output ${{ vars.OUTPUT_DIR_PROD }} --configuration Release
+            dotnet publish --output $OUTPUT_DIR_PROD --configuration Release
             sudo systemctl restart pooposting-api-prod
           EOF
