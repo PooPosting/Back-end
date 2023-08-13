@@ -159,6 +159,7 @@ app.UseFileServer(
 using (var scope = app.Services.CreateScope()) {
     if (!app.Environment.IsProduction())
     {
+        
         var seeder = scope.ServiceProvider.GetRequiredService<PictureSeeder>();
         seeder.Seed();
 

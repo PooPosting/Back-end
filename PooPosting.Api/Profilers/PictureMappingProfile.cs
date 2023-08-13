@@ -14,9 +14,12 @@ public class PictureMappingProfile : Profile
         CreateMap<Picture, PictureDto>()
             .ForMember(dto => dto.LikeState,
                 opt => opt.MapFrom<LikeStateResolver>())
-            .ForMember(dto => dto.AccountPreview,
+            .ForMember(dto => dto.Account,
                 opt => opt.MapFrom(
                     p => p.Account))
+            .ForMember(dto => dto.Comments,
+                opt => opt.MapFrom(
+                    p => p.Comments))
             .ForMember(dto => dto.Url,
                 opt => opt.MapFrom<UrlResolver>())
             .ForMember(dto => dto.IsModifiable,

@@ -1,5 +1,6 @@
 ﻿using PooPosting.Api.Enums;
 using PooPosting.Api.Models.Dtos.Account;
+using PooPosting.Api.Models.Dtos.Comment;
 
 namespace PooPosting.Api.Models.Dtos.Picture;
 
@@ -11,7 +12,8 @@ public class PictureDto
     public string Name { get; set; }
     public string Description { get; set; }
 
-    public AccountPreviewDto AccountPreview { get; set; }
+    public AccountDto Account { get; set; }
+    public IEnumerable<CommentDto> Comments { get; set; }
 
     public string Url { get; set; }
     public DateTime PictureAdded { get; set; }
