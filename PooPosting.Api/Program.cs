@@ -15,15 +15,12 @@ using PooPosting.Api.ActionFilters;
 using PooPosting.Api.Authorization;
 using PooPosting.Api.Entities;
 using PooPosting.Api.Middleware;
-using PooPosting.Api.Models.Configuration;
-using PooPosting.Api.Models.Dtos;
 using PooPosting.Api.Models.Dtos.Account;
 using PooPosting.Api.Models.Dtos.Account.Validators;
 using PooPosting.Api.Models.Dtos.Picture;
 using PooPosting.Api.Models.Dtos.Picture.Validators;
 using PooPosting.Api.Models.Queries;
 using PooPosting.Api.Models.Queries.Validators;
-using PooPosting.Api.Models.Validators;
 using PooPosting.Api.Repos;
 using PooPosting.Api.Repos.Interfaces;
 using PooPosting.Api.Services;
@@ -85,7 +82,6 @@ builder.Services.AddScoped<IValidator<Query>, QueryValidator>();
 builder.Services.AddScoped<IValidator<PersonalizedQuery>, PersonalizedQueryValidator>();
 builder.Services.AddScoped<IValidator<LsLoginDto>, LsLoginDtoValidator>();
 builder.Services.AddScoped<IValidator<CreateAccountDto>, CreateAccountDtoValidator>();
-builder.Services.AddScoped<IValidator<PatchRestrictedIp>, PatchRestrictedIpValidator>();
 
 builder.Services.AddScoped<IValidator<UpdateAccountEmailDto>, UpdateAccountEmailDtoValidator>();
 builder.Services.AddScoped<IValidator<UpdateAccountPasswordDto>, UpdateAccountPasswordDtoValidator>();
@@ -144,7 +140,25 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.AddNLog();
 
+var envName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+if (envName == "Development")
+{
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy(name: "DevCors",
+            policy  =>
+            {
+                policy
+                    .AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            });
+    });
+}
+
 var app = builder.Build();
+
+
 // Configure
 DirectoryManager.EnsureAllDirectoriesAreCreated();
 app.UseFileServer(
@@ -156,19 +170,6 @@ app.UseFileServer(
         EnableDefaultFiles = true
     });
 
-using (var scope = app.Services.CreateScope()) {
-    if (!app.Environment.IsProduction())
-    {
-        
-        var seeder = scope.ServiceProvider.GetRequiredService<PictureSeeder>();
-        seeder.Seed();
-
-        app.UseDeveloperExceptionPage();
-    }
-    var envSetter = scope.ServiceProvider.GetRequiredService<EnvironmentVariableSetter>();
-    envSetter.Set();
-}
-
 app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseMiddleware<RequestTimeMiddleware>();
 app.UseMiddleware<HttpLoggingMiddleware>();
@@ -178,6 +179,16 @@ app.UseSwagger();
 
 app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "PooPostingAPI"));
+
+if (envName == "Development")
+{
+    app.UseCors("DevCors");
+    
+    var seeder = app.Services.CreateScope().ServiceProvider.GetRequiredService<PictureSeeder>();
+    seeder.Seed();
+
+    app.UseDeveloperExceptionPage();
+}
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {

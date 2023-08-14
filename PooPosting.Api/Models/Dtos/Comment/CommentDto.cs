@@ -10,7 +10,7 @@ public class CommentDto
     public string Text { get; set; }
     public DateTime CommentAdded { get; set; }
 
-    public AccountPreviewDto AccountPreview { get; set; }
+    public AccountDto Account { get; set; }
     public bool IsModifiable { get; set; } = false;
     public bool IsAdminModifiable { get; set; } = false;
 }

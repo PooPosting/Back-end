@@ -13,7 +13,7 @@ public class PictureDto
     public string Description { get; set; }
 
     public AccountDto Account { get; set; }
-    public IEnumerable<CommentDto> Comments { get; set; }
+    public CommentDto Comment { get; set; }
 
     public string Url { get; set; }
     public DateTime PictureAdded { get; set; }

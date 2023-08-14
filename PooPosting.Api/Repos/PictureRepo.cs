@@ -114,6 +114,7 @@ public class PictureRepo : IPictureRepo
     {
         var query = _dbContext.Pictures
             .Include(p => p.Comments)
+            .ThenInclude(p => p.Account)
             .Include(p => p.Account)
             .Include(p => p.PictureTags)
             .ThenInclude(j => j.Tag)

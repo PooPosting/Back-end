@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.IdentityModel.Tokens;
 using PooPosting.Api.Entities;
 using PooPosting.Api.Models.Dtos.Account;
 using PooPosting.Api.Models.Dtos;
@@ -17,13 +18,13 @@ public class PfPicUrlResolver:
 
     public string Resolve(Account source, AccountDto destination, string destMember, ResolutionContext context)
     {
-        if (source.ProfilePicUrl is null) return null;
+        if (source.ProfilePicUrl.IsNullOrEmpty()) return null;
         return source.ProfilePicUrl.StartsWith("http") ? source.ProfilePicUrl : Path.Combine(_appOrigin, source.ProfilePicUrl);
     }
 
     public string Resolve(Account source, AccountPreviewDto destination, string destMember, ResolutionContext context)
     {
-        if (source.ProfilePicUrl is null) return null;
+        if (source.ProfilePicUrl.IsNullOrEmpty()) return null;
         return source.ProfilePicUrl.StartsWith("http") ? source.ProfilePicUrl : Path.Combine(_appOrigin, source.ProfilePicUrl);
     }
 }
