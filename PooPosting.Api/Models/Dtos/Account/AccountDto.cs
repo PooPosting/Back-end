@@ -9,10 +9,7 @@ public class AccountDto
     public string? ProfilePicUrl { get; set; }
     public string BackgroundPicUrl { get; set; }
     public string AccountDescription { get; set; }
-
-    public bool IsModifiable { get; set; } = false;
-    public bool IsAdminModifiable { get; set; } = false;
-
+    
     public int RoleId { get; set; }
     public DateTime AccountCreated { get; set; }
 }

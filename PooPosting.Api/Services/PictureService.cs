@@ -90,50 +90,6 @@ public class HttpPictureService : IPictureService
             await _pictureRepo.CountPicturesAsync()
         );
     }
-    public async Task<PagedResult<PicturePreviewDto>> GetLikedPictures(
-        int accId,
-        Query query
-        )
-    {
-        var pictures = await _pictureRepo.GetLikedPicturesByAccountIdAsync(
-            accId,
-            query.PageSize * (query.PageNumber - 1),
-            query.PageSize
-        );
-
-        var picPreviews = _mapper.Map<IEnumerable<PicturePreviewDto>>(pictures);
-
-        var result = new PagedResult<PicturePreviewDto>(
-            picPreviews,
-            query.PageNumber,
-            query.PageSize,
-            await _pictureRepo.CountPicturesAsync(p => p.AccountId == accId)
-        );
-
-        return result;
-    }
-    public async Task<PagedResult<PicturePreviewDto>> GetPostedPictures(
-        int accId,
-        Query query
-        )
-    {
-        var pictures = await _pictureRepo.GetPostedPicturesByAccountIdAsync(
-            accId,
-            query.PageSize * (query.PageNumber - 1),
-            query.PageSize
-        );
-
-        var picPreviews = _mapper.Map<IEnumerable<PicturePreviewDto>>(pictures);
-
-        var result = new PagedResult<PicturePreviewDto>(
-            picPreviews,
-            query.PageNumber,
-            query.PageSize,
-            await _pictureRepo.CountPicturesAsync(p => p.AccountId == accId)
-        );
-
-        return result;
-    }
 
     public async Task<PagedResult<PictureDto>> SearchAll(
         CustomQuery query

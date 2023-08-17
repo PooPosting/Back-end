@@ -17,7 +17,7 @@ public class Account
     public bool IsDeleted { get; set; }
     public int RoleId { get; set; }
 
-    public Role Role { get; set; }
+    public virtual Role Role { get; set; }
     [AllowNull] public virtual ICollection<Picture> Pictures { get; set; }
     [AllowNull] public virtual ICollection<Like> Likes { get; set; }
     [AllowNull] public virtual ICollection<Comment> Comments { get; set; }

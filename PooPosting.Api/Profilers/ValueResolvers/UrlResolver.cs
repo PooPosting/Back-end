@@ -6,8 +6,7 @@ using PooPosting.Api.Models.Dtos;
 namespace PooPosting.Api.Profilers.ValueResolvers;
 
 public class UrlResolver:
-    IValueResolver<Picture, PictureDto, string>,
-    IValueResolver<Picture, PicturePreviewDto, string>
+    IValueResolver<Picture, PictureDto, string>
 {
     private readonly string _appOrigin;
     public UrlResolver(IConfiguration configuration)
@@ -20,8 +19,4 @@ public class UrlResolver:
         return source.Url.StartsWith("http") ? source.Url : Path.Combine(_appOrigin, source.Url);
     }
 
-    public string Resolve(Picture source, PicturePreviewDto destination, string destMember, ResolutionContext context)
-    {
-        return source.Url.StartsWith("http") ? source.Url : Path.Combine(_appOrigin, source.Url);
-    }
 }

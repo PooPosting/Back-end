@@ -35,10 +35,7 @@ public class CommentService : ICommentService
         _authorizationService = authorizationService;
     }
 
-    public async Task<PagedResult<CommentDto>> GetByPictureId(
-        int picId,
-        Query query
-    )
+    public async Task<PagedResult<CommentDto>> GetByPictureId(int picId, Query query)
     {
         var comments = await _commentRepo
             .GetByPictureIdAsync(
@@ -59,7 +56,7 @@ public class CommentService : ICommentService
         string text
         )
     {
-        if ((await _pictureRepo.GetByIdAsync(picId)) is null) throw new NotFoundException();
+        if (await _pictureRepo.GetByIdAsync(picId) is null) throw new NotFoundException();
         var comment = new Comment()
         {
             AccountId = _accountContextService.GetAccountId(),
@@ -67,14 +64,10 @@ public class CommentService : ICommentService
             Text = text
         };
         var result = _mapper.Map<CommentDto>(await _commentRepo.InsertAsync(comment));
-        result.IsModifiable = true;
         return result;
     }
 
-    public async Task<CommentDto> Update(
-        int commId,
-        string text
-        )
+    public async Task<CommentDto> Update(int commId, string text)
     {
         await AuthorizeCommentOperation(commId, ResourceOperation.Update ,"you cant modify a comment you didnt added");
 
@@ -83,13 +76,10 @@ public class CommentService : ICommentService
         await _commentRepo.UpdateAsync(comment);
 
         var result = _mapper.Map<CommentDto>(comment);
-        result.IsModifiable = true;
         return result;
     }
 
-    public async Task<bool> Delete(
-        int commId
-        )
+    public async Task<bool> Delete(int commId)
     {
         await AuthorizeCommentOperation(commId, ResourceOperation.Delete,"you have no rights to delete this comment");
         var comment = await _commentRepo.GetByIdAsync(commId);

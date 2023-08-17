@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-using FluentValidation;
-using HashidsNet;
+﻿using HashidsNet;
 using PooPosting.Api.Exceptions;
 
 namespace PooPosting.Api.Middleware;

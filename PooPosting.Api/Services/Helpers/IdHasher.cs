@@ -1,4 +1,5 @@
 ﻿using HashidsNet;
+using PooPosting.Api.Exceptions;
 using PooPosting.Api.Models.Configuration;
 
 namespace PooPosting.Api.Services.Helpers;

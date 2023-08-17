@@ -25,10 +25,7 @@ public class AdminModifiableResolver :
     {
         var user = _httpContextAccessor.HttpContext!.User;
         var roleId = user.FindFirst(c => c.Type == ClaimTypes.Role);
-        if (roleId is not null)
-        {
-            return roleId.Value == "3";
-        }
+        if (roleId is not null) return roleId.Value == "3";
         return false;
     }
 
@@ -36,10 +33,7 @@ public class AdminModifiableResolver :
     {
         var user = _httpContextAccessor.HttpContext!.User;
         var roleId = user.FindFirst(c => c.Type == ClaimTypes.Role);
-        if (roleId is not null)
-        {
-            return roleId.Value == "3";
-        }
+        if (roleId is not null) return roleId.Value == "3";
         return false;
     }
 
@@ -47,10 +41,7 @@ public class AdminModifiableResolver :
     {
         var user = _httpContextAccessor.HttpContext!.User;
         var roleId = user.FindFirst(c => c.Type == ClaimTypes.Role);
-        if (roleId is not null)
-        {
-            return roleId.Value == "3";
-        }
+        if (roleId is not null) return roleId.Value == "3";
         return false;
     }
 }

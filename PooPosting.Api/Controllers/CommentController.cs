@@ -15,9 +15,7 @@ public class CommentController: ControllerBase
 {
     private readonly ICommentService _commentService;
 
-    public CommentController(
-        ICommentService commentService
-        )
+    public CommentController(ICommentService commentService)
     {
         _commentService = commentService;
     }

@@ -2,10 +2,10 @@
 using PooPosting.Api.Models.Dtos.Account;
 using PooPosting.Api.Services.Interfaces;
 
-namespace PooPosting.Api.Controllers.Account;
+namespace PooPosting.Api.Controllers.Auth;
 
 [ApiController]
-[Route("api/account/auth")]
+[Route("api/auth")]
 public class AccountAuthController : ControllerBase
 {
     private readonly IAuthService _authService;
@@ -17,7 +17,7 @@ public class AccountAuthController : ControllerBase
 
     [HttpPost]
     [Route("register")]
-    public async Task<IActionResult> PostAccount([FromBody] CreateAccountDto dto)
+    public async Task<IActionResult> Register([FromBody] CreateAccountDto dto)
     {
         var accountId = await _authService.RegisterAccount(dto);
         return Created($"/api/account/{accountId}", null);

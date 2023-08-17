@@ -7,8 +7,7 @@ using PooPosting.Api.Models.Dtos;
 namespace PooPosting.Api.Profilers.ValueResolvers;
 
 public class PfPicUrlResolver:
-    IValueResolver<Account, AccountDto, string>,
-    IValueResolver<Account, AccountPreviewDto, string>
+    IValueResolver<Account, AccountDto, string>
 {
     private readonly string _appOrigin;
     public PfPicUrlResolver(IConfiguration configuration)
@@ -22,9 +21,4 @@ public class PfPicUrlResolver:
         return source.ProfilePicUrl.StartsWith("http") ? source.ProfilePicUrl : Path.Combine(_appOrigin, source.ProfilePicUrl);
     }
 
-    public string Resolve(Account source, AccountPreviewDto destination, string destMember, ResolutionContext context)
-    {
-        if (source.ProfilePicUrl.IsNullOrEmpty()) return null;
-        return source.ProfilePicUrl.StartsWith("http") ? source.ProfilePicUrl : Path.Combine(_appOrigin, source.ProfilePicUrl);
-    }
 }
