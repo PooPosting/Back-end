@@ -156,6 +156,19 @@ if (envName == "Development")
     });
 }
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "All",
+        policy  =>
+        {
+            policy
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowAnyOrigin();
+        });
+});
+
+
 var app = builder.Build();
 
 
@@ -170,6 +183,7 @@ app.UseFileServer(
         EnableDefaultFiles = true
     });
 
+
 app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseMiddleware<RequestTimeMiddleware>();
 app.UseMiddleware<HttpLoggingMiddleware>();
@@ -180,13 +194,14 @@ app.UseSwagger();
 app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "PooPostingAPI"));
 
-if (envName == "Development")
+var isDev = envName == "Development";
+
+var seeder = app.Services.CreateScope().ServiceProvider.GetRequiredService<PictureSeeder>();
+seeder.Seed(isDev);
+
+if (isDev)
 {
     app.UseCors("DevCors");
-    
-    var seeder = app.Services.CreateScope().ServiceProvider.GetRequiredService<PictureSeeder>();
-    seeder.Seed();
-
     app.UseDeveloperExceptionPage();
 }
 
@@ -197,6 +212,9 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardLimit = null,
 });
 app.UseRouting();
+
+app.UseCors("All");
+
 app.UseAuthorization();
 app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 

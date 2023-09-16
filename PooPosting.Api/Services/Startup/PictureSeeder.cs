@@ -11,26 +11,24 @@ public class PictureSeeder
         _dbContext = dbContext;
     }
 
-    public void Seed()
+    public void Seed(bool isDev)
     {
-        if (!_dbContext.Roles.Any())
-        {
-            Console.WriteLine("Seeding the database...");
-            var roles = GetRoles();
-            _dbContext.Roles.AddRange(roles);
-            _dbContext.SaveChanges();
-        }
-            
+        
         if (_dbContext.Database.CanConnect())
         {
-            if (!_dbContext.Accounts.Any())
+            if (!_dbContext.Roles.Any())
+            {
+                Console.WriteLine("Seeding the database...");
+                var roles = GetRoles();
+                _dbContext.Roles.AddRange(roles);
+                _dbContext.SaveChanges();
+            }
+
+            if (isDev && !_dbContext.Accounts.Any())
             {
                 var accounts = GetAccounts();
                 _dbContext.Accounts.AddRange(accounts);
 
-                var likes = GetLikes();
-                // _dbContext.Likes.AddRange(likes);
-                    
                 _dbContext.SaveChanges();
             }
         }
@@ -146,19 +144,6 @@ public class PictureSeeder
             }
         };
         return roles;
-    }
-
-    private IEnumerable<Like> GetLikes()
-    {
-        var likes = new List<Like>()
-        {
-            new Like()
-            {
-                PictureId = GetAccounts().ToList()[0].Pictures.ToList()[0].Id,
-                AccountId = GetAccounts().ToList()[0].Id
-            }
-        };
-        return likes;
     }
 
 }
