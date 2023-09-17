@@ -8,5 +8,6 @@ public class CommentDto
     public string Text { get; set; }
     public DateTime CommentAdded { get; set; }
 
+    public string PictureId { get; set; }
     public AccountDto Account { get; set; }
 }

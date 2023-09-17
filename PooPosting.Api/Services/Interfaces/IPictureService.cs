@@ -7,7 +7,7 @@ namespace PooPosting.Api.Services.Interfaces;
 public interface IPictureService
 {
     Task<PictureDto> GetById(int id);
-    Task<IEnumerable<PictureDto>> GetPersonalizedPictures(PersonalizedQuery query);
+    Task<IEnumerable<PictureDto>> GetPictures(PersonalizedQuery query);
     Task<PagedResult<PictureDto>> GetPictures(Query query);
     Task<PagedResult<PictureDto>> SearchAll(CustomQuery query);
     Task<PictureDto> UpdatePictureName(int picId, UpdatePictureNameDto dto);

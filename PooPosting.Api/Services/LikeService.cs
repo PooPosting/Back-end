@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using PooPosting.Api.Entities;
 using PooPosting.Api.Models;
 using PooPosting.Api.Models.Dtos.Like;
 using PooPosting.Api.Models.Queries;
@@ -12,15 +13,15 @@ namespace PooPosting.Api.Services;
 public class LikeService : ILikeService
 {
     private readonly IMapper _mapper;
-    private readonly ILikeRepo _likeRepo;
+    private readonly PictureDbContext _dbContext;
 
     public LikeService(
         IMapper mapper,
-        ILikeRepo likeRepo
+        PictureDbContext dbContext
         )
     {
         _mapper = mapper;
-        _likeRepo = likeRepo;
+        _dbContext = dbContext;
     }
 
     public async Task<PagedResult<LikeDto>> GetLikesByPictureId(
@@ -28,18 +29,17 @@ public class LikeService : ILikeService
         int picId
     )
     {
-        var likes = await _likeRepo
-            .GetByPictureIdAsync(
-                picId,
-                query.PageSize * (query.PageNumber - 1),
-                query.PageSize
-                );
+        var likes = await _dbContext.Likes
+            .Where(l => l.PictureId == picId)
+            .Skip(query.PageSize * (query.PageNumber - 1))
+            .Take(query.PageSize)
+            .ToListAsync();
 
         return new PagedResult<LikeDto>(
             _mapper.Map<IEnumerable<LikeDto>>(likes),
             query.PageNumber,
             query.PageSize,
-            await _likeRepo.CountLikesAsync(l => l.PictureId == picId)
+            await _dbContext.Likes.CountAsync(l => l.PictureId == picId)
             );
     }
 

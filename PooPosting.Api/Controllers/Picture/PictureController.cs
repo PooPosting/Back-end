@@ -43,7 +43,7 @@ public class PictureController : ControllerBase
         [FromQuery] PersonalizedQuery query
         )
     {
-        var pictures = await _pictureService.GetPersonalizedPictures(query);
+        var pictures = await _pictureService.GetPictures(query);
         return Ok(pictures);
     }
 
@@ -62,9 +62,7 @@ public class PictureController : ControllerBase
     [HttpGet]
     [AllowAnonymous]
     [Route("{id}")]
-    public async Task<IActionResult> GetSinglePictureById(
-        [FromRoute] string id
-        )
+    public async Task<IActionResult> GetSinglePictureById([FromRoute] string id)
     {
         var picture = await _pictureService.GetById(IdHasher.DecodePictureId(id));
         return Ok(picture);
@@ -72,50 +70,8 @@ public class PictureController : ControllerBase
 
     [HttpPost]
     [Route("post")]
-    public async Task<IActionResult> PostPicture(
-        // can i somehow pass whole objects like that?
-        [FromForm] IFormFile file,
-        [FromForm] string name,
-        [FromForm] string? description,
-        [FromForm] string? tags
-        )
+    public async Task<IActionResult> PostPicture([FromBody] CreatePictureDto dto)
     {
-        var dto = new CreatePictureDto()
-        {
-            Name = name,
-            Description = description,
-            File = file,
-            Tags = tags?.Split(' ').ToList()
-        };
-
-        // TEMPORARY
-
-        if (dto.Name.Length > 40 || dto.Name.Length < 4)
-        {
-            throw new BadRequestException("Picture name should be between 4 and 40 characters");
-        }
-
-        if (dto.Description is not null)
-        {
-            if (dto.Description.Length > 500)
-            {
-                throw new BadRequestException("Description should be shorter than 500 characters");
-            }
-        }
-
-        if (dto.File.Length > 4000000)
-        {
-            throw new BadRequestException("File should be smaller than 4mb");
-        }
-
-        if (dto.Tags is not null)
-        {
-            if ((dto.Tags.Count > 4) || dto.Tags.Any(t => t.Length > 25))
-            {
-                throw new BadRequestException("Maximum tag count is 4 and every tag should be shorter than 25 characters");
-            }
-        }
-
         var pictureId = await _pictureService.Create(dto);
         return Created($"api/picture/{pictureId}", null);
     }

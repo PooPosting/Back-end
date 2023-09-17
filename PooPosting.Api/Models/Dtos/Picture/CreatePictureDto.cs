@@ -15,8 +15,8 @@ public class CreatePictureDto
     
     [MaxLength(4)]
     [AllowNull] 
-    public List<string> Tags { get; set; }
+    public string[] Tags { get; set; }
 
     [MaxLength(4194304)]
-    public IFormFile File { get; set; }
+    public string FileBase64 { get; set; }
 }

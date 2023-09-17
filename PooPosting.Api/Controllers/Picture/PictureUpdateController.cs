@@ -8,7 +8,7 @@ namespace PooPosting.Api.Controllers.Picture;
 
 [ApiController]
 [Authorize]
-[Route("api/picture/{picId}/update")]
+[Route("api/picture/{picId}")]
 public class PictureUpdateController : ControllerBase
 {
     private readonly IPictureService _pictureService;

@@ -103,7 +103,7 @@ builder.Services.AddScoped<IsUserAdminFilter>();
 builder.Services.AddScoped<IAccountContextService, AccountContextService>();
 builder.Services.AddScoped<IPictureLikingService, PictureLikingService>();
 builder.Services.AddScoped<IAccountService, HttpAccountService>();
-builder.Services.AddScoped<IPictureService, HttpPictureService>();
+builder.Services.AddScoped<IPictureService, PictureService>();
 builder.Services.AddScoped<IPopularService, HttpPopularService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ILikeService, LikeService>();
@@ -111,15 +111,10 @@ builder.Services.AddScoped<IAuthService, HttpAuthService>();
 builder.Services.AddScoped<IRestrictedIpsService, RestrictedIpsService>();
 
 // Helpers
-builder.Services.AddScoped<ITagHelper, TagHelper>();
 builder.Services.AddScoped<ILikeHelper, LikeHelper>();
-builder.Services.AddScoped<IPictureHelper, PictureHelper>();
 
 // Repos
 builder.Services.AddScoped<IAccountRepo, AccountRepo>();
-builder.Services.AddScoped<ILikeRepo, LikeRepo>();
-builder.Services.AddScoped<IPictureRepo, PictureRepo>();
-builder.Services.AddScoped<ICommentRepo, CommentRepo>();
 builder.Services.AddScoped<IRestrictedIpRepo, RestrictedIpRepo>();
 builder.Services.AddScoped<IRoleRepo, RoleRepo>();
 builder.Services.AddScoped<ITagRepo, TagRepo>();
