@@ -4,9 +4,7 @@ using PooPosting.Api.Entities;
 using PooPosting.Api.Models;
 using PooPosting.Api.Models.Dtos.Like;
 using PooPosting.Api.Models.Queries;
-using PooPosting.Api.Repos.Interfaces;
 using PooPosting.Api.Services.Interfaces;
-using PooPosting.Api.Exceptions;
 
 namespace PooPosting.Api.Services;
 

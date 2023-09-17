@@ -7,12 +7,12 @@ namespace PooPosting.Api.Services.Interfaces;
 public interface IPictureService
 {
     Task<PictureDto> GetById(int id);
-    Task<IEnumerable<PictureDto>> GetPictures(PersonalizedQuery query);
-    Task<PagedResult<PictureDto>> GetPictures(Query query);
-    Task<PagedResult<PictureDto>> SearchAll(CustomQuery query);
-    Task<PictureDto> UpdatePictureName(int picId, UpdatePictureNameDto dto);
-    Task<PictureDto> UpdatePictureDescription(int picId, UpdatePictureDescriptionDto dto);
-    Task<PictureDto> UpdatePictureTags(int picId, UpdatePictureTagsDto dto);
+    Task<IEnumerable<PictureDto>> GetAll(PersonalizedQuery query);
+    Task<PagedResult<PictureDto>> GetAll(Query query);
+    Task<PagedResult<PictureDto>> GetAll(CustomQuery query);
+    Task<PictureDto> UpdateName(int picId, UpdatePictureNameDto dto);
+    Task<PictureDto> UpdateDescription(int picId, UpdatePictureDescriptionDto dto);
+    Task<PictureDto> UpdateTags(int picId, UpdatePictureTagsDto dto);
     Task<string> Create(CreatePictureDto dto);
     Task<bool> Delete(int id);
 }

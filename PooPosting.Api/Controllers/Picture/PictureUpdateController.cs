@@ -27,7 +27,7 @@ public class PictureUpdateController : ControllerBase
         [FromBody] UpdatePictureNameDto dto
     )
     {
-        return Ok(await _pictureService.UpdatePictureName(IdHasher.DecodePictureId(picId), dto));
+        return Ok(await _pictureService.UpdateName(IdHasher.DecodePictureId(picId), dto));
     }
 
     [HttpPatch]
@@ -37,7 +37,7 @@ public class PictureUpdateController : ControllerBase
         [FromBody] UpdatePictureDescriptionDto dto
     )
     {
-        return Ok(await _pictureService.UpdatePictureDescription(IdHasher.DecodePictureId(picId), dto));
+        return Ok(await _pictureService.UpdateDescription(IdHasher.DecodePictureId(picId), dto));
     }
 
     [HttpPatch]
@@ -47,6 +47,6 @@ public class PictureUpdateController : ControllerBase
         [FromBody] UpdatePictureTagsDto dto
     )
     {
-        return Ok(await _pictureService.UpdatePictureTags(IdHasher.DecodePictureId(picId), dto));
+        return Ok(await _pictureService.UpdateTags(IdHasher.DecodePictureId(picId), dto));
     }
 }

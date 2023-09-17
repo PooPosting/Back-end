@@ -32,7 +32,7 @@ public class PictureController : ControllerBase
         [FromQuery] Query query
         )
     {
-        var pictures = await _pictureService.GetPictures(query);
+        var pictures = await _pictureService.GetAll(query);
         return Ok(pictures);
     }
 
@@ -43,7 +43,7 @@ public class PictureController : ControllerBase
         [FromQuery] PersonalizedQuery query
         )
     {
-        var pictures = await _pictureService.GetPictures(query);
+        var pictures = await _pictureService.GetAll(query);
         return Ok(pictures);
     }
 
@@ -55,7 +55,7 @@ public class PictureController : ControllerBase
         [FromQuery] CustomQuery query
         )
     {
-        var pictures = await _pictureService.SearchAll(query);
+        var pictures = await _pictureService.GetAll(query);
         return Ok(pictures);
     }
 

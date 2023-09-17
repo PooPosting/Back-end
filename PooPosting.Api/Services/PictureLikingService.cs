@@ -4,10 +4,7 @@ using PooPosting.Api.Entities;
 using PooPosting.Api.Entities.Joins;
 using PooPosting.Api.Exceptions;
 using PooPosting.Api.Models.Dtos.Picture;
-using PooPosting.Api.Repos.Interfaces;
-using PooPosting.Api.Services.Helpers.Interfaces;
 using PooPosting.Api.Services.Interfaces;
-using PooPosting.Api.Models.Dtos;
 using PooPosting.Api.Services.Helpers;
 
 namespace PooPosting.Api.Services;

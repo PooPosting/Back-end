@@ -21,8 +21,6 @@ using PooPosting.Api.Models.Dtos.Picture;
 using PooPosting.Api.Models.Dtos.Picture.Validators;
 using PooPosting.Api.Models.Queries;
 using PooPosting.Api.Models.Queries.Validators;
-using PooPosting.Api.Repos;
-using PooPosting.Api.Repos.Interfaces;
 using PooPosting.Api.Services;
 using PooPosting.Api.Services.Helpers;
 using PooPosting.Api.Services.Helpers.Interfaces;
@@ -102,23 +100,14 @@ builder.Services.AddScoped<IsUserAdminFilter>();
 // Services
 builder.Services.AddScoped<IAccountContextService, AccountContextService>();
 builder.Services.AddScoped<IPictureLikingService, PictureLikingService>();
-builder.Services.AddScoped<IAccountService, HttpAccountService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IPictureService, PictureService>();
-builder.Services.AddScoped<IPopularService, HttpPopularService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ILikeService, LikeService>();
 builder.Services.AddScoped<IAuthService, HttpAuthService>();
-builder.Services.AddScoped<IRestrictedIpsService, RestrictedIpsService>();
 
 // Helpers
 builder.Services.AddScoped<ILikeHelper, LikeHelper>();
-
-// Repos
-builder.Services.AddScoped<IAccountRepo, AccountRepo>();
-builder.Services.AddScoped<IRestrictedIpRepo, RestrictedIpRepo>();
-builder.Services.AddScoped<IRoleRepo, RoleRepo>();
-builder.Services.AddScoped<ITagRepo, TagRepo>();
-builder.Services.AddScoped<IPopularRepo, PopularRepo>();
 
 // Other stuff
 builder.Services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
@@ -181,7 +170,7 @@ app.UseFileServer(
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseMiddleware<RequestTimeMiddleware>();
-app.UseMiddleware<HttpLoggingMiddleware>();
+// app.UseMiddleware<HttpLoggingMiddleware>();
 app.UseAuthentication();
 app.UseHttpsRedirection();
 app.UseSwagger();
@@ -197,7 +186,6 @@ seeder.Seed(isDev);
 if (isDev)
 {
     app.UseCors("DevCors");
-    app.UseDeveloperExceptionPage();
 }
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions

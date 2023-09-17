@@ -44,12 +44,10 @@ public class PictureService : IPictureService
             .Where(p => p.Id == id)
             .ProjectTo<PictureDto>(_mapper.ConfigurationProvider)
             .FirstOrDefaultAsync();
-        
-        if (picture == null) throw new NotFoundException();
-        return _mapper.Map<PictureDto>(picture);
+        return picture ?? throw new NotFoundException();
     }
 
-    public async Task<IEnumerable<PictureDto>> GetPictures(PersonalizedQuery query)
+    public async Task<IEnumerable<PictureDto>> GetAll(PersonalizedQuery query)
     {
         var accId = _accountContextService.GetAccountId();
         
@@ -74,7 +72,7 @@ public class PictureService : IPictureService
         return pictureDtos;
     }
 
-    public async Task<PagedResult<PictureDto>> GetPictures(Query query)
+    public async Task<PagedResult<PictureDto>> GetAll(Query query)
     {
         var pictureDtos = _dbContext.Pictures
             .Skip(query.PageSize * (query.PageNumber - 1))
@@ -91,7 +89,7 @@ public class PictureService : IPictureService
         );
     }
 
-    public async Task<PagedResult<PictureDto>> SearchAll(CustomQuery query)
+    public async Task<PagedResult<PictureDto>> GetAll(CustomQuery query)
     {
         var picQuery = _dbContext.Pictures
             .Where(p => query.SearchPhrase == string.Empty || p.Name.ToLower().Contains(query.SearchPhrase.ToLower()));
@@ -126,31 +124,34 @@ public class PictureService : IPictureService
 
         return result;
     }
-
-
-    public async Task<PictureDto> UpdatePictureName(int picId, UpdatePictureNameDto dto)
+    
+    public async Task<PictureDto> UpdateName(int picId, UpdatePictureNameDto dto)
     {
-        var picture = await _dbContext.Pictures.FirstOrDefaultAsync(p => p.Id == picId);
+        var picture = await _dbContext.Pictures
+            .Include(p => p.Account)
+            .FirstOrDefaultAsync(p => p.Id == picId);
         if (picture == null) throw new NotFoundException();
         await AuthorizePictureOperation(picture, ResourceOperation.Update, "you cannot modify picture you didnt post");
         picture.Name = dto.Name;
-        var result = _mapper.Map<PictureDto>(_dbContext.Pictures.Update(picture));
+        var result = _mapper.Map<PictureDto>(_dbContext.Pictures.Update(picture).Entity);
         await _dbContext.SaveChangesAsync();
         return result;
     }
     
-    public async Task<PictureDto> UpdatePictureDescription(int picId, UpdatePictureDescriptionDto dto)
+    public async Task<PictureDto> UpdateDescription(int picId, UpdatePictureDescriptionDto dto)
     {
-        var picture = await _dbContext.Pictures.FirstOrDefaultAsync(p => p.Id == picId);
+        var picture = await _dbContext.Pictures
+            .Include(p => p.Account)
+            .FirstOrDefaultAsync(p => p.Id == picId);
         if (picture == null) throw new NotFoundException();
         await AuthorizePictureOperation(picture, ResourceOperation.Update, "you cannot modify picture you didnt post");
         picture.Description = dto.Description;
-        var result = _mapper.Map<PictureDto>(_dbContext.Pictures.Update(picture));
+        var result = _mapper.Map<PictureDto>(_dbContext.Pictures.Update(picture).Entity);
         await _dbContext.SaveChangesAsync();
         return result;
     }
 
-    public async Task<PictureDto> UpdatePictureTags(int picId, UpdatePictureTagsDto dto)
+    public async Task<PictureDto> UpdateTags(int picId, UpdatePictureTagsDto dto)
     {
         var picture = await _dbContext.Pictures
             .Include(p => p.Account)
@@ -243,7 +244,9 @@ public class PictureService : IPictureService
 
     public async Task<bool> Delete(int id)
     {
-        var picture = await _dbContext.Pictures.FirstOrDefaultAsync(p => p.Id == id) ?? throw new NotFoundException();
+        var picture = await _dbContext.Pictures
+            .Include(p => p.Account)
+            .FirstOrDefaultAsync(p => p.Id == id) ?? throw new NotFoundException();
         _logger.LogWarning("Picture with id: {Id} DELETE (hide) action invoked", id);
 
         await AuthorizePictureOperation(picture, ResourceOperation.Delete ,"you have no rights to delete this picture");

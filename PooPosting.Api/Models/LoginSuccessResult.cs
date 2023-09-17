@@ -8,4 +8,5 @@ public class LoginSuccessResult
 {
     public string AuthToken { get; set; }
     public string Uid { get; set; }
+    public int RoleId { get; set; }
 }

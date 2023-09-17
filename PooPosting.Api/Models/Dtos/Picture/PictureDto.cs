@@ -19,6 +19,4 @@ public class PictureDto
     public DateTime PictureAdded { get; set; }
     public int LikeCount { get; set; }
     public int CommentCount { get; set; }
-
-    public LikeState LikeState { get; set; }
 }
