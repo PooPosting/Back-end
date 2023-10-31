@@ -6,7 +6,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
         <PackageReference Include="FluentValidation.AspNetCore" Version="11.2.2" />
         <PackageReference Include="Google.Apis.Vision.v1" Version="1.60.0.2814" />
         <PackageReference Include="Google.Cloud.Vision.V1" Version="3.3.0" />

@@ -1,12 +1,11 @@
-﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using PooPosting.Api.Authorization;
 using PooPosting.Api.Entities;
 using PooPosting.Api.Entities.Joins;
 using PooPosting.Api.Enums;
 using PooPosting.Api.Exceptions;
+using PooPosting.Api.Mappers;
 using PooPosting.Api.Models;
 using PooPosting.Api.Models.Dtos.Picture;
 using PooPosting.Api.Models.Queries;
@@ -18,7 +17,6 @@ namespace PooPosting.Api.Services;
 public class PictureService : IPictureService
 {
     private readonly ILogger<PictureService> _logger;
-    private readonly IMapper _mapper;
     private readonly PictureDbContext _dbContext;
     private readonly IAuthorizationService _authorizationService;
     private readonly IAccountContextService _accountContextService;
@@ -27,12 +25,10 @@ public class PictureService : IPictureService
         ILogger<PictureService> logger,
         IAuthorizationService authorizationService,
         IAccountContextService accountContextService,
-        IMapper mapper,
         PictureDbContext dbContext
         )
     {
         _logger = logger;
-        _mapper = mapper;
         _dbContext = dbContext;
         _authorizationService = authorizationService;
         _accountContextService = accountContextService;
@@ -40,10 +36,12 @@ public class PictureService : IPictureService
 
     public async Task<PictureDto> GetById(int id)
     {
+        var currAccId = _accountContextService.TryGetAccountId();
         var picture = await _dbContext.Pictures
             .Where(p => p.Id == id)
-            .ProjectTo<PictureDto>(_mapper.ConfigurationProvider)
+            .ProjectToDto(currAccId)
             .FirstOrDefaultAsync();
+        
         return picture ?? throw new NotFoundException();
     }
 
@@ -51,7 +49,7 @@ public class PictureService : IPictureService
     {
         var accId = _accountContextService.GetAccountId();
         
-        var picQueryable = _dbContext.Pictures
+        var pictureDtos = await _dbContext.Pictures
             .OrderByDescending(p => (p.PictureTags
                 .Select(t => t.Tag)
                 .SelectMany(t => t.AccountLikedTags)
@@ -60,9 +58,10 @@ public class PictureService : IPictureService
             .Where(p => !_dbContext.PicturesSeenByAccounts
                 .Where(j => j.Account.Id == accId)
                 .Any(j => j.Picture.Id == p.Id && j.Account.Id == accId))
-            .Take(query.PageSize);
+            .Take(query.PageSize)
+            .ProjectToDto(_accountContextService.TryGetAccountId())
+            .ToListAsync();
 
-        var pictureDtos = _mapper.ProjectTo<PictureDto>(picQueryable).ToArray();
 
         foreach (var picture in pictureDtos)
         {
@@ -74,15 +73,17 @@ public class PictureService : IPictureService
 
     public async Task<PagedResult<PictureDto>> GetAll(Query query)
     {
+        var currAccId = _accountContextService.TryGetAccountId();
+
         var pictureDtos = _dbContext.Pictures
-            .Skip(query.PageSize * (query.PageNumber - 1))
-            .Take(query.PageSize)
             .OrderByDescending(p => p.PopularityScore)
             .ThenByDescending(p => p.Id)
-            .ProjectTo<PictureDto>(_mapper.ConfigurationProvider);
+            .Skip(query.PageSize * (query.PageNumber - 1))
+            .Take(query.PageSize)
+            .ProjectToDto(currAccId);
         
         return new PagedResult<PictureDto>(
-            pictureDtos,
+            await pictureDtos.ToListAsync(),
             query.PageNumber,
             query.PageSize,
             await _dbContext.Pictures.CountAsync()
@@ -109,12 +110,12 @@ public class PictureService : IPictureService
         }
 
         var totalCount = await picQuery.CountAsync();
-        var pictures = await picQuery
+        var pictureDtos = await picQuery
             .Skip(query.PageSize * (query.PageNumber - 1))
             .Take(query.PageSize)
+            .ProjectToDto(_accountContextService.TryGetAccountId())
             .ToListAsync();
-
-        var pictureDtos = _mapper.Map<List<PictureDto>>(pictures);
+        
         var result = new PagedResult<PictureDto>(
             pictureDtos,
             query.PageNumber,
@@ -131,9 +132,11 @@ public class PictureService : IPictureService
             .Include(p => p.Account)
             .FirstOrDefaultAsync(p => p.Id == picId);
         if (picture == null) throw new NotFoundException();
+        
         await AuthorizePictureOperation(picture, ResourceOperation.Update, "you cannot modify picture you didnt post");
         picture.Name = dto.Name;
-        var result = _mapper.Map<PictureDto>(_dbContext.Pictures.Update(picture).Entity);
+        
+        var result = _dbContext.Pictures.Update(picture).Entity.MapToDto(_accountContextService.TryGetAccountId());
         await _dbContext.SaveChangesAsync();
         return result;
     }
@@ -146,7 +149,8 @@ public class PictureService : IPictureService
         if (picture == null) throw new NotFoundException();
         await AuthorizePictureOperation(picture, ResourceOperation.Update, "you cannot modify picture you didnt post");
         picture.Description = dto.Description;
-        var result = _mapper.Map<PictureDto>(_dbContext.Pictures.Update(picture).Entity);
+        
+        var result = _dbContext.Pictures.Update(picture).Entity.MapToDto(_accountContextService.TryGetAccountId());
         await _dbContext.SaveChangesAsync();
         return result;
     }
@@ -183,7 +187,7 @@ public class PictureService : IPictureService
 
         await _dbContext.SaveChangesAsync();
 
-        var result = _mapper.Map<PictureDto>(picture);
+        var result = picture.MapToDto(_accountContextService.TryGetAccountId());
         return result;
     }
     
@@ -192,8 +196,13 @@ public class PictureService : IPictureService
         if (string.IsNullOrWhiteSpace(dto.FileBase64)) throw new BadRequestException("Invalid picture");
 
         var accountId = _accountContextService.GetAccountId();
-        var picture = _mapper.Map<Picture>(dto);
-        picture.AccountId = accountId;
+        
+        var picture = new Picture
+        {
+            Name = dto.Name,
+            Description = dto.Description,
+            AccountId = accountId
+        };
 
         var rootPath = Directory.GetCurrentDirectory();
         var randomName = $"{Path.GetRandomFileName().Replace('.', '-')}.webp";
@@ -264,14 +273,11 @@ public class PictureService : IPictureService
             return false;
         }
     }
+    
 
     #region Private methods
 
-    private async Task AuthorizePictureOperation(
-        Picture picture,
-        ResourceOperation operation,
-        string message
-        )
+    private async Task AuthorizePictureOperation(Picture picture, ResourceOperation operation, string message)
     {
         var user = _accountContextService.User;
         var authorizationResult = await _authorizationService.AuthorizeAsync(user, picture, new PictureOperationRequirement(operation));

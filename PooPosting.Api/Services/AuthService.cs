@@ -48,22 +48,23 @@ public class HttpAuthService: IAuthService
             Path.Combine("wwwroot", "accounts", "profile_pictures", $"default{new Random().Next(0, 5)}-pfp.webp");
         
         var account = await _dbContext.Accounts.AddAsync(newAccount);
+        await _dbContext.SaveChangesAsync();
         return IdHasher.EncodeAccountId(account.Entity.Id);
     }
 
     public async Task<LoginSuccessResult> GenerateJwt(LoginDto dto)
     {
         var account = await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Nickname.ToLower() == dto.Nickname.ToLower());
-        if (account is null) throw new BadRequestException("Invalid nickname or password");
+        if (account is null) throw new UnauthorizedException("Invalid nickname or password");
         
         var result = _passwordHasher.VerifyHashedPassword(account, account.PasswordHash, dto.Password);
-        if (result == PasswordVerificationResult.Failed) throw new BadRequestException("Invalid nickname or password");
+        if (result == PasswordVerificationResult.Failed) throw new UnauthorizedException("Invalid nickname or password");
         
         var claims = new List<Claim>()
         {
             new Claim(ClaimTypes.NameIdentifier, (account.Id.ToString())),
             new Claim(ClaimTypes.Name, account.Nickname),
-            new Claim(ClaimTypes.Role, account.Role.Id.ToString()),
+            new Claim(ClaimTypes.Role, account.RoleId.ToString()),
         };
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authenticationSettings.JwtKey));
         var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

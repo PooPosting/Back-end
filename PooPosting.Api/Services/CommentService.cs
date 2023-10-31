@@ -1,11 +1,10 @@
-﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using PooPosting.Api.Authorization;
 using PooPosting.Api.Entities;
 using PooPosting.Api.Enums;
 using PooPosting.Api.Exceptions;
+using PooPosting.Api.Mappers;
 using PooPosting.Api.Models;
 using PooPosting.Api.Models.Dtos.Comment;
 using PooPosting.Api.Models.Queries;
@@ -15,19 +14,16 @@ namespace PooPosting.Api.Services
 {
     public class CommentService : ICommentService
     {
-        private readonly IMapper _mapper;
         private readonly PictureDbContext _dbContext;
         private readonly IAccountContextService _accountContextService;
         private readonly IAuthorizationService _authorizationService;
 
         public CommentService(
-            IMapper mapper,
             PictureDbContext dbContext,
             IAccountContextService accountContextService,
             IAuthorizationService authorizationService
         )
         {
-            _mapper = mapper;
             _dbContext = dbContext;
             _accountContextService = accountContextService;
             _authorizationService = authorizationService;
@@ -37,10 +33,10 @@ namespace PooPosting.Api.Services
         {
             var commentsQuery = _dbContext.Comments
                 .Where(c => c.PictureId == picId)
-                .OrderByDescending(c => c.Id)
-                .ProjectTo<CommentDto>(_mapper.ConfigurationProvider);
+                .OrderByDescending(c => c.Id);
 
             var comments = await commentsQuery
+                .ProjectToDto()
                 .Skip(query.PageSize * (query.PageNumber - 1))
                 .Take(query.PageSize)
                 .ToListAsync();
@@ -73,7 +69,7 @@ namespace PooPosting.Api.Services
             var commentDto = _dbContext.Comments
                 .Include(c => c.Account)
                 .Where(c => c.Id == comment.Id)
-                .ProjectTo<CommentDto>(_mapper.ConfigurationProvider)
+                .ProjectToDto()
                 .FirstOrDefaultAsync();
 
             return await commentDto; 
@@ -89,7 +85,7 @@ namespace PooPosting.Api.Services
             comment.Text = text;
             await _dbContext.SaveChangesAsync();
 
-            return _mapper.Map<CommentDto>(comment);
+            return comment.MapToDto();
         }
 
         public async Task<bool> Delete(int commId)

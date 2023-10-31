@@ -4,7 +4,7 @@ namespace PooPosting.Api.Models.Queries.Validators;
 
 public class CustomQueryValidator: AbstractValidator<CustomQuery>
 {
-    private readonly int[] _allowedPageSizes = { 2, 3, 5, 7, 10 };
+    private readonly int[] _allowedPageSizes = { 2, 3, 4, 5, 6, 7, 8, 10, 15, 20 };
 
     public CustomQueryValidator()
     {

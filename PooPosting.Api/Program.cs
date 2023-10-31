@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Text;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -113,13 +112,12 @@ builder.Services.AddScoped<ILikeHelper, LikeHelper>();
 builder.Services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
 builder.Services.AddScoped<PictureSeeder>();
 builder.Services.AddScoped<EnvironmentVariableSetter>();
-builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSwaggerGen();
 
 IdHasher.Configure(builder.Configuration);
 
-builder.Logging.SetMinimumLevel(LogLevel.Trace);
+// builder.Logging.SetMinimumLevel(LogLevel.Trace);
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.AddNLog();
@@ -152,9 +150,7 @@ builder.Services.AddCors(options =>
         });
 });
 
-
 var app = builder.Build();
-
 
 // Configure
 DirectoryManager.EnsureAllDirectoriesAreCreated();

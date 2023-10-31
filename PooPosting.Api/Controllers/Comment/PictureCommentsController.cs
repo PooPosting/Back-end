@@ -1,14 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
-using PooPosting.Api.ActionFilters;
 using PooPosting.Api.Models.Dtos.Comment;
 using PooPosting.Api.Models.Queries;
 using PooPosting.Api.Services.Helpers;
 using PooPosting.Api.Services.Interfaces;
-using PooPosting.Api.Models.Dtos;
 
-namespace PooPosting.Api.Controllers.Picture;
+namespace PooPosting.Api.Controllers.Comment;
 
 [ApiController]
 [Route("api/picture/{picId}/comment")]

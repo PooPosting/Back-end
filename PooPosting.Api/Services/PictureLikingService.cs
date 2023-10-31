@@ -1,8 +1,8 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PooPosting.Api.Entities;
 using PooPosting.Api.Entities.Joins;
 using PooPosting.Api.Exceptions;
+using PooPosting.Api.Mappers;
 using PooPosting.Api.Models.Dtos.Picture;
 using PooPosting.Api.Services.Interfaces;
 using PooPosting.Api.Services.Helpers;
@@ -11,16 +11,13 @@ namespace PooPosting.Api.Services;
 
 public class PictureLikingService : IPictureLikingService
 {
-    private readonly IMapper _mapper;
     private readonly IAccountContextService _accountContextService;
     private readonly PictureDbContext _dbContext;
 
     public PictureLikingService(
-        IMapper mapper,
         IAccountContextService accountContextService,
         PictureDbContext dbContext)
     {
-        _mapper = mapper;
         _accountContextService = accountContextService;
         _dbContext = dbContext;
     }
@@ -33,13 +30,17 @@ public class PictureLikingService : IPictureLikingService
             .ThenInclude(l => l.Account)
             .Include(p => p.PictureTags)
             .ThenInclude(pt => pt.Tag)
+            .ThenInclude(t => t.AccountLikedTags)
             .FirstOrDefaultAsync(p => p.Id == pictureId);
 
         if (picture == null) throw new NotFoundException();
         var accountId = _accountContextService.GetAccountId();
         var pictureResult = await LikeAsync(picture, accountId);
-        var mappedResult = _mapper.Map<PictureDto>(pictureResult);
-        return mappedResult;
+
+        return await _dbContext.Pictures
+            .Where(p => p.Id == pictureResult.Id)
+            .ProjectToDto(accountId)
+            .FirstOrDefaultAsync();
     }
 
     public async Task<PictureDto> DisLike(int pictureId)
@@ -55,13 +56,12 @@ public class PictureLikingService : IPictureLikingService
         if (picture == null) throw new NotFoundException();
         var accountId = _accountContextService.GetAccountId();
         var pictureResult = await DislikeAsync(picture, accountId);
-        var mappedResult = _mapper.Map<PictureDto>(pictureResult);
-        return mappedResult;
+        return pictureResult.MapToDto(accountId);
     }
     
     private async Task<Picture> LikeAsync(Picture picture, int accountId)
     {
-        var like = picture.Likes.SingleOrDefault(l => l.AccountId == accountId);
+        var like = picture.Likes.FirstOrDefault(l => l.AccountId == accountId);
 
         if (like == null)
         {
@@ -76,6 +76,11 @@ public class PictureLikingService : IPictureLikingService
             // Update LikedTags
             foreach (var pictureTag in picture.PictureTags)
             {
+                var entryExists = pictureTag.Tag.AccountLikedTags.Any(alt =>
+                    alt.AccountId == accountId && alt.TagId == pictureTag.TagId);
+
+                if (entryExists) continue;
+
                 pictureTag.Tag.AccountLikedTags.Add(new AccountLikedTag
                 {
                     AccountId = accountId,
@@ -85,38 +90,7 @@ public class PictureLikingService : IPictureLikingService
         }
         else
         {
-            if (like.IsLike)
-            {
-                // User previously liked the picture; now unliking it
-                picture.Likes.Remove(like);
-
-                // Remove LikedTags entries
-                foreach (var pictureTag in picture.PictureTags)
-                {
-                    var likedTag = pictureTag.Tag.AccountLikedTags
-                        .SingleOrDefault(alt => alt.AccountId == accountId && alt.TagId == pictureTag.TagId);
-
-                    if (likedTag != null)
-                    {
-                        pictureTag.Tag.AccountLikedTags.Remove(likedTag);
-                    }
-                }
-            }
-            else
-            {
-                // User previously unliked the picture; now liking it
-                like.IsLike = true;
-
-                // Update LikedTags
-                foreach (var pictureTag in picture.PictureTags)
-                {
-                    pictureTag.Tag.AccountLikedTags.Add(new AccountLikedTag
-                    {
-                        AccountId = accountId,
-                        TagId = pictureTag.TagId,
-                    });
-                }
-            }
+            picture.Likes.Remove(like);
         }
 
         // Update PopularityScore
@@ -125,6 +99,7 @@ public class PictureLikingService : IPictureLikingService
         await _dbContext.SaveChangesAsync();
         return picture;
     }
+
 
     private async Task<Picture> DislikeAsync(Picture picture, int accountId)
     {
@@ -144,29 +119,7 @@ public class PictureLikingService : IPictureLikingService
         }
         else
         {
-            if (!like.IsLike)
-            {
-                // User previously disliked the picture; now removing the dislike
-                picture.Likes.Remove(like);
-
-                // No need to update LikedTags in this case
-            }
-            else
-            {
-                like.IsLike = false;
-
-                // Remove LikedTags entries
-                foreach (var pictureTag in picture.PictureTags)
-                {
-                    var likedTag = pictureTag.Tag.AccountLikedTags
-                        .SingleOrDefault(alt => alt.AccountId == accountId && alt.TagId == pictureTag.TagId);
-
-                    if (likedTag != null)
-                    {
-                        pictureTag.Tag.AccountLikedTags.Remove(likedTag);
-                    }
-                }
-            }
+            picture.Likes.Remove(like);
         }
 
         // Update PopularityScore
