@@ -67,7 +67,9 @@ public class PictureSeeder
                     }
                 },
                 AccountCreated = DateTime.Now,
-                RoleId = 3
+                RoleId = 3,
+                BackgroundPicUrl = Path.Combine("wwwroot", "accounts", "background_pictures", $"default{new Random().Next(0, 5)}-bgp.webp"),
+                ProfilePicUrl = Path.Combine("wwwroot", "accounts", "profile_pictures", $"default{new Random().Next(0, 5)}-pfp.webp"),
             },
             new Account()
             {
@@ -88,8 +90,9 @@ public class PictureSeeder
                     }
                 },
                 AccountCreated = DateTime.Now,
-                RoleId = 3
-
+                RoleId = 3,
+                BackgroundPicUrl = Path.Combine("wwwroot", "accounts", "background_pictures", $"default{new Random().Next(0, 5)}-bgp.webp"),
+                ProfilePicUrl = Path.Combine("wwwroot", "accounts", "profile_pictures", $"default{new Random().Next(0, 5)}-pfp.webp"),
             },
             new Account()
             {
@@ -118,8 +121,9 @@ public class PictureSeeder
                     }
                 },
                 AccountCreated = DateTime.Now,
-                RoleId = 1
-
+                RoleId = 1,
+                BackgroundPicUrl = Path.Combine("wwwroot", "accounts", "background_pictures", $"default{new Random().Next(0, 5)}-bgp.webp"),
+                ProfilePicUrl = Path.Combine("wwwroot", "accounts", "profile_pictures", $"default{new Random().Next(0, 5)}-pfp.webp"),
             }
                 
         };

@@ -98,6 +98,7 @@ builder.Services.AddScoped<IsUserAdminFilter>();
 
 // Services
 builder.Services.AddScoped<IAccountContextService, AccountContextService>();
+builder.Services.AddScoped<IAccountPicturesService, AccountPicturesService>();
 builder.Services.AddScoped<IPictureLikingService, PictureLikingService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IPictureService, PictureService>();

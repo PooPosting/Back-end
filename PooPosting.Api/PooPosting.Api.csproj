@@ -35,7 +35,6 @@
         <Folder Include="bin\Debug\net7.0\logs\requests\" />
         <Folder Include="bin\Debug\net7.0\logs\warnings\" />
         <Folder Include="wwwroot\pictures" />
-        <Folder Include="wwwroot\accounts" />
     </ItemGroup>
 
     <ItemGroup>
