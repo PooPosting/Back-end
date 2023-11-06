@@ -85,6 +85,7 @@ builder.Services.AddScoped<IValidator<UpdateAccountPasswordDto>, UpdateAccountPa
 builder.Services.AddScoped<IValidator<UpdateAccountDescriptionDto>, UpdateAccountDescriptionDtoValidator>();
 builder.Services.AddScoped<IValidator<UpdateAccountPictureDto>, UpdateAccountPictureDtoValidator>();
 
+builder.Services.AddScoped<IValidator<CreatePictureDto>, CreatePictureDtoValidator>();
 builder.Services.AddScoped<IValidator<UpdatePictureNameDto>, UpdatePictureNameDtoValidator>();
 builder.Services.AddScoped<IValidator<UpdatePictureDescriptionDto>, UpdatePictureDescriptionDtoValidator>();
 builder.Services.AddScoped<IValidator<UpdatePictureTagsDto>, UpdatePictureTagsDtoValidator>();
