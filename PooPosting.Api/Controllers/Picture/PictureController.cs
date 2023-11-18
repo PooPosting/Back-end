@@ -8,6 +8,7 @@ using PooPosting.Api.Models.Queries;
 using PooPosting.Api.Services.Helpers;
 using PooPosting.Api.Services.Interfaces;
 using PooPosting.Api.Models.Dtos;
+using PooPosting.Api.Models.Dtos.Picture.Validators;
 
 namespace PooPosting.Api.Controllers.Picture;
 
@@ -70,8 +71,12 @@ public class PictureController : ControllerBase
 
     [HttpPost]
     [Route("post")]
-    public async Task<IActionResult> PostPicture([FromBody] CreatePictureDto dto)
+    public async Task<IActionResult> PostPicture([FromForm]CreatePictureDto dto)
     {
+        var validator = new CreatePictureDtoValidator();
+        var validationResult = await validator.ValidateAsync(dto);
+        if (!validationResult.IsValid) return BadRequest(validationResult.Errors);
+        
         var pictureId = await _pictureService.Create(dto);
         return Created($"api/picture/{pictureId}", null);
     }
