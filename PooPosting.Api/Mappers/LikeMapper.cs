@@ -20,8 +20,6 @@ public static class LikeMapper
                         Nickname = l.Account.Nickname,
                         Email = l.Account.Email,
                         ProfilePicUrl = l.Account.ProfilePicUrl,
-                        BackgroundPicUrl = l.Account.BackgroundPicUrl,
-                        AccountDescription = l.Account.AccountDescription,
                         RoleId = l.Account.RoleId,
                         AccountCreated = l.Account.AccountCreated
                     }
@@ -43,8 +41,6 @@ public static class LikeMapper
                 Nickname = l.Account.Nickname,
                 Email = l.Account.Email,
                 ProfilePicUrl = l.Account.ProfilePicUrl,
-                BackgroundPicUrl = l.Account.BackgroundPicUrl,
-                AccountDescription = l.Account.AccountDescription,
                 RoleId = l.Account.RoleId,
                 AccountCreated = l.Account.AccountCreated
             }

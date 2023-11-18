@@ -23,7 +23,7 @@ public class AccountController : ControllerBase
     [HttpGet]
     [EnableQuery]
     public async Task<IActionResult> SearchAllAccounts(
-        [FromQuery] CustomQuery query
+        [FromQuery] SearchQuery query
     )
     {
         var accounts = await _accountService.GetAll(query);

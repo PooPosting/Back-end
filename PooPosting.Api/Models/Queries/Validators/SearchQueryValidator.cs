@@ -2,11 +2,11 @@
 
 namespace PooPosting.Api.Models.Queries.Validators;
 
-public class CustomQueryValidator: AbstractValidator<CustomQuery>
+public class SearchQueryValidator: AbstractValidator<SearchQuery>
 {
     private readonly int[] _allowedPageSizes = { 2, 3, 4, 5, 6, 7, 8, 10, 15, 20 };
 
-    public CustomQueryValidator()
+    public SearchQueryValidator()
     {
         RuleFor(p => p.PageSize).Custom((value, context) =>
         {

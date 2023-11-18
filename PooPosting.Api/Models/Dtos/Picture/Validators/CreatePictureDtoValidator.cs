@@ -10,9 +10,6 @@ public class CreatePictureDtoValidator : AbstractValidator<CreatePictureDto>
 
     public CreatePictureDtoValidator()
     {
-        RuleFor(p => p.Name)
-            .NotEmpty();
-
         RuleFor(p => p.DataUrl)
             .NotEmpty()
             .WithMessage("FileBase64 is required.");

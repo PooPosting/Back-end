@@ -41,9 +41,6 @@ public class HttpAuthService: IAuthService
         var hashedPassword = _passwordHasher.HashPassword(newAccount, dto.Password);
         newAccount.PasswordHash = hashedPassword;
         
-        newAccount.BackgroundPicUrl =
-            Path.Combine("wwwroot", "accounts", "background_pictures", $"default{new Random().Next(0, 5)}-bgp.webp");
-        
         newAccount.ProfilePicUrl =
             Path.Combine("wwwroot", "accounts", "profile_pictures", $"default{new Random().Next(0, 5)}-pfp.webp");
         
@@ -52,14 +49,45 @@ public class HttpAuthService: IAuthService
         return IdHasher.EncodeAccountId(account.Entity.Id);
     }
 
-    public async Task<LoginSuccessResult> GenerateJwt(LoginDto dto)
+    public async Task<AuthSuccessResult> GenerateJwt(LoginWithAuthCredsDto dto)
     {
         var account = await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Nickname.ToLower() == dto.Nickname.ToLower());
         if (account is null) throw new UnauthorizedException("Invalid nickname or password");
         
         var result = _passwordHasher.VerifyHashedPassword(account, account.PasswordHash, dto.Password);
         if (result == PasswordVerificationResult.Failed) throw new UnauthorizedException("Invalid nickname or password");
+
+        return await GenerateAuthResult(account);
+    }
+    
+    public async Task<AuthSuccessResult> GenerateJwt(LoginWithRefreshTokenDto dto)
+    {
+        var account = await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Id == IdHasher.DecodeAccountId(dto.Uid));
         
+        if (account is null) throw new NotFoundException();
+        if (account.RefreshToken != dto.RefreshToken) throw new UnauthorizedException("Refresh token invalid");
+        if (account.RefreshTokenExpires > DateTime.Now) throw new UnauthorizedException("Refresh token invalid");
+
+        return await GenerateAuthResult(account);
+    }
+    
+    public async Task Forget(ForgetTokensDto dto)
+    {
+        var account = await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Id == IdHasher.DecodeAccountId(dto.Uid));
+        
+        if (account is null) throw new NotFoundException();
+        if (account.RefreshToken != dto.RefreshToken) throw new UnauthorizedException("Refresh token invalid");
+        
+        if (account.RefreshTokenExpires < DateTime.Now)
+        {
+            account.RefreshToken = null;
+            account.RefreshTokenExpires = null;
+            await _dbContext.SaveChangesAsync();
+        }
+    }
+
+    private async Task<AuthSuccessResult> GenerateAuthResult(Account account)
+    {
         var claims = new List<Claim>()
         {
             new Claim(ClaimTypes.NameIdentifier, (account.Id.ToString())),
@@ -76,60 +104,23 @@ public class HttpAuthService: IAuthService
             expires: expires,
             signingCredentials: cred);
         
+
+        var refreshToken = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N");
+
+        account.RefreshToken = refreshToken;
+        account.RefreshTokenExpires = DateTime.Now.AddDays(_authenticationSettings.RefreshTokenExpireDays);
+
+        await _dbContext.SaveChangesAsync();
+            
         var tokenHandler = new JwtSecurityTokenHandler();
-        
-        var loginSuccessResult = new LoginSuccessResult()
+        var authSuccessResult = new AuthSuccessResult()
         {
             AuthToken = tokenHandler.WriteToken(token),
             Uid = IdHasher.EncodeAccountId(account.Id),
-            RoleId = account.RoleId
+            RoleId = account.RoleId,
+            RefreshToken = refreshToken
         };
         
-        return loginSuccessResult;
-    }
-
-    public async Task<LoginSuccessResult> VerifyJwt(LsLoginDto dto)
-    {
-        var handler = new JwtSecurityTokenHandler();
-        try
-        {
-            var jwtToken = handler.ReadToken(dto.JwtToken) as JwtSecurityToken ?? throw new UnauthorizedException();
-            var id = jwtToken.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            
-            var account = await _dbContext.Accounts
-                .Include(a => a.Role)
-                .FirstOrDefaultAsync(a => a.Id == int.Parse(id));
-            if (account is null) throw new UnauthorizedException();
-            
-            var claims = new List<Claim>()
-            {
-                new(ClaimTypes.NameIdentifier, (account.Id.ToString())),
-                new(ClaimTypes.Name, account.Nickname),
-                new(ClaimTypes.Role, account.Role.Id.ToString()),
-            };
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authenticationSettings.JwtKey));
-            var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expires = DateTime.Now.AddDays(_authenticationSettings.JwtExpireDays);
-            var token = new JwtSecurityToken(
-                _authenticationSettings.JwtIssuer,
-                _authenticationSettings.JwtIssuer,
-                claims,
-                expires: expires,
-                signingCredentials: cred);
-            var tokenHandler = new JwtSecurityTokenHandler();
-        
-            var loginSuccessResult = new LoginSuccessResult()
-            {
-                Uid = IdHasher.EncodeAccountId(int.Parse(id)),
-                AuthToken = tokenHandler.WriteToken(token),
-                RoleId = account.RoleId
-            };
-            return loginSuccessResult;
-        }
-        catch (Exception)
-        {
-            throw new UnauthorizedException();
-        }
-
+        return authSuccessResult;
     }
 }

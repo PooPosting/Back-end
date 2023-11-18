@@ -9,13 +9,8 @@ public class PictureConfiguration: IEntityTypeConfiguration<Picture>
     {
         builder.HasQueryFilter(p => !p.IsDeleted && !p.Account.IsDeleted);
         builder.HasIndex(p => p.PopularityScore);
-        builder.HasIndex(p => p.Name);
         builder.HasKey(p => p.Id);
 
-        builder
-            .Property(p => p.Name)
-            .HasMaxLength(40)
-            .IsRequired();
         builder
             .Property(p => p.Description)
             .HasMaxLength(500);

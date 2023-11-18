@@ -9,7 +9,7 @@ public interface IPictureService
     Task<PictureDto> GetById(int id);
     Task<IEnumerable<PictureDto>> GetAll(PersonalizedQuery query);
     Task<PagedResult<PictureDto>> GetAll(Query query);
-    Task<PagedResult<PictureDto>> GetAll(CustomQuery query);
+    Task<PagedResult<PictureDto>> GetAll(SearchQuery query);
     Task<PictureDto> UpdateName(int picId, UpdatePictureNameDto dto);
     Task<PictureDto> UpdateDescription(int picId, UpdatePictureDescriptionDto dto);
     Task<PictureDto> UpdateTags(int picId, UpdatePictureTagsDto dto);

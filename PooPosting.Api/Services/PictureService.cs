@@ -91,10 +91,10 @@ public class PictureService : IPictureService
         );
     }
 
-    public async Task<PagedResult<PictureDto>> GetAll(CustomQuery query)
+    public async Task<PagedResult<PictureDto>> GetAll(SearchQuery query)
     {
         var picQuery = _dbContext.Pictures
-            .Where(p => query.SearchPhrase == string.Empty || p.Name.ToLower().Contains(query.SearchPhrase.ToLower()));
+            .Where(p => query.SearchPhrase == string.Empty || p.Description.ToLower().Contains(query.SearchPhrase.ToLower()));
 
         switch (query.SearchBy)
         {
@@ -135,7 +135,6 @@ public class PictureService : IPictureService
         if (picture == null) throw new NotFoundException();
         
         await AuthorizePictureOperation(picture, ResourceOperation.Update, "you cannot modify picture you didnt post");
-        picture.Name = dto.Name;
         
         var result = _dbContext.Pictures.Update(picture).Entity.MapToDto(_accountContextService.TryGetAccountId());
         await _dbContext.SaveChangesAsync();
@@ -200,7 +199,6 @@ public class PictureService : IPictureService
         
         var picture = new Picture
         {
-            Name = dto.Name,
             Description = dto.Description,
             AccountId = accountId
         };

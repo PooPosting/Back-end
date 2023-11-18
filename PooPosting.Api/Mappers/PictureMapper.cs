@@ -15,7 +15,6 @@ public static class PictureMapper
                 {
                     Id = IdHasher.EncodePictureId(p.Id),
                     Tags = p.PictureTags.Select(t => t.Tag.Value).ToList(),
-                    Name = p.Name,
                     Description = p.Description,
                     Account = new AccountDto
                     {
@@ -23,8 +22,6 @@ public static class PictureMapper
                         Nickname = p.Account.Nickname,
                         Email = p.Account.Email,
                         ProfilePicUrl = p.Account.ProfilePicUrl,
-                        BackgroundPicUrl = p.Account.BackgroundPicUrl,
-                        AccountDescription = p.Account.AccountDescription,
                         RoleId = p.Account.RoleId,
                         AccountCreated = p.Account.AccountCreated
                     },
@@ -42,8 +39,6 @@ public static class PictureMapper
                                 Nickname = c.Account.Nickname,
                                 Email = c.Account.Email,
                                 ProfilePicUrl = c.Account.ProfilePicUrl,
-                                BackgroundPicUrl = c.Account.BackgroundPicUrl,
-                                AccountDescription = c.Account.AccountDescription,
                                 RoleId = c.Account.RoleId,
                                 AccountCreated = c.Account.AccountCreated
                             }
@@ -66,7 +61,6 @@ public static class PictureMapper
         {
             Id = IdHasher.EncodePictureId(p.Id),
             Tags = p.PictureTags?.Select(t => t.Tag.Value).ToList(),
-            Name = p.Name,
             Description = p.Description,
             Account = p.Account != null ? new AccountDto
             {
@@ -74,8 +68,6 @@ public static class PictureMapper
                 Nickname = p.Account.Nickname,
                 Email = p.Account.Email,
                 ProfilePicUrl = p.Account.ProfilePicUrl,
-                BackgroundPicUrl = p.Account.BackgroundPicUrl,
-                AccountDescription = p.Account.AccountDescription,
                 RoleId = p.Account.RoleId,
                 AccountCreated = p.Account.AccountCreated
             } : null,
@@ -91,8 +83,6 @@ public static class PictureMapper
                     Nickname = c.Account.Nickname,
                     Email = c.Account.Email,
                     ProfilePicUrl = c.Account.ProfilePicUrl,
-                    BackgroundPicUrl = c.Account.BackgroundPicUrl,
-                    AccountDescription = c.Account.AccountDescription,
                     RoleId = c.Account.RoleId,
                     AccountCreated = c.Account.AccountCreated
                 } : null

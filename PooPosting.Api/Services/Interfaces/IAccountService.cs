@@ -9,7 +9,7 @@ namespace PooPosting.Api.Services.Interfaces;
 public interface IAccountService
 {
     Task<AccountDto> GetById(int id);
-    Task<PagedResult<AccountDto>> GetAll(CustomQuery query);
+    Task<PagedResult<AccountDto>> GetAll(SearchQuery query);
     Task<AccountDto> UpdateEmail(UpdateAccountEmailDto dto);
     Task<AccountDto> UpdateDescription(UpdateAccountDescriptionDto dto);
     Task<AccountDto> UpdatePassword(UpdateAccountPasswordDto dto);

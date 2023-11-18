@@ -2,10 +2,10 @@
 
 namespace PooPosting.Api.Models.Dtos.Account;
 
-public class LsLoginDto
+public class LoginWithAuthCredsDto
 {
     [Required]
-    public string JwtToken { get; set; }
+    public string Nickname { get; set; }
     [Required]
-    public string Uid { get; set; }
+    public string Password { get; set; }
 }

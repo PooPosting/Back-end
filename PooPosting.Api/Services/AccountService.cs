@@ -48,7 +48,7 @@ public class AccountService : IAccountService
         return account ?? throw new NotFoundException();
     }
 
-    public async Task<PagedResult<AccountDto>> GetAll(CustomQuery query)
+    public async Task<PagedResult<AccountDto>> GetAll(SearchQuery query)
     {
         var accountsQueryable= _dbContext.Accounts
                 .Skip(query.PageSize * (query.PageNumber - 1))
@@ -58,8 +58,7 @@ public class AccountService : IAccountService
         {
             accountsQueryable = accountsQueryable
                 .Where(a =>
-                    a.Nickname.ToLower().Contains(query.SearchPhrase.ToLower()) ||
-                    a.AccountDescription.ToLower().Contains(query.SearchPhrase.ToLower())
+                    a.Nickname.ToLower().Contains(query.SearchPhrase.ToLower())
                 );
         }
 
@@ -92,7 +91,6 @@ public class AccountService : IAccountService
     public async Task<AccountDto> UpdateDescription(UpdateAccountDescriptionDto dto)
     {
         var account = await _accountContextService.GetAccountAsync();
-        account.AccountDescription = dto.Description;
         var result = _dbContext.Update(account).Entity.MapToDto(account.Id);
         await _dbContext.SaveChangesAsync();
         return result;
@@ -113,7 +111,6 @@ public class AccountService : IAccountService
         if (!dto.File.ContentType.StartsWith("image")) throw new BadRequestException("invalid picture");
         var fileExt = dto.File.ContentType.EndsWith("gif") ? "gif" : "webp";
         var bgName = $"{IdHasher.EncodeAccountId(account.Id)}-{DateTime.Now.ToFileTimeUtc()}-bgp.{fileExt}";
-        account.BackgroundPicUrl = Path.Combine("wwwroot", "accounts", "background_pictures", $"{bgName}");
         var result = _dbContext.Update(account).Entity.MapToDto(account.Id);
         await _dbContext.SaveChangesAsync();
         return result;

@@ -14,6 +14,7 @@ using PooPosting.Api.ActionFilters;
 using PooPosting.Api.Authorization;
 using PooPosting.Api.Entities;
 using PooPosting.Api.Middleware;
+using PooPosting.Api.Models;
 using PooPosting.Api.Models.Dtos.Account;
 using PooPosting.Api.Models.Dtos.Account.Validators;
 using PooPosting.Api.Models.Dtos.Picture;
@@ -74,11 +75,12 @@ builder.Services.AddDbContext<PictureDbContext>(options =>
 
 // Validators
 builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddScoped<IValidator<CustomQuery>, CustomQueryValidator>();
 builder.Services.AddScoped<IValidator<Query>, QueryValidator>();
+builder.Services.AddScoped<IValidator<SearchQuery>, SearchQueryValidator>();
 builder.Services.AddScoped<IValidator<PersonalizedQuery>, PersonalizedQueryValidator>();
-builder.Services.AddScoped<IValidator<LsLoginDto>, LsLoginDtoValidator>();
 builder.Services.AddScoped<IValidator<CreateAccountDto>, CreateAccountDtoValidator>();
+// builder.Services.AddScoped<IValidator<ForgetTokensDto>, ForgetTokensDtoValidator>();
+// builder.Services.AddScoped<IValidator<LoginWithRefreshTokenDto>, LoginWithRefreshTokenDtoValidator>();
 
 builder.Services.AddScoped<IValidator<UpdateAccountEmailDto>, UpdateAccountEmailDtoValidator>();
 builder.Services.AddScoped<IValidator<UpdateAccountPasswordDto>, UpdateAccountPasswordDtoValidator>();

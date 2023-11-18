@@ -6,9 +6,6 @@ namespace PooPosting.Api.Models.Dtos.Picture;
 
 public class CreatePictureDto
 {
-    [MaxLength(40)]
-    public string Name { get; set; }
-    
     [MaxLength(500)]
     [AllowNull] 
     public string Description { get; set; }

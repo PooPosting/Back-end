@@ -22,8 +22,6 @@ public static class CommentMapper
                         Nickname = c.Account.Nickname,
                         Email = c.Account.Email,
                         ProfilePicUrl = c.Account.ProfilePicUrl,
-                        BackgroundPicUrl = c.Account.BackgroundPicUrl,
-                        AccountDescription = c.Account.AccountDescription,
                         RoleId = c.Account.RoleId,
                         AccountCreated = c.Account.AccountCreated
                     }
@@ -47,8 +45,6 @@ public static class CommentMapper
                 Nickname = c.Account.Nickname,
                 Email = c.Account.Email,
                 ProfilePicUrl = c.Account.ProfilePicUrl,
-                BackgroundPicUrl = c.Account.BackgroundPicUrl,
-                AccountDescription = c.Account.AccountDescription,
                 RoleId = c.Account.RoleId,
                 AccountCreated = c.Account.AccountCreated
             }

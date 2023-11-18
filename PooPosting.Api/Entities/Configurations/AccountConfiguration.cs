@@ -31,12 +31,6 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
             .Property(a => a.ProfilePicUrl)
             .HasMaxLength(255);
         builder
-            .Property(a => a.BackgroundPicUrl)
-            .HasMaxLength(255);
-        builder
-            .Property(a => a.AccountDescription)
-            .HasMaxLength(500);
-        builder
             .Property(a => a.AccountCreated)
             .HasDefaultValueSql("now()");
         builder

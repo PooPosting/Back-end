@@ -17,15 +17,12 @@ public static class AccountMapper
                     Nickname = a.Nickname,
                     Email = a.Email,
                     ProfilePicUrl = a.ProfilePicUrl,
-                    BackgroundPicUrl = a.BackgroundPicUrl,
-                    AccountDescription = a.AccountDescription,
                     RoleId = a.RoleId,
                     AccountCreated = a.AccountCreated,
                     Pictures = a.Pictures.Select(p => new PictureDto
                     {
                         Id = IdHasher.EncodePictureId(p.Id),
                         Tags = p.PictureTags.Select(t => t.Tag.Value).ToList(),
-                        Name = p.Name,
                         Description = p.Description,
                         Account = new AccountDto
                         {
@@ -45,8 +42,6 @@ public static class AccountMapper
                                     Nickname = c.Account.Nickname,
                                     Email = c.Account.Email,
                                     ProfilePicUrl = c.Account.ProfilePicUrl,
-                                    BackgroundPicUrl = c.Account.BackgroundPicUrl,
-                                    AccountDescription = c.Account.AccountDescription,
                                     RoleId = c.Account.RoleId,
                                     AccountCreated = c.Account.AccountCreated
                                 } : null
@@ -75,15 +70,12 @@ public static class AccountMapper
             Nickname = a.Nickname,
             Email = a.Email,
             ProfilePicUrl = a.ProfilePicUrl,
-            BackgroundPicUrl = a.BackgroundPicUrl,
-            AccountDescription = a.AccountDescription,
             RoleId = a.RoleId,
             AccountCreated = a.AccountCreated,
             Pictures = a.Pictures.Select(p => new PictureDto
             {
                 Id = IdHasher.EncodePictureId(p.Id),
                 Tags = p.PictureTags.Select(t => t.Tag.Value).ToList(),
-                Name = p.Name,
                 Description = p.Description,
                 Account = new AccountDto
                 {
@@ -103,8 +95,6 @@ public static class AccountMapper
                             Nickname = c.Account.Nickname,
                             Email = c.Account.Email,
                             ProfilePicUrl = c.Account.ProfilePicUrl,
-                            BackgroundPicUrl = c.Account.BackgroundPicUrl,
-                            AccountDescription = c.Account.AccountDescription,
                             RoleId = c.Account.RoleId,
                             AccountCreated = c.Account.AccountCreated
                         }

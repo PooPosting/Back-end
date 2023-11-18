@@ -2,7 +2,7 @@
 
 namespace PooPosting.Api.Models.Dtos.Account.Validators;
 
-public class LoginDtoValidator : AbstractValidator<LoginDto>
+public class LoginDtoValidator : AbstractValidator<LoginWithAuthCredsDto>
 {
     public LoginDtoValidator()
     {

@@ -25,18 +25,26 @@ public class AccountAuthController : ControllerBase
 
     [HttpPost]
     [Route("login")]
-    public async Task<IActionResult> Login([FromBody] LoginDto dto)
+    public async Task<IActionResult> Login([FromBody] LoginWithAuthCredsDto withAuthCredsDto)
     {
-        var result = await _authService.GenerateJwt(dto);
+        var result = await _authService.GenerateJwt(withAuthCredsDto);
         return Ok(result);
     }
 
     [HttpPost]
-    [Route("verifyJwt")]
-    public async Task<IActionResult> VerifyJwt([FromBody] LsLoginDto dto)
+    [Route("refresh")]
+    public async Task<IActionResult> RefreshJwt([FromBody] LoginWithRefreshTokenDto dto)
     {
-        var result = await _authService.VerifyJwt(dto);
+        var result = await _authService.GenerateJwt(dto);
         return Ok(result);
+    }
+    
+    [HttpPost]
+    [Route("forgetTokens")]
+    public async Task<IActionResult> ForgetTokens([FromBody] ForgetTokensDto dto)
+    {
+        await _authService.Forget(dto);
+        return Ok();
     }
 
 }

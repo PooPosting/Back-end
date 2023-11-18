@@ -53,7 +53,7 @@ public class PictureController : ControllerBase
     [AllowAnonymous]
     [Route("search")]
     public async Task<IActionResult> SearchAllPictures(
-        [FromQuery] CustomQuery query
+        [FromQuery] SearchQuery query
         )
     {
         var pictures = await _pictureService.GetAll(query);
