@@ -18,5 +18,5 @@ public class CreatePictureDto
     public string[] Tags { get; set; }
 
     [MaxLength(4194304)]
-    public string FileBase64 { get; set; }
+    public string DataUrl { get; set; }
 }

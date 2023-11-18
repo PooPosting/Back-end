@@ -13,13 +13,11 @@ public class CreatePictureDtoValidator : AbstractValidator<CreatePictureDto>
         RuleFor(p => p.Name)
             .NotEmpty();
 
-        RuleFor(p => p.FileBase64)
+        RuleFor(p => p.DataUrl)
             .NotEmpty()
-            .WithMessage("FileBase64 is required.")
-            .Must(BeAValidBase64String)
-            .WithMessage("FileBase64 must be a valid Base64 string.");
+            .WithMessage("FileBase64 is required.");
 
-        RuleFor(p => p.FileBase64.Length)
+        RuleFor(p => p.DataUrl.Length)
             .GreaterThan(0)
             .WithMessage("Picture size must be larger than 0 bytes.")
             .LessThan(MaxFileSize)
@@ -27,19 +25,6 @@ public class CreatePictureDtoValidator : AbstractValidator<CreatePictureDto>
         
         RuleFor(x => x.Tags)
             .Custom(ValidateTags);
-    }
-    
-    private bool BeAValidBase64String(string base64String)
-    {
-        try
-        {
-            Convert.FromBase64String(base64String);
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
     }
     
     private void ValidateTags(string[] tags, ValidationContext<CreatePictureDto> context)
@@ -51,6 +36,7 @@ public class CreatePictureDtoValidator : AbstractValidator<CreatePictureDto>
 
         foreach (var tag in tags)
         {
+            if (tag is null) continue;
             if (tag.Length > MaxTagLength)
                 context.AddFailure($"Maximum tag length is {MaxTagLength}");
         }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using PooPosting.Api.Authorization;
 using PooPosting.Api.Entities;
@@ -193,7 +194,7 @@ public class PictureService : IPictureService
     
     public async Task<string> Create(CreatePictureDto dto)
     {
-        if (string.IsNullOrWhiteSpace(dto.FileBase64)) throw new BadRequestException("Invalid picture");
+        if (string.IsNullOrWhiteSpace(dto.DataUrl)) throw new BadRequestException("Invalid picture");
 
         var accountId = _accountContextService.GetAccountId();
         
@@ -211,7 +212,8 @@ public class PictureService : IPictureService
 
         try
         {
-            var imageData = Convert.FromBase64String(dto.FileBase64);
+            var base64Data = Regex.Match(dto.DataUrl, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
+            var imageData = Convert.FromBase64String(base64Data);
 
             await using (var stream = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.Write))
             {
