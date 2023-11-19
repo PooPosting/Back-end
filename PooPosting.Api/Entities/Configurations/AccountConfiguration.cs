@@ -13,7 +13,7 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
 
         builder
             .Property(a => a.Nickname)
-            .HasMaxLength(25)
+            .HasMaxLength(16)
             .IsRequired();
         builder
             .Property(a => a.Email)
