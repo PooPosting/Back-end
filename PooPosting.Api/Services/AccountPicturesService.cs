@@ -49,7 +49,7 @@ public class AccountPicturesService : IAccountPicturesService
     public async Task<PagedResult<PictureDto>> GetLikedPaged(Query query, string accountId)
     {
         var picsQueryable = _dbContext.Likes
-            .OrderByDescending(l => l.Id)
+            .OrderByDescending(l => l.Liked)
             .ThenByDescending(l => l.Id)
             .Where(l => l.AccountId == IdHasher.DecodeAccountId(accountId))
             .Select(l => l.Picture)
