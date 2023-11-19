@@ -9,6 +9,7 @@ public class PictureConfiguration: IEntityTypeConfiguration<Picture>
     {
         builder.HasQueryFilter(p => !p.IsDeleted && !p.Account.IsDeleted);
         builder.HasIndex(p => p.PopularityScore);
+        builder.HasIndex(p => p.PictureAdded);
         builder.HasKey(p => p.Id);
 
         builder
