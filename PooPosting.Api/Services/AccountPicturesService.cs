@@ -45,4 +45,27 @@ public class AccountPicturesService : IAccountPicturesService
         );
         return result;
     }
+    
+    public async Task<PagedResult<PictureDto>> GetLikedPaged(Query query, string accountId)
+    {
+        var accountsQueryable= _dbContext.Pictures
+            .Where(p => p.Likes.Any(l => l.AccountId == IdHasher.DecodeAccountId(accountId)))
+            .Skip(query.PageSize * (query.PageNumber - 1))
+            .Take(query.PageSize);
+
+        var count = await accountsQueryable.CountAsync();
+        
+        var currAccId = _accountContextService.TryGetAccountId();
+        var pictureDtos= await accountsQueryable
+            .ProjectToDto(currAccId)
+            .ToListAsync();
+
+        var result = new PagedResult<PictureDto>(
+            pictureDtos    ,
+            query.PageNumber,
+            query.PageSize,
+            count
+        );
+        return result;
+    }
 }

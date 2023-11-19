@@ -48,6 +48,19 @@ public class AccountService : IAccountService
         return account ?? throw new NotFoundException();
     }
 
+    public async Task<AccountDto> GetCurrent()
+    {
+        var accId = _accountContextService.TryGetAccountId();
+        if (accId is null) throw new UnauthorizedException();
+        
+        var acc = await _dbContext.Accounts
+            .Where(a => a.Id == accId)
+            .ProjectToDto(accId    )
+            .FirstOrDefaultAsync();
+        
+        return acc;
+    }
+
     public async Task<PagedResult<AccountDto>> GetAll(SearchQuery query)
     {
         var accountsQueryable= _dbContext.Accounts

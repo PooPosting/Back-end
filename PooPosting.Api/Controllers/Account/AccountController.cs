@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using PooPosting.Api.Models.Queries;
@@ -37,6 +38,15 @@ public class AccountController : ControllerBase
         )
     {
         var account = await _accountService.GetById(IdHasher.DecodeAccountId(accId));
+        return Ok(account);
+    }
+    
+    [HttpGet]
+    [Authorize]
+    [Route("me")]
+    public async Task<IActionResult> GetCurrentAccount()
+    {
+        var account = await _accountService.GetCurrent();
         return Ok(account);
     }
 

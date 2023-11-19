@@ -127,6 +127,26 @@ public class PictureService : IPictureService
         return result;
     }
     
+    public async Task<PagedResult<PictureDto>> GetTrending(Query query)
+    {
+        // todo: maybe update this
+        var currAccId = _accountContextService.TryGetAccountId();
+
+        var pictureDtos = _dbContext.Pictures
+            .OrderByDescending(p => p.Likes.Count)
+            .Where(p => p.PictureAdded.AddDays(3) < DateTime.Now)
+            .Skip(query.PageSize * (query.PageNumber - 1))
+            .Take(query.PageSize)
+            .ProjectToDto(currAccId);
+        
+        return new PagedResult<PictureDto>(
+            await pictureDtos.ToListAsync(),
+            query.PageNumber,
+            query.PageSize,
+            await _dbContext.Pictures.CountAsync()
+        );
+    }
+    
     public async Task<PictureDto> UpdateName(int picId, UpdatePictureNameDto dto)
     {
         var picture = await _dbContext.Pictures

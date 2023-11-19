@@ -7,4 +7,5 @@ namespace PooPosting.Api.Services.Interfaces;
 public interface IAccountPicturesService
 {
     Task<PagedResult<PictureDto>> GetPaged(Query query, string accountId);
+    Task<PagedResult<PictureDto>> GetLikedPaged(Query query, string accountId);
 }

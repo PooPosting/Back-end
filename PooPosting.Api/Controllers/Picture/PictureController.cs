@@ -47,6 +47,17 @@ public class PictureController : ControllerBase
         var pictures = await _pictureService.GetAll(query);
         return Ok(pictures);
     }
+    
+    [HttpGet]
+    [EnableQuery]
+    [Route("trending")]
+    public async Task<IActionResult> GetTrendingPictures(
+        [FromQuery] Query query
+    )
+    {
+        var pictures = await _pictureService.GetAll(query);
+        return Ok(pictures);
+    }
 
     [HttpGet]
     [EnableQuery]
