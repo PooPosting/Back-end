@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PooPosting.Api.Entities;
 
@@ -10,9 +11,11 @@ using PooPosting.Api.Entities;
 namespace PooPosting.Api.Migrations
 {
     [DbContext(typeof(PictureDbContext))]
-    partial class PictureDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231119100606_updated like")]
+    partial class updatedlike
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

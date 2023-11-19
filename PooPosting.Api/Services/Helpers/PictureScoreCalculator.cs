@@ -12,8 +12,7 @@ public static class PictureScoreCalculator
 
         picture.Likes.ToList().ForEach(l =>
         {
-            if (l.IsLike) likePoints += 1;
-            else likePoints += 0.5;
+            likePoints += 1;
         });
 
         if ((DateTime.Now - picture.PictureAdded).TotalMinutes < 180)

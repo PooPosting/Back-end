@@ -102,7 +102,7 @@ public class PictureService : IPictureService
                 picQuery = picQuery.OrderByDescending(p => p.PictureAdded.Ticks);
                 break;
             case SortBy.MostLikes:
-                picQuery = picQuery.OrderByDescending(p => p.Likes.Count(l => l.IsLike));
+                picQuery = picQuery.OrderByDescending(p => p.Likes.Count);
                 break;
             case SortBy.MostPopular:
             default:

@@ -48,15 +48,18 @@ public class AccountPicturesService : IAccountPicturesService
     
     public async Task<PagedResult<PictureDto>> GetLikedPaged(Query query, string accountId)
     {
-        var accountsQueryable= _dbContext.Pictures
-            .Where(p => p.Likes.Any(l => l.AccountId == IdHasher.DecodeAccountId(accountId)))
+        var picsQueryable = _dbContext.Likes
+            .OrderByDescending(l => l.Id)
+            .ThenByDescending(l => l.Id)
+            .Where(l => l.AccountId == IdHasher.DecodeAccountId(accountId))
+            .Select(l => l.Picture)
             .Skip(query.PageSize * (query.PageNumber - 1))
             .Take(query.PageSize);
-
-        var count = await accountsQueryable.CountAsync();
+        
+        var count = await picsQueryable.CountAsync();
         
         var currAccId = _accountContextService.TryGetAccountId();
-        var pictureDtos= await accountsQueryable
+        var pictureDtos= await picsQueryable
             .ProjectToDto(currAccId)
             .ToListAsync();
 

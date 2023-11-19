@@ -70,7 +70,7 @@ public class PictureLikingService : IPictureLikingService
             {
                 AccountId = accountId,
                 PictureId = picture.Id,
-                IsLike = true,
+                Liked = DateTime.Now
             });
 
             // Update LikedTags
@@ -112,7 +112,7 @@ public class PictureLikingService : IPictureLikingService
             {
                 AccountId = accountId,
                 PictureId = picture.Id,
-                IsLike = false,
+                Liked = DateTime.Now
             });
 
             // No need to update LikedTags in this case

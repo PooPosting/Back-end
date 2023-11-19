@@ -49,7 +49,6 @@ public class LikeHelper: ILikeHelper
             {
                 AccountId = accId,
                 PictureId = picId,
-                IsLike = true,
             });
             picture.Likes = picLikes;
             account.LikedTags = accLikedTags;
@@ -58,8 +57,6 @@ public class LikeHelper: ILikeHelper
         }
         else
         {
-            if (like.IsLike)
-            {
                 foreach (var pictureTag in picture.PictureTags)
                 {
                     accLikedTags = accLikedTags
@@ -67,16 +64,6 @@ public class LikeHelper: ILikeHelper
                         .ToList();
                 }
                 picLikes.Remove(like);
-            }
-            else
-            {
-                like.IsLike = !like.IsLike;
-                accLikedTags.AddRange(picture.PictureTags
-                    .Select(pictureTag => new AccountLikedTag()
-                    {
-                        AccountId = accId, TagId = pictureTag.TagId
-                    }));
-            }
         }
         picture.Likes = picLikes;
         account.LikedTags = accLikedTags;
@@ -113,7 +100,6 @@ public class LikeHelper: ILikeHelper
             {
                 AccountId = accId,
                 PictureId = picId,
-                IsLike = false,
             });
             picture.Likes = picLikes;
             account.LikedTags = accLikedTags;
@@ -121,27 +107,13 @@ public class LikeHelper: ILikeHelper
             await _dbContext.SaveChangesAsync();
             return picture;
         }
-        else
+        
+        foreach (var pictureTag in picture.PictureTags)
         {
-            if (like.IsLike)
-            {
-                like.IsLike = !like.IsLike;
-                foreach (var pictureTag in picture.PictureTags)
-                {
-                    accLikedTags = accLikedTags
-                        .Where(alt => alt.TagId != pictureTag.TagId)
-                        .ToList();
-                }
-            }
-            else
-            {
-                picLikes.Remove(like);
-            }
-            picture.Likes = picLikes;
-            account.LikedTags = accLikedTags;
-            picture.PopularityScore = PictureScoreCalculator.CalcPoints(picture);
-            await _dbContext.SaveChangesAsync();
-            return picture;
+            accLikedTags = accLikedTags
+                .Where(alt => alt.TagId != pictureTag.TagId)
+                .ToList();
         }
+        return picture;
     }
 }

@@ -9,9 +9,11 @@ public class LikeConfiguration: IEntityTypeConfiguration<Like>
     {
         builder.HasQueryFilter(l => !l.Account.IsDeleted);
         builder.HasKey(c => c.Id);
-
+        
         builder
-            .Property(l => l.IsLike)
+            .Property(p => p.Liked)
+            .HasDefaultValueSql("now()")
             .IsRequired();
+
     }
 }
