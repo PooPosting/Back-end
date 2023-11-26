@@ -10,6 +10,8 @@ public class PicturesSeenByAccountConfiguration: IEntityTypeConfiguration<Pictur
     {
         builder.HasQueryFilter(p => !p.Account.IsDeleted);
         builder.HasKey(p => p.Id);
+        builder.HasIndex(p => p.AccountId);
+        builder.HasIndex(p => p.PictureId);
 
         builder
             .HasOne(p => p.Picture)

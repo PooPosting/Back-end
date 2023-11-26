@@ -63,6 +63,11 @@ builder.Services.AddScoped<IAuthorizationHandler, PictureOperationRequirementHan
 builder.Services.AddScoped<IAuthorizationHandler, AccountOperationRequirementHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, CommentOperationRequirementHandler>();
 
+
+var firebaseConfig = new FirebaseConfig();
+builder.Configuration.GetSection("FirebaseConfig").Bind(firebaseConfig);
+builder.Services.AddSingleton(firebaseConfig);
+
 // DbContext
 builder.Services.AddDbContext<PictureDbContext>(options =>
 {
@@ -110,6 +115,7 @@ builder.Services.AddScoped<IPictureService, PictureService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ILikeService, LikeService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IStorageService, StorageService>();
 
 // Helpers
 builder.Services.AddScoped<ILikeHelper, LikeHelper>();

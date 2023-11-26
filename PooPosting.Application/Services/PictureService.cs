@@ -23,7 +23,8 @@ public class PictureService(
         ILogger<PictureService> logger,
         IAuthorizationService authorizationService,
         IAccountContextService accountContextService,
-        PictureDbContext dbContext
+        PictureDbContext dbContext,
+        IStorageService storageService
         )
     : IPictureService
 {
@@ -211,11 +212,7 @@ public class PictureService(
         {
             var base64Data = Regex.Match(dto.DataUrl, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
             var imageData = Convert.FromBase64String(base64Data);
-
-            await using (var stream = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.Write))
-            {
-                await stream.WriteAsync(imageData);
-            }
+            await storageService.UploadFile(fullPath, imageData);
 
             if (dto.Tags.Any())
             {
