@@ -2,27 +2,19 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using PooPosting.Api.Models.Queries;
-using PooPosting.Api.Services.Helpers;
-using PooPosting.Api.Services.Interfaces;
+using PooPosting.Application.Services.Helpers;
+using PooPosting.Application.Services.Interfaces;
 
 namespace PooPosting.Api.Controllers.Picture;
 
 [ApiController]
 [Route("api/picture/{picId}/like")]
-public class PictureLikesController: ControllerBase
-{
-    private readonly IPictureLikingService _pictureLikingService;
-    private readonly ILikeService _likeService;
-
-    public PictureLikesController(
+public class PictureLikesController(
         IPictureLikingService pictureLikingService,
         ILikeService likeService
         )
-    {
-        _pictureLikingService = pictureLikingService;
-        _likeService = likeService;
-    }
-
+    : ControllerBase
+{
     [HttpGet]
     [EnableQuery]
     public async Task<IActionResult> GetPictureLikes(
@@ -30,7 +22,7 @@ public class PictureLikesController: ControllerBase
         [FromQuery] Query query
         )
     {
-        var likes = await _likeService.GetLikesByPictureId(
+        var likes = await likeService.GetLikesByPictureId(
             query,
             IdHasher.DecodePictureId(picId)
             );
@@ -44,7 +36,7 @@ public class PictureLikesController: ControllerBase
         [FromRoute] string picId
         )
     {
-        var result = await _pictureLikingService.Like(IdHasher.DecodePictureId(picId));
+        var result = await pictureLikingService.Like(IdHasher.DecodePictureId(picId));
         return Ok(result);
     }
 
@@ -55,7 +47,7 @@ public class PictureLikesController: ControllerBase
         [FromRoute] string picId
         )
     {
-        var result = await _pictureLikingService.DisLike(IdHasher.DecodePictureId(picId));
+        var result = await pictureLikingService.DisLike(IdHasher.DecodePictureId(picId));
         return Ok(result);
     }
 }

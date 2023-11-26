@@ -1,31 +1,24 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PooPosting.Api.Models.Dtos.Account;
-using PooPosting.Api.Services.Interfaces;
+using PooPosting.Application.Models.Dtos.Account;
+using PooPosting.Application.Services.Interfaces;
 
 namespace PooPosting.Api.Controllers.Account;
 
 [ApiController]
 [Authorize]
 [Route("api/account/update")]
-public class AccountUpdateController: ControllerBase
+public class AccountUpdateController(
+    IAccountService accountService
+    ) : ControllerBase
 {
-    private readonly IAccountService _accountService;
-
-    public AccountUpdateController(
-        IAccountService accountService
-        )
-    {
-        _accountService = accountService;
-    }
-
     [HttpPost]
     [Route("email")]
     public async Task<IActionResult> UpdateAccountEmail(
         [FromBody] UpdateAccountEmailDto dto
     )
     {
-        return Ok(await _accountService.UpdateEmail(dto));
+        return Ok(await accountService.UpdateEmail(dto));
     }
 
     [HttpPost]
@@ -34,7 +27,7 @@ public class AccountUpdateController: ControllerBase
         [FromBody] UpdateAccountPasswordDto dto
     )
     {
-        return Ok(await _accountService.UpdatePassword(dto));
+        return Ok(await accountService.UpdatePassword(dto));
     }
 
     [HttpPatch]
@@ -43,7 +36,7 @@ public class AccountUpdateController: ControllerBase
         [FromBody] UpdateAccountDescriptionDto dto
     )
     {
-        return Ok(await _accountService.UpdateDescription(dto));
+        return Ok(await accountService.UpdateDescription(dto));
     }
 
     [HttpPatch]
@@ -52,7 +45,7 @@ public class AccountUpdateController: ControllerBase
         [FromForm] UpdateAccountPictureDto dto
     )
     {
-        return Ok(await _accountService.UpdateProfilePicture(dto));
+        return Ok(await accountService.UpdateProfilePicture(dto));
 
     }
 
@@ -62,7 +55,7 @@ public class AccountUpdateController: ControllerBase
         [FromForm] UpdateAccountPictureDto dto
     )
     {
-        return Ok(await _accountService.UpdateBackgroundPicture(dto));
+        return Ok(await accountService.UpdateBackgroundPicture(dto));
 
     }
 }

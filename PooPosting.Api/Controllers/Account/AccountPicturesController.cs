@@ -2,23 +2,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using PooPosting.Api.Models.Queries;
-using PooPosting.Api.Services.Interfaces;
+using PooPosting.Application.Services.Interfaces;
 
 namespace PooPosting.Api.Controllers.Account;
 
 [ApiController]
 [Route("api/account/{accId}/picture")]
-public class AccountPicturesController: ControllerBase
+public class AccountPicturesController(
+    IAccountPicturesService accountPicService
+    ) : ControllerBase
 {
-    private readonly IAccountPicturesService _accountPicService;
-
-    public AccountPicturesController(
-        IAccountPicturesService accountPicService
-    )
-    {
-        _accountPicService = accountPicService;
-    }
-    
     [HttpGet]
     [EnableQuery]
     public async Task<IActionResult> GetAccountPictures(
@@ -26,7 +19,7 @@ public class AccountPicturesController: ControllerBase
         [FromRoute] string accId
     )
     {
-        var pictures = await _accountPicService.GetPaged(query, accId);
+        var pictures = await accountPicService.GetPaged(query, accId);
         return Ok(pictures);
     }
     
@@ -38,7 +31,7 @@ public class AccountPicturesController: ControllerBase
         [FromRoute] string accId
     )
     {
-        var accounts = await _accountPicService.GetLikedPaged(query, accId);
+        var accounts = await accountPicService.GetLikedPaged(query, accId);
         return Ok(accounts);
     }
 }

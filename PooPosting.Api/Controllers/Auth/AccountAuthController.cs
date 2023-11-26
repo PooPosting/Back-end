@@ -1,25 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PooPosting.Api.Models.Dtos.Account;
-using PooPosting.Api.Services.Interfaces;
+using PooPosting.Application.Models.Dtos.Account;
+using PooPosting.Application.Services.Interfaces;
 
 namespace PooPosting.Api.Controllers.Auth;
 
 [ApiController]
 [Route("api/auth")]
-public class AccountAuthController : ControllerBase
+public class AccountAuthController(
+    IAuthService authService
+    ) : ControllerBase
 {
-    private readonly IAuthService _authService;
-
-    public AccountAuthController(IAuthService authService)
-    {
-        _authService = authService;
-    }
-
     [HttpPost]
     [Route("register")]
     public async Task<IActionResult> Register([FromBody] CreateAccountDto dto)
     {
-        var accountId = await _authService.RegisterAccount(dto);
+        var accountId = await authService.RegisterAccount(dto);
         return Created($"/api/account/{accountId}", null);
     }
 
@@ -27,7 +22,7 @@ public class AccountAuthController : ControllerBase
     [Route("login")]
     public async Task<IActionResult> Login([FromBody] LoginWithAuthCredsDto withAuthCredsDto)
     {
-        var result = await _authService.GenerateJwt(withAuthCredsDto);
+        var result = await authService.GenerateJwt(withAuthCredsDto);
         return Ok(result);
     }
 
@@ -35,7 +30,7 @@ public class AccountAuthController : ControllerBase
     [Route("refresh")]
     public async Task<IActionResult> RefreshJwt([FromBody] LoginWithRefreshTokenDto dto)
     {
-        var result = await _authService.GenerateJwt(dto);
+        var result = await authService.GenerateJwt(dto);
         return Ok(result);
     }
     
@@ -43,7 +38,7 @@ public class AccountAuthController : ControllerBase
     [Route("forgetTokens")]
     public async Task<IActionResult> ForgetTokens([FromBody] ForgetTokensDto dto)
     {
-        await _authService.Forget(dto);
+        await authService.Forget(dto);
         return Ok();
     }
 

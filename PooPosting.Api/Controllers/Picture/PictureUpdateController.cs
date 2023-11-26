@@ -1,25 +1,18 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PooPosting.Api.Models.Dtos.Picture;
-using PooPosting.Api.Services.Helpers;
-using PooPosting.Api.Services.Interfaces;
+using PooPosting.Application.Services.Helpers;
+using PooPosting.Application.Services.Interfaces;
 
 namespace PooPosting.Api.Controllers.Picture;
 
 [ApiController]
 [Authorize]
 [Route("api/picture/{picId}")]
-public class PictureUpdateController : ControllerBase
+public class PictureUpdateController(
+    IPictureService pictureService
+    ) : ControllerBase
 {
-    private readonly IPictureService _pictureService;
-
-    public PictureUpdateController(
-        IPictureService pictureService
-        )
-    {
-        _pictureService = pictureService;
-    }
-
     [HttpPatch]
     [Route("name")]
     public async Task<IActionResult> UpdatePictureName(
@@ -27,7 +20,7 @@ public class PictureUpdateController : ControllerBase
         [FromBody] UpdatePictureNameDto dto
     )
     {
-        return Ok(await _pictureService.UpdateName(IdHasher.DecodePictureId(picId), dto));
+        return Ok(await pictureService.UpdateName(IdHasher.DecodePictureId(picId), dto));
     }
 
     [HttpPatch]
@@ -37,7 +30,7 @@ public class PictureUpdateController : ControllerBase
         [FromBody] UpdatePictureDescriptionDto dto
     )
     {
-        return Ok(await _pictureService.UpdateDescription(IdHasher.DecodePictureId(picId), dto));
+        return Ok(await pictureService.UpdateDescription(IdHasher.DecodePictureId(picId), dto));
     }
 
     [HttpPatch]
@@ -47,6 +40,6 @@ public class PictureUpdateController : ControllerBase
         [FromBody] UpdatePictureTagsDto dto
     )
     {
-        return Ok(await _pictureService.UpdateTags(IdHasher.DecodePictureId(picId), dto));
+        return Ok(await pictureService.UpdateTags(IdHasher.DecodePictureId(picId), dto));
     }
 }

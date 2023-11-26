@@ -3,24 +3,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using PooPosting.Api.Models.Dtos.Comment;
 using PooPosting.Api.Models.Queries;
-using PooPosting.Api.Services.Helpers;
-using PooPosting.Api.Services.Interfaces;
+using PooPosting.Application.Services.Helpers;
+using PooPosting.Application.Services.Interfaces;
 
 namespace PooPosting.Api.Controllers.Comment;
 
 [ApiController]
 [Route("api/picture/{picId}/comment")]
-public class PictureCommentsController: ControllerBase
+public class PictureCommentsController(
+    ICommentService commentService
+    ) : ControllerBase
 {
-    private readonly ICommentService _commentService;
-
-    public PictureCommentsController(
-        ICommentService commentService
-        )
-    {
-        _commentService = commentService;
-    }
-
     [HttpGet]
     [EnableQuery]
     public async Task<IActionResult> GetPictureComments(
@@ -28,7 +21,7 @@ public class PictureCommentsController: ControllerBase
         [FromQuery] Query query
         )
     {
-        var result = await _commentService.GetByPictureId(IdHasher.DecodePictureId(picId), query);
+        var result = await commentService.GetByPictureId(IdHasher.DecodePictureId(picId), query);
         return Ok(result);
     }
 
@@ -40,7 +33,7 @@ public class PictureCommentsController: ControllerBase
         [FromBody] PostPutCommentDto dto
         )
     {
-        var result = await _commentService.Create(IdHasher.DecodePictureId(picId), dto.Text);
+        var result = await commentService.Create(IdHasher.DecodePictureId(picId), dto.Text);
         return Ok(result);
     }
 

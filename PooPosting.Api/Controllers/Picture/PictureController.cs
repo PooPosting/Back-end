@@ -2,30 +2,23 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
-using PooPosting.Api.Exceptions;
 using PooPosting.Api.Models.Dtos.Picture;
 using PooPosting.Api.Models.Queries;
-using PooPosting.Api.Services.Helpers;
-using PooPosting.Api.Services.Interfaces;
-using PooPosting.Api.Models.Dtos;
 using PooPosting.Api.Models.Dtos.Picture.Validators;
+using PooPosting.Application.Models.Queries;
+using PooPosting.Application.Services.Helpers;
+using PooPosting.Application.Services.Interfaces;
 
 namespace PooPosting.Api.Controllers.Picture;
 
 [ApiController]
 [Authorize]
 [Route("api/picture")]
-public class PictureController : ControllerBase
+public class PictureController(
+    IPictureService pictureService
+    ) 
+    : ControllerBase
 {
-    private readonly IPictureService _pictureService;
-
-    public PictureController(
-        IPictureService pictureService
-        )
-    {
-        _pictureService = pictureService;
-    }
-
     [HttpGet]
     [EnableQuery]
     [AllowAnonymous]
@@ -33,21 +26,10 @@ public class PictureController : ControllerBase
         [FromQuery] Query query
         )
     {
-        var pictures = await _pictureService.GetAll(query);
+        var pictures = await pictureService.GetAll(query);
         return Ok(pictures);
     }
 
-    [HttpGet]
-    [EnableQuery]
-    [Route("personalized")]
-    public async Task<IActionResult> GetPersonalizedPictures(
-        [FromQuery] PersonalizedQuery query
-        )
-    {
-        var pictures = await _pictureService.GetAll(query);
-        return Ok(pictures);
-    }
-    
     [HttpGet]
     [EnableQuery]
     [Route("trending")]
@@ -55,7 +37,7 @@ public class PictureController : ControllerBase
         [FromQuery] Query query
     )
     {
-        var pictures = await _pictureService.GetAll(query);
+        var pictures = await pictureService.GetAll(query);
         return Ok(pictures);
     }
 
@@ -67,7 +49,7 @@ public class PictureController : ControllerBase
         [FromQuery] SearchQuery query
         )
     {
-        var pictures = await _pictureService.GetAll(query);
+        var pictures = await pictureService.GetAll(query);
         return Ok(pictures);
     }
 
@@ -76,7 +58,7 @@ public class PictureController : ControllerBase
     [Route("{id}")]
     public async Task<IActionResult> GetSinglePictureById([FromRoute] string id)
     {
-        var picture = await _pictureService.GetById(IdHasher.DecodePictureId(id));
+        var picture = await pictureService.GetById(IdHasher.DecodePictureId(id));
         return Ok(picture);
     }
 
@@ -88,7 +70,7 @@ public class PictureController : ControllerBase
         var validationResult = await validator.ValidateAsync(dto);
         if (!validationResult.IsValid) return BadRequest(validationResult.Errors);
         
-        var pictureId = await _pictureService.Create(dto);
+        var pictureId = await pictureService.Create(dto);
         return Created($"api/picture/{pictureId}", null);
     }
 
@@ -98,7 +80,7 @@ public class PictureController : ControllerBase
         [FromRoute] string id
         )
     {
-        await _pictureService.Delete(IdHasher.DecodePictureId(id));
+        await pictureService.Delete(IdHasher.DecodePictureId(id));
         return NoContent();
     }
 

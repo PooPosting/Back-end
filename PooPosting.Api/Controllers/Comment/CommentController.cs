@@ -1,25 +1,18 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PooPosting.Api.ActionFilters;
 using PooPosting.Api.Models.Dtos.Comment;
-using PooPosting.Api.Services.Helpers;
-using PooPosting.Api.Services.Interfaces;
-using PooPosting.Api.Models.Dtos;
+using PooPosting.Application.Services.Helpers;
+using PooPosting.Application.Services.Interfaces;
 
-namespace PooPosting.Api.Controllers;
+namespace PooPosting.Api.Controllers.Comment;
 
 [ApiController]
 [Authorize]
 [Route("api/comment")]
-public class CommentController: ControllerBase
+public class CommentController(
+    ICommentService commentService
+    ) : ControllerBase
 {
-    private readonly ICommentService _commentService;
-
-    public CommentController(ICommentService commentService)
-    {
-        _commentService = commentService;
-    }
-
     [HttpPatch]
     [Route("{commId}")]
     public async Task<IActionResult> PatchComment(
@@ -27,7 +20,7 @@ public class CommentController: ControllerBase
         [FromBody] PostPutCommentDto text
         )
     {
-        var result = await _commentService.Update(IdHasher.DecodeCommentId(commId), text.Text);
+        var result = await commentService.Update(IdHasher.DecodeCommentId(commId), text.Text);
         return Ok(result);
     }
     
@@ -37,7 +30,7 @@ public class CommentController: ControllerBase
         [FromRoute] string commId
         )
     {
-        await _commentService.Delete(IdHasher.DecodeCommentId(commId));
+        await commentService.Delete(IdHasher.DecodeCommentId(commId));
         return NoContent();
     }
 }

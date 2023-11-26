@@ -2,32 +2,25 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
-using PooPosting.Api.Models.Queries;
-using PooPosting.Api.Services.Helpers;
-using PooPosting.Api.Services.Interfaces;
+using PooPosting.Application.Models.Queries;
+using PooPosting.Application.Services.Helpers;
+using PooPosting.Application.Services.Interfaces;
 
 namespace PooPosting.Api.Controllers.Account;
 
 [ApiController]
 [Route("api/account")]
-public class AccountController : ControllerBase
+public class AccountController(
+    IAccountService accountService
+    ) : ControllerBase
 {
-    private readonly IAccountService _accountService;
-
-    public AccountController(
-        IAccountService accountService
-        )
-    {
-        _accountService = accountService;
-    }
-
     [HttpGet]
     [EnableQuery]
     public async Task<IActionResult> SearchAllAccounts(
         [FromQuery] SearchQuery query
     )
     {
-        var accounts = await _accountService.GetAll(query);
+        var accounts = await accountService.GetAll(query);
         return Ok(accounts);
     }
 
@@ -37,7 +30,7 @@ public class AccountController : ControllerBase
         [FromRoute] string accId
         )
     {
-        var account = await _accountService.GetById(IdHasher.DecodeAccountId(accId));
+        var account = await accountService.GetById(IdHasher.DecodeAccountId(accId));
         return Ok(account);
     }
     
@@ -46,7 +39,7 @@ public class AccountController : ControllerBase
     [Route("me")]
     public async Task<IActionResult> GetCurrentAccount()
     {
-        var account = await _accountService.GetCurrent();
+        var account = await accountService.GetCurrent();
         return Ok(account);
     }
 
@@ -56,7 +49,7 @@ public class AccountController : ControllerBase
         [FromRoute] string accId
     )
     {
-        return Ok(await _accountService.Delete(IdHasher.DecodeAccountId(accId)));
+        return Ok(await accountService.Delete(IdHasher.DecodeAccountId(accId)));
     }
 
 }
