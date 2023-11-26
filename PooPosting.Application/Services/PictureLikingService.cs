@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PooPosting.Api.Models.Dtos.Picture;
 using PooPosting.Application.Mappers;
+using PooPosting.Application.Models.Dtos.Picture;
 using PooPosting.Application.Services.Helpers;
 using PooPosting.Application.Services.Interfaces;
 using PooPosting.Domain.DbContext;

@@ -1,4 +1,4 @@
-﻿namespace PooPosting.Api.Models.Configuration;
+﻿namespace PooPosting.Application.Models.Configuration;
 
 public class HashIdsSettings
 {

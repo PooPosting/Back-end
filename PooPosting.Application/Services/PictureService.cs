@@ -7,6 +7,7 @@ using PooPosting.Api.Models.Queries;
 using PooPosting.Application.Authorization;
 using PooPosting.Application.Mappers;
 using PooPosting.Application.Models;
+using PooPosting.Application.Models.Dtos.Picture;
 using PooPosting.Application.Models.Queries;
 using PooPosting.Application.Services.Helpers;
 using PooPosting.Application.Services.Interfaces;
@@ -40,8 +41,9 @@ public class PictureService(
     public async Task<PagedResult<PictureDto>> GetAll(Query query)
     {
         var currAccId = accountContextService.TryGetAccountId();
-
+        
         var pictureDtos = dbContext.Pictures
+            // .Where(p => p.SeenByAccount.All(sa => sa.AccountId != currAccId))
             .OrderByDescending(p => p.PopularityScore)
             .ThenByDescending(p => p.Id)
             .Skip(query.PageSize * (query.PageNumber - 1))

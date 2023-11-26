@@ -1,4 +1,4 @@
-﻿namespace PooPosting.Api.Models;
+﻿namespace PooPosting.Application.Models.Configuration;
 
 public class AuthenticationSettings
 {

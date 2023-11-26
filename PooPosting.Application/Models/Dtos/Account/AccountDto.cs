@@ -1,4 +1,5 @@
 ﻿using PooPosting.Api.Models.Dtos.Picture;
+using PooPosting.Application.Models.Dtos.Picture;
 
 namespace PooPosting.Application.Models.Dtos.Account;
 

@@ -1,6 +1,7 @@
 ﻿using PooPosting.Api.Models.Dtos.Picture;
 using PooPosting.Api.Models.Queries;
 using PooPosting.Application.Models;
+using PooPosting.Application.Models.Dtos.Picture;
 
 namespace PooPosting.Application.Services.Interfaces;
 

@@ -17,6 +17,8 @@ using PooPosting.Api.Models.Queries.Validators;
 using PooPosting.Application.ActionFilters;
 using PooPosting.Application.Authorization;
 using PooPosting.Application.Middleware;
+using PooPosting.Application.Models;
+using PooPosting.Application.Models.Configuration;
 using PooPosting.Application.Models.Dtos.Account;
 using PooPosting.Application.Models.Dtos.Account.Validators;
 using PooPosting.Application.Models.Queries;
@@ -107,7 +109,7 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IPictureService, PictureService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ILikeService, LikeService>();
-builder.Services.AddScoped<IAuthService, HttpAuthService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Helpers
 builder.Services.AddScoped<ILikeHelper, LikeHelper>();

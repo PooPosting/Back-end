@@ -4,23 +4,22 @@ using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using PooPosting.Api.Models;
 using PooPosting.Application.Models;
+using PooPosting.Application.Models.Configuration;
 using PooPosting.Application.Models.Dtos.Account;
 using PooPosting.Application.Services.Helpers;
-using PooPosting.Application.Services.Interfaces;
 using PooPosting.Domain.DbContext;
 using PooPosting.Domain.DbContext.Entities;
 using PooPosting.Domain.Exceptions;
 
 namespace PooPosting.Application.Services;
 
-public class HttpAuthService(
+public class AuthService(
         IPasswordHasher<Account> passwordHasher,
         AuthenticationSettings authenticationSettings,
         PictureDbContext dbContext
         )
-    : IAuthService
+    : Interfaces.IAuthService
 {
     public async Task<string> RegisterAccount(CreateAccountDto dto)
     {

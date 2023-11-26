@@ -1,6 +1,7 @@
 ﻿using PooPosting.Api.Models.Dtos.Comment;
 using PooPosting.Api.Models.Dtos.Picture;
 using PooPosting.Application.Models.Dtos.Account;
+using PooPosting.Application.Models.Dtos.Picture;
 using PooPosting.Application.Services.Helpers;
 using PooPosting.Domain.DbContext.Entities;
 

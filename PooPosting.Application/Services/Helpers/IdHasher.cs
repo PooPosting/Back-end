@@ -1,6 +1,6 @@
 ﻿using HashidsNet;
 using Microsoft.Extensions.Configuration;
-using PooPosting.Api.Models.Configuration;
+using PooPosting.Application.Models.Configuration;
 
 namespace PooPosting.Application.Services.Helpers;
 
