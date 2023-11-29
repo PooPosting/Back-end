@@ -42,7 +42,7 @@ public class AuthService(
 
     public async Task<AuthSuccessResult> GenerateJwt(LoginWithAuthCredsDto dto)
     {
-        var account = await dbContext.Accounts.FirstOrDefaultAsync(a => a.Nickname.ToLower() == dto.Nickname.ToLower());
+        var account = await dbContext.Accounts.FirstOrDefaultAsync(a => a.Nickname == dto.Nickname);
         if (account is null) throw new UnauthorizedException("Invalid nickname or password");
         
         var result = passwordHasher.VerifyHashedPassword(account, account.PasswordHash, dto.Password);

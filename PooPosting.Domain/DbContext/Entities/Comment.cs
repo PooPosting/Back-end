@@ -15,10 +15,9 @@ public class Comment
     
     [Required]
     public DateTime CommentAdded { get; set; } = DateTime.Now;
-    
+
     [Required]
-    [DefaultValue(false)]
-    public bool IsDeleted { get; set; }
+    public bool IsDeleted { get; set; } = false;
 
     [Required]
     public int PictureId { get; set; }
