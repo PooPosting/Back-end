@@ -28,23 +28,19 @@ public class Account
     
     [Required]
     public DateTime AccountCreated { get; set; } = DateTime.Now;
-    
+
     [Required]
-    [DefaultValue(false)]
-    public bool IsDeleted { get; set; }
-    
-    [Required]
-    [DefaultValue(1)]
-    public int RoleId { get; set; }
+    public bool IsDeleted { get; set; } = false;
+
+    [Required] 
+    public int RoleId { get; set; } = 1;
     
     [AllowNull]
     public string ProfilePicUrl { get; set; }
     
-    [AllowNull] 
     [MaxLength(64)] 
-    public string RefreshToken { get; set; }
+    public string? RefreshToken { get; set; }
     
-    [AllowNull] 
     public DateTime? RefreshTokenExpires { get; set; }
     
     

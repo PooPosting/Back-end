@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
+using PooPosting.Api.Models.Dtos.Picture;
 
-namespace PooPosting.Api.Models.Dtos.Picture.Validators;
+namespace PooPosting.Application.Models.Dtos.Picture.Validators;
 
 public class CreatePictureDtoValidator : AbstractValidator<CreatePictureDto>
 {
@@ -24,7 +25,7 @@ public class CreatePictureDtoValidator : AbstractValidator<CreatePictureDto>
             .Custom(ValidateTags);
     }
     
-    private void ValidateTags(string[] tags, ValidationContext<CreatePictureDto> context)
+    private void ValidateTags(string[]? tags, ValidationContext<CreatePictureDto> context)
     {
         if (tags is null) return;
 

@@ -11,10 +11,9 @@ public class Picture
     public int Id { get; set; }
     public int AccountId { get; set; }
     
-    [AllowNull]
     [MinLength(2)]
     [MaxLength(250)]
-    public string Description { get; set; }
+    public string? Description { get; set; }
     
     [MaxLength(255)]
     [Required]
@@ -22,14 +21,12 @@ public class Picture
     
     [Required]
     public DateTime PictureAdded { get; set; } = DateTime.Now;
-    
+
     [Required]
-    [DefaultValue(false)]
-    public bool IsDeleted { get; set; }
-    
+    public bool IsDeleted { get; set; } = false;
+
     [Required]
-    [DefaultValue(36500)]
-    public long PopularityScore { get; set; }
+    public long PopularityScore { get; set; } = 36500;
 
     // navigation props
     public virtual Account Account { get; set; } = null!;
