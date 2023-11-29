@@ -37,16 +37,13 @@ public class Account
     [DefaultValue(1)]
     public int RoleId { get; set; }
     
-    [AllowNull]
-    public string ProfilePicUrl { get; set; }
+    [MaxLength(255)]
+    public string? ProfilePicUrl { get; set; }
     
-    [AllowNull] 
     [MaxLength(64)] 
-    public string RefreshToken { get; set; }
+    public string? RefreshToken { get; set; }
     
-    [AllowNull] 
     public DateTime? RefreshTokenExpires { get; set; }
-    
     
 
     public virtual Role Role { get; set; } = null!;

@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.OData.Query;
 using PooPosting.Api.Models.Dtos.Picture;
 using PooPosting.Api.Models.Queries;
 using PooPosting.Api.Models.Dtos.Picture.Validators;
+using PooPosting.Application.Models.Dtos.Picture;
+using PooPosting.Application.Models.Dtos.Picture.Validators;
 using PooPosting.Application.Models.Queries;
 using PooPosting.Application.Services.Helpers;
 using PooPosting.Application.Services.Interfaces;

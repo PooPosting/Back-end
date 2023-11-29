@@ -11,10 +11,9 @@ public class Picture
     public int Id { get; set; }
     public int AccountId { get; set; }
     
-    [AllowNull]
     [MinLength(2)]
     [MaxLength(250)]
-    public string Description { get; set; }
+    public string? Description { get; set; }
     
     [MaxLength(255)]
     [Required]

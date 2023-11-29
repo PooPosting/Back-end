@@ -21,6 +21,8 @@ using PooPosting.Application.Models;
 using PooPosting.Application.Models.Configuration;
 using PooPosting.Application.Models.Dtos.Account;
 using PooPosting.Application.Models.Dtos.Account.Validators;
+using PooPosting.Application.Models.Dtos.Picture;
+using PooPosting.Application.Models.Dtos.Picture.Validators;
 using PooPosting.Application.Models.Queries;
 using PooPosting.Application.Services;
 using PooPosting.Application.Services.Helpers;
