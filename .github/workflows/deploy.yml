@@ -1,5 +1,5 @@
 name: Deploy Prod
-run-name: ${{ github.actor }} odpalił
+run-name: ${{ github.actor }} odpaliło
 on:
   push:
     branches:
