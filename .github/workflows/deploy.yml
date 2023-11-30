@@ -1,7 +1,7 @@
 name: Deploy Prod
 run-name: ${{ github.actor }} odpalił
 on:
-  pull:
+  push:
     branches:
       - main
 jobs:
