@@ -34,14 +34,16 @@ jobs:
           input: .github/appsettings.json
           substitutionRegex: \$<([A-Z0-9_]+)>
           substitutionData: ${{ toJSON(secrets) }}
-#      - name: Run ansible playbook
-#        env:
-#          type: prod
-#        uses: dawidd6/action-ansible-playbook@master
-#        with:
-#          playbook: playbook.yml
-#          directory: ./.github
-#          key: ${{ secrets.SSH_PRIVATE_KEY }}
-#          inventory: |
-#            [vps]
-#            ${{ secrets.IP }}
+      - name: Zaciągnięcie playbooka
+        run: "wget https://raw.githubusercontent.com/PooPosting/DevOps/master/backend-update.yml -O .github/workflows/backend-update.yml"
+      - name: Run ansible playbook
+        env:
+          type: prod
+        uses: dawidd6/action-ansible-playbook@master
+        with:
+          playbook: frontend-update.yml
+          directory: ./.github/workflows
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          inventory: |
+            [vps]
+            ${{ secrets.IP }}
