@@ -41,7 +41,7 @@ jobs:
           type: prod
         uses: dawidd6/action-ansible-playbook@master
         with:
-          playbook: frontend-update.yml
+          playbook: backend-update.yml
           directory: ./.github/workflows
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           inventory: |
