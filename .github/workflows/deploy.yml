@@ -27,11 +27,11 @@ jobs:
           fi
           python -u .github/workflows/varsManage.py
       - name: Zaciągnięcie pliku appsettings
-        run: "wget https://raw.githubusercontent.com/PooPosting/Back-end/master/PooPosting.Api/appsettings.Template.json -O .github/appsettings.json"
+        run: "wget https://raw.githubusercontent.com/PooPosting/Back-end/master/PooPosting.Api/appsettings.Template.json -O .github/workflows/appsettings.json"
       - name: Wypełnianie pliku sekretami
         uses: faradaytrs/substitute-secrets-action@2.1
         with:
-          input: .github/appsettings.json
+          input: .github/workflows/appsettings.json
           substitutionRegex: \$<([A-Z0-9_]+)>
           substitutionData: ${{ toJSON(secrets) }}
       - name: Zaciągnięcie playbooka
