@@ -1,0 +1,50 @@
+name: Deploy Dev
+run-name: ${{ github.actor }} odpalił
+on:
+  workflow_dispatch
+#  push:
+#    branches:
+#      - development
+jobs:
+  DeployDev:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Udało się!"
+      - name: Git repo
+        uses: actions/checkout@v3
+      - name: Zaciągnięcie skryptu python
+        run: "wget https://raw.githubusercontent.com/PooPosting/DevOps/master/.github/workflows/varsManage.py -O .github/workflows/varsManage.py"
+      - name: Zaciągnięcie pliku requirements
+        run: "wget https://raw.githubusercontent.com/PooPosting/DevOps/master/.github/workflows/requirements.txt -O .github/workflows/requirements.txt" 
+      - name: Uruchomienie skryptu python
+        env:
+          API_KEY_DEVOPS: ${{secrets.API_KEY_DEVOPS}}
+          aktualizowac: "absolutnie"
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f .github/workflows/requirements.txt ]; then
+            pip install -r .github/workflows/requirements.txt; 
+          fi
+          python -u .github/workflows/varsManage.py
+      - name: Zaciągnięcie pliku appsettings
+        run: "wget https://raw.githubusercontent.com/PooPosting/Back-end/development/PooPosting.Api/appsettings.Template.json -O .github/workflows/appsettings.json"
+      - name: Wypełnianie pliku sekretami
+        uses: faradaytrs/substitute-secrets-action@2.1
+        with:
+          input: .github/workflows/appsettings.json
+          substitutionRegex: \$<([A-Z0-9_]+)>
+          substitutionData: ${{ toJSON(secrets) }}
+      - name: Zaciągnięcie playbooka
+        run: "wget https://raw.githubusercontent.com/PooPosting/DevOps/master/backend-update.yml -O .github/workflows/backend-update.yml"
+      - name: Run ansible playbook
+        env:
+          type: dev
+          repo: development
+        uses: dawidd6/action-ansible-playbook@master
+        with:
+          playbook: backend-update.yml
+          directory: ./.github/workflows
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          inventory: |
+            [vps]
+            ${{ secrets.IP }}
