@@ -50,6 +50,7 @@ jobs:
         env:
           type: prod
           repo: main
+          d_version: ${{vars.DOTNET_VERSION}}
         uses: dawidd6/action-ansible-playbook@master
         with:
           playbook: backend-update.yml
