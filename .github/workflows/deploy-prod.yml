@@ -1,12 +1,15 @@
-name: Deploy Dev
+name: Deploy Prod
 run-name: ${{ github.actor }} odpalił
 on:
-  workflow_dispatch
-#  push:
-#    branches:
-#      - development
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+concurrency:
+  group: PooPosting
+  cancel-in-progress: false
 jobs:
-  DeployDev:
+  DeployProd:
     runs-on: ubuntu-latest
     steps:
       - run: echo "Udało się!"
@@ -37,7 +40,7 @@ jobs:
           fi
           python -u .github/workflows/varsManage.py
       - name: Zaciągnięcie pliku appsettings
-        run: "wget https://raw.githubusercontent.com/PooPosting/Back-end/development/PooPosting.Api/appsettings.Template.json -O .github/workflows/appsettings.json"
+        run: "wget https://raw.githubusercontent.com/PooPosting/Back-end/master/PooPosting.Api/appsettings.Template.json -O .github/workflows/appsettings.json"
       - name: Wypełnianie pliku sekretami
         uses: faradaytrs/substitute-secrets-action@2.1
         with:
@@ -48,8 +51,8 @@ jobs:
         run: "wget https://raw.githubusercontent.com/PooPosting/DevOps/master/backend-update.yml -O .github/workflows/backend-update.yml"
       - name: Run ansible playbook
         env:
-          type: dev
-          repo: development
+          type: prod
+          repo: main
           d_version: ${{vars.DOTNET_VERSION}}
         uses: dawidd6/action-ansible-playbook@master
         with:
