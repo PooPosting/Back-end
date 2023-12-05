@@ -1,10 +1,13 @@
 name: Deploy Prod
 run-name: ${{ github.actor }} odpalił
 on:
-  workflow_dispatch
-#  push:
-#    branches:
-#      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+concurrency:
+  group: PooPosting
+  cancel-in-progress: false
 jobs:
   DeployProd:
     runs-on: ubuntu-latest
