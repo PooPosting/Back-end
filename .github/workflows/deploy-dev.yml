@@ -12,6 +12,11 @@ jobs:
   DeployDev:
     runs-on: ubuntu-latest
     steps:
+      - name: Queue (kłełełe)
+        uses: devkeydet/action-environment-queue@v1
+        with:
+          environment: PooPosting
+          github-token: ${{ secrets.API_KEY_DEVOPS }}
       - run: echo "Udało się!"
       - name: Git repo
         uses: actions/checkout@v3
