@@ -2,9 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
-using PooPosting.Api.Models.Dtos.Picture;
+using Newtonsoft.Json;
 using PooPosting.Api.Models.Queries;
-using PooPosting.Api.Models.Dtos.Picture.Validators;
 using PooPosting.Application.Models.Dtos.Picture;
 using PooPosting.Application.Models.Dtos.Picture.Validators;
 using PooPosting.Application.Models.Queries;
@@ -69,6 +68,7 @@ public class PictureController(
     public async Task<IActionResult> PostPicture([FromForm]CreatePictureDto dto)
     {
         var validator = new CreatePictureDtoValidator();
+        dto.Tags = JsonConvert.DeserializeObject<string[]>(HttpContext.Request.Form["Tags"][0]!);
         var validationResult = await validator.ValidateAsync(dto);
         if (!validationResult.IsValid) return BadRequest(validationResult.Errors);
         
