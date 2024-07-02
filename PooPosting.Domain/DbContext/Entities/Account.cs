@@ -27,7 +27,7 @@ public class Account
     public bool Verified { get; set; }
     
     [Required]
-    public DateTime AccountCreated { get; set; } = DateTime.Now;
+    public DateTime AccountCreated { get; set; } = DateTime.UtcNow;
 
     [Required]
     public bool IsDeleted { get; set; } = false;

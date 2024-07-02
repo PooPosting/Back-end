@@ -7,7 +7,7 @@ public static class PictureScoreCalculator
     {
         double result = 0;
         var date = DateTime.Today.AddDays(-7);
-        var time = (date - DateTime.Now).TotalMinutes;
+        var time = (date - DateTime.UtcNow).TotalMinutes;
         var likePoints = 1.0;
 
         picture.Likes.ToList().ForEach(_ =>
@@ -15,7 +15,7 @@ public static class PictureScoreCalculator
             likePoints += 1;
         });
 
-        if ((DateTime.Now - picture.PictureAdded).TotalMinutes < 180)
+        if ((DateTime.UtcNow - picture.PictureAdded).TotalMinutes < 180)
         {
             result += CalcPicPoints(likePoints, time) * 1.5;
         }

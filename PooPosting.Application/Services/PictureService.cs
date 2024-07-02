@@ -114,7 +114,7 @@ public class PictureService(
 
         var pictureDtos = dbContext.Pictures
             .OrderByDescending(p => p.Likes.Count)
-            .Where(p => p.PictureAdded.AddDays(3) < DateTime.Now)
+            .Where(p => p.PictureAdded.AddDays(3) < DateTime.UtcNow)
             .Skip(query.PageSize * (query.PageNumber - 1))
             .Take(query.PageSize)
             .ProjectToDto(currAccId);

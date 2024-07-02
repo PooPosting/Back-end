@@ -65,7 +65,7 @@ public class PictureLikingService(
             {
                 AccountId = accountId,
                 PictureId = picture.Id,
-                Liked = DateTime.Now
+                Liked = DateTime.UtcNow
             });
 
             // Update LikedTags
@@ -107,7 +107,7 @@ public class PictureLikingService(
             {
                 AccountId = accountId,
                 PictureId = picture.Id,
-                Liked = DateTime.Now
+                Liked = DateTime.UtcNow
             });
 
             // No need to update LikedTags in this case

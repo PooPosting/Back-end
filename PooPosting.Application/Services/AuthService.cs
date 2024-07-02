@@ -57,7 +57,7 @@ public class AuthService(
         
         if (account is null) throw new NotFoundException();
         if (account.RefreshToken != dto.RefreshToken) throw new UnauthorizedException("Refresh token invalid");
-        if (account.RefreshTokenExpires > DateTime.Now) throw new UnauthorizedException("Refresh token invalid");
+        if (account.RefreshTokenExpires > DateTime.UtcNow) throw new UnauthorizedException("Refresh token invalid");
 
         return await GenerateAuthResult(account);
     }
@@ -69,7 +69,7 @@ public class AuthService(
         if (account is null) throw new NotFoundException();
         if (account.RefreshToken != dto.RefreshToken) throw new UnauthorizedException("Refresh token invalid");
         
-        if (account.RefreshTokenExpires < DateTime.Now)
+        if (account.RefreshTokenExpires < DateTime.UtcNow)
         {
             account.RefreshToken = null;
             account.RefreshTokenExpires = null;
@@ -87,7 +87,7 @@ public class AuthService(
         };
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authenticationSettings.JwtKey));
         var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        var expires = DateTime.Now.AddDays(authenticationSettings.JwtExpireDays);
+        var expires = DateTime.UtcNow.AddDays(authenticationSettings.JwtExpireDays);
         var token = new JwtSecurityToken(
             authenticationSettings.JwtIssuer,
             authenticationSettings.JwtIssuer,
@@ -99,7 +99,7 @@ public class AuthService(
         var refreshToken = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N");
 
         account.RefreshToken = refreshToken;
-        account.RefreshTokenExpires = DateTime.Now.AddDays(authenticationSettings.RefreshTokenExpireDays);
+        account.RefreshTokenExpires = DateTime.UtcNow.AddDays(authenticationSettings.RefreshTokenExpireDays);
 
         await dbContext.SaveChangesAsync();
             
