@@ -14,7 +14,7 @@ public class Comment
     public string Text { get; set; } = null!;
     
     [Required]
-    public DateTime CommentAdded { get; set; } = DateTime.Now;
+    public DateTime CommentAdded { get; set; } = DateTime.UtcNow;
 
     [Required]
     public bool IsDeleted { get; set; } = false;

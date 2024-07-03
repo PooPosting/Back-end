@@ -110,7 +110,7 @@ public class AccountService(ILogger<AccountService> logger,
         // var account = await accountContextService.GetAccountAsync();
         // if (dto.File != null && !dto.File.ContentType.StartsWith("image")) throw new BadRequestException("invalid picture");
         // var fileExt = dto.File != null && dto.File.ContentType.EndsWith("gif") ? "gif" : "webp";
-        // var bgName = $"{IdHasher.EncodeAccountId(account.Id)}-{DateTime.Now.ToFileTimeUtc()}-bgp.{fileExt}";
+        // var bgName = $"{IdHasher.EncodeAccountId(account.Id)}-{DateTime.UtcNow.ToFileTimeUtc()}-bgp.{fileExt}";
         // var result = dbContext.Update(account).Entity.MapToDto(account.Id);
         // await dbContext.SaveChangesAsync();
         // return result;
@@ -122,7 +122,7 @@ public class AccountService(ILogger<AccountService> logger,
         var account = await accountContextService.GetAccountAsync();
         if (dto.File != null && !dto.File.ContentType.StartsWith("image")) throw new BadRequestException("invalid picture");
         var fileExt = dto.File != null && dto.File.ContentType.EndsWith("gif") ? "gif" : "webp";
-        var bgName = $"{IdHasher.EncodeAccountId(account.Id)}-{DateTime.Now.ToFileTimeUtc()}-bgp.{fileExt}";
+        var bgName = $"{IdHasher.EncodeAccountId(account.Id)}-{DateTime.UtcNow.ToFileTimeUtc()}-bgp.{fileExt}";
         account.ProfilePicUrl = Path.Combine("wwwroot", "accounts", "profile_pictures", $"{bgName}");
         var result = dbContext.Update(account).Entity.MapToDto(account.Id);
         await dbContext.SaveChangesAsync();

@@ -20,7 +20,7 @@ public class Picture
     public string Url { get; set; } = null!;
     
     [Required]
-    public DateTime PictureAdded { get; set; } = DateTime.Now;
+    public DateTime PictureAdded { get; set; } = DateTime.UtcNow;
 
     [Required]
     public bool IsDeleted { get; set; } = false;

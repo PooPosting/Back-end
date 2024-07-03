@@ -73,14 +73,13 @@ builder.Services.AddSingleton(firebaseConfig);
 // DbContext
 builder.Services.AddDbContext<PictureDbContext>(options =>
 {
-    var connString = builder.Configuration.GetConnectionString("DefaultConnection");
-    options
-        .UseMySql(connString, ServerVersion.AutoDetect(connString),
-            (optionBuilder) =>
-            {
-                optionBuilder.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-            })
-        .UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
+        var connString = builder.Configuration.GetConnectionString(builder.Environment.IsProduction() ? "Prod" : "Dev");
+            
+        options.UseNpgsql(connString, settings =>
+        {
+            settings.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+            settings.CommandTimeout(360);
+        }).UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
 });
 
 // Validators

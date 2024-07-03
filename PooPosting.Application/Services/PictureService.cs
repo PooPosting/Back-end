@@ -114,7 +114,7 @@ public class PictureService(
 
         var pictureDtos = dbContext.Pictures
             .OrderByDescending(p => p.Likes.Count)
-            .Where(p => p.PictureAdded.AddDays(3) < DateTime.Now)
+            .Where(p => p.PictureAdded.AddDays(3) < DateTime.UtcNow)
             .Skip(query.PageSize * (query.PageNumber - 1))
             .Take(query.PageSize)
             .ProjectToDto(currAccId);
@@ -214,7 +214,7 @@ public class PictureService(
             var imageData = Convert.FromBase64String(base64Data);
             await storageService.UploadFile(fullPath, imageData);
 
-            if (dto.Tags.Any())
+            if (dto.Tags != null && dto.Tags.Length != 0)
             {
                 var existingTags = await dbContext.Tags
                     .Where(tag => dto.Tags.Contains(tag.Value))
@@ -223,6 +223,7 @@ public class PictureService(
                 var newTags = dto.Tags
                     .Except(existingTags.Select(tag => tag.Value))
                     .Select(tag => new Tag { Value = tag })
+                    .Where(t => t.Value != null!)
                     .ToList();
 
                 if (newTags.Any())
