@@ -65,10 +65,14 @@ public class PictureController(
 
     [HttpPost]
     [Route("post")]
-    public async Task<IActionResult> PostPicture([FromForm]CreatePictureDto dto)
+    public async Task<IActionResult> PostPicture([FromForm] CreatePictureDto dto)
     {
         var validator = new CreatePictureDtoValidator();
-        dto.Tags = JsonConvert.DeserializeObject<string[]>(HttpContext.Request.Form["Tags"][0]!);
+        var tagsFromForm = HttpContext.Request.Form["Tags"];
+        if (tagsFromForm.Count > 0)
+        {
+            dto.Tags = JsonConvert.DeserializeObject<string[]>(tagsFromForm);
+        }
         var validationResult = await validator.ValidateAsync(dto);
         if (!validationResult.IsValid) return BadRequest(validationResult.Errors);
         

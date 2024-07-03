@@ -2,5 +2,5 @@
 
 public interface IStorageService
 {
-    Task UploadFile(string fullPath, byte[] itemBytes);
+    Task<string> UploadFile(string dataUrl, string filePath);
 }

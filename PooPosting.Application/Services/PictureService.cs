@@ -200,52 +200,38 @@ public class PictureService(
         var picture = new Picture
         {
             Description = dto.Description,
-            AccountId = accountId
+            AccountId = accountId,
+            Url = await storageService.UploadFile(dto.DataUrl, $"pictures/{RandomName.Generate("webp")}"),
+            PictureTags = await CreatePictureTags(dto),
         };
 
-        var rootPath = Directory.GetCurrentDirectory();
-        var randomName = $"{Path.GetRandomFileName().Replace('.', '-')}.webp";
-        var fullPath = Path.Combine(rootPath, "wwwroot", "pictures", randomName);
-        picture.Url = Path.Combine("wwwroot", "pictures", randomName);
+        await dbContext.Pictures.AddAsync(picture);
+        await dbContext.SaveChangesAsync();
 
-        try
+        return IdHasher.EncodePictureId(picture.Id);
+    }
+
+    private async Task<ICollection<PictureTag>> CreatePictureTags(CreatePictureDto dto)
+    {
+        if (dto.Tags == null || dto.Tags.Length == 0) return Array.Empty<PictureTag>();
+        var existingTags = await dbContext.Tags
+            .Where(tag => dto.Tags.Contains(tag.Value))
+            .ToListAsync();
+
+        var newTags = dto.Tags
+            .Except(existingTags.Select(tag => tag.Value))
+            .Select(tag => new Tag { Value = tag })
+            .Where(t => t.Value != null!)
+            .ToList();
+
+        if (newTags.Any())
         {
-            var base64Data = Regex.Match(dto.DataUrl, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
-            var imageData = Convert.FromBase64String(base64Data);
-            await storageService.UploadFile(fullPath, imageData);
-
-            if (dto.Tags != null && dto.Tags.Length != 0)
-            {
-                var existingTags = await dbContext.Tags
-                    .Where(tag => dto.Tags.Contains(tag.Value))
-                    .ToListAsync();
-
-                var newTags = dto.Tags
-                    .Except(existingTags.Select(tag => tag.Value))
-                    .Select(tag => new Tag { Value = tag })
-                    .Where(t => t.Value != null!)
-                    .ToList();
-
-                if (newTags.Any())
-                {
-                    await dbContext.Tags.AddRangeAsync(newTags);
-                    await dbContext.SaveChangesAsync();
-                    existingTags.AddRange(newTags);
-                }
-
-                picture.PictureTags = existingTags.Select(tag => new PictureTag { TagId = tag.Id }).ToList();
-            }
-
-            await dbContext.Pictures.AddAsync(picture);
+            await dbContext.Tags.AddRangeAsync(newTags);
             await dbContext.SaveChangesAsync();
+            existingTags.AddRange(newTags);
+        }
 
-            return IdHasher.EncodePictureId(picture.Id);
-        }
-        catch (Exception)
-        {
-            if (File.Exists(fullPath)) File.Delete(fullPath);
-            throw;
-        }
+        return existingTags.Select(tag => new PictureTag { TagId = tag.Id }).ToList();
     }
 
     public async Task<bool> Delete(int id)

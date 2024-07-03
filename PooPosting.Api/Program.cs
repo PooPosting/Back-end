@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using System.Text;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -65,10 +66,24 @@ builder.Services.AddScoped<IAuthorizationHandler, PictureOperationRequirementHan
 builder.Services.AddScoped<IAuthorizationHandler, AccountOperationRequirementHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, CommentOperationRequirementHandler>();
 
-
-var firebaseConfig = new FirebaseConfig();
-builder.Configuration.GetSection("FirebaseConfig").Bind(firebaseConfig);
-builder.Services.AddSingleton(firebaseConfig);
+// Supabase
+var supabaseConfig = new SupabaseConfig();
+if (builder.Environment.IsDevelopment())
+{
+    supabaseConfig.Endpoint = builder.Configuration.GetValue<string>("SupabaseConfig:EndpointDev");
+    supabaseConfig.Jwt = builder.Configuration.GetValue<string>("SupabaseConfig:JwtDev");
+}
+if (builder.Environment.IsProduction())
+{
+    supabaseConfig.Endpoint = builder.Configuration.GetValue<string>("SupabaseConfig:EndpointProd");
+    supabaseConfig.Jwt = builder.Configuration.GetValue<string>("SupabaseConfig:JwtProd");
+}
+builder.Services.AddSingleton(supabaseConfig);
+builder.Services.AddHttpClient("SupabaseClient", client =>
+{
+    client.BaseAddress = new Uri(supabaseConfig.Endpoint + "/storage/v1/s3");
+    client.DefaultRequestHeaders.Add("Authorization", $"Bearer {supabaseConfig.Jwt}");
+});
 
 // DbContext
 builder.Services.AddDbContext<PictureDbContext>(options =>
@@ -78,7 +93,7 @@ builder.Services.AddDbContext<PictureDbContext>(options =>
         options.UseNpgsql(connString, settings =>
         {
             settings.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-            settings.CommandTimeout(360);
+            settings.CommandTimeout(30);
         }).UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
 });
 
