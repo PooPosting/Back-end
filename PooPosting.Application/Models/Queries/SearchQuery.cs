@@ -6,5 +6,5 @@ namespace PooPosting.Application.Models.Queries;
 public class SearchQuery: Query
 {
     public string? SearchPhrase { get; set; }
-    public SortBy SearchBy { get; set; }
+    public OrderBy OrderBy { get; set; }
 }

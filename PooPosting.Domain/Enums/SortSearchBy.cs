@@ -1,6 +1,6 @@
 ﻿namespace PooPosting.Domain.Enums;
 
-public enum SortBy
+public enum OrderBy
 {
     MostPopular,
     MostLikes,

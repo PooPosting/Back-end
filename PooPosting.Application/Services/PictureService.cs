@@ -76,15 +76,15 @@ public class PictureService(
                 (query.SearchPhrase == string.Empty || p.Description.Contains(query.SearchPhrase, StringComparison.CurrentCultureIgnoreCase))
                 );
 
-        switch (query.SearchBy)
+        switch (query.OrderBy)
         {
-            case SortBy.Newest:
+            case OrderBy.Newest:
                 picQuery = picQuery.OrderByDescending(p => p.PictureAdded.Ticks);
                 break;
-            case SortBy.MostLikes:
+            case OrderBy.MostLikes:
                 picQuery = picQuery.OrderByDescending(p => p.Likes.Count);
                 break;
-            case SortBy.MostPopular:
+            case OrderBy.MostPopular:
             default:
                 picQuery = picQuery.OrderByDescending(p => p.PopularityScore);
                 break;

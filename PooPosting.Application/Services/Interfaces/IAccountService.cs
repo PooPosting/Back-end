@@ -1,5 +1,4 @@
-﻿using PooPosting.Api.Models.Queries;
-using PooPosting.Application.Models;
+﻿using PooPosting.Application.Models;
 using PooPosting.Application.Models.Dtos.Account;
 using PooPosting.Application.Models.Queries;
 

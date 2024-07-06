@@ -19,7 +19,5 @@ public class SearchQueryValidator: AbstractValidator<SearchQuery>
         RuleFor(p => p.PageNumber)
             .NotEmpty()
             .Must(pn => pn > 0);
-        RuleFor(p => p.SearchPhrase)
-            .NotEmpty();
     }
 }
