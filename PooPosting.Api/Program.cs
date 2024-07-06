@@ -1,4 +1,3 @@
-using System.Net.Http.Headers;
 using System.Text;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -10,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using NLog.Extensions.Logging;
-using PooPosting.Api.Models;
 using PooPosting.Api.Models.Dtos.Picture;
 using PooPosting.Api.Models.Dtos.Picture.Validators;
 using PooPosting.Api.Models.Queries;
@@ -18,7 +16,6 @@ using PooPosting.Api.Models.Queries.Validators;
 using PooPosting.Application.ActionFilters;
 using PooPosting.Application.Authorization;
 using PooPosting.Application.Middleware;
-using PooPosting.Application.Models;
 using PooPosting.Application.Models.Configuration;
 using PooPosting.Application.Models.Dtos.Account;
 using PooPosting.Application.Models.Dtos.Account.Validators;
@@ -197,10 +194,16 @@ app.UseMiddleware<RequestTimeMiddleware>();
 // app.UseMiddleware<HttpLoggingMiddleware>();
 app.UseAuthentication();
 app.UseHttpsRedirection();
-app.UseSwagger();
 
+app.UseSwagger(c =>
+{
+    c.RouteTemplate = "api/swagger/{documentName}/swagger.json";
+});
 app.UseSwaggerUI(c =>
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "PooPostingAPI"));
+{
+    c.SwaggerEndpoint("/api/swagger/v1/swagger.json", "PooPostingAPI");
+    c.RoutePrefix = "api/docs";
+});
 
 var isDev = envName == "Development";
 
@@ -223,7 +226,10 @@ app.UseRouting();
 app.UseCors("All");
 
 app.UseAuthorization();
-app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
 
 app.Run();
         
