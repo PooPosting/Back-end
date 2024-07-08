@@ -10,7 +10,7 @@ public interface IPictureService
 {
     Task<PictureDto> GetById(int id);
     Task<PagedResult<PictureDto>> GetAll(Query query);
-    Task<PagedResult<PictureDto>> GetAll(SearchQuery query);
+    Task<PagedResult<PictureDto>> GetAll(PictureSearchQuery query);
     Task<PagedResult<PictureDto>> GetTrending(Query query);
     Task<PictureDto> UpdateName(int picId, UpdatePictureNameDto dto);
     Task<PictureDto> UpdateDescription(int picId, UpdatePictureDescriptionDto dto);

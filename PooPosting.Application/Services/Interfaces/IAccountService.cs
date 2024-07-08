@@ -8,7 +8,7 @@ public interface IAccountService
 {
     Task<AccountDto> GetById(int id);
     Task<AccountDto> GetCurrent();
-    Task<PagedResult<AccountDto>> GetAll(SearchQuery query);
+    Task<PagedResult<AccountDto>> GetAll(AccountSearchQuery query);
     Task<AccountDto> UpdateEmail(UpdateAccountEmailDto dto);
     Task<AccountDto> UpdateDescription(UpdateAccountDescriptionDto dto);
     Task<AccountDto> UpdatePassword(UpdateAccountPasswordDto dto);

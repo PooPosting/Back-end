@@ -97,7 +97,7 @@ builder.Services.AddDbContext<PictureDbContext>(options =>
 // Validators
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddScoped<IValidator<Query>, QueryValidator>();
-builder.Services.AddScoped<IValidator<SearchQuery>, SearchQueryValidator>();
+builder.Services.AddScoped<IValidator<PictureSearchQuery>, SearchQueryValidator>();
 builder.Services.AddScoped<IValidator<CreateAccountDto>, CreateAccountDtoValidator>();
 // builder.Services.AddScoped<IValidator<ForgetTokensDto>, ForgetTokensDtoValidator>();
 // builder.Services.AddScoped<IValidator<LoginWithRefreshTokenDto>, LoginWithRefreshTokenDtoValidator>();

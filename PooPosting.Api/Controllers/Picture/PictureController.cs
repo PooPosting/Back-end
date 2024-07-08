@@ -47,7 +47,7 @@ public class PictureController(
     [AllowAnonymous]
     [Route("search")]
     public async Task<IActionResult> SearchAllPictures(
-        [FromQuery] SearchQuery query
+        [FromQuery] PictureSearchQuery query
         )
     {
         var pictures = await pictureService.GetAll(query);

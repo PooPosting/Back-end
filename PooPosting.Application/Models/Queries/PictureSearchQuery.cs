@@ -3,7 +3,7 @@ using PooPosting.Domain.Enums;
 
 namespace PooPosting.Application.Models.Queries;
 
-public class SearchQuery: Query
+public class PictureSearchQuery: Query
 {
     public string? SearchPhrase { get; set; }
     public OrderBy OrderBy { get; set; }

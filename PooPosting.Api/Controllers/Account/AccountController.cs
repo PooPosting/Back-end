@@ -17,7 +17,7 @@ public class AccountController(
     [HttpGet]
     [EnableQuery]
     public async Task<IActionResult> SearchAllAccounts(
-        [FromQuery] SearchQuery query
+        [FromQuery] AccountSearchQuery query
     )
     {
         var accounts = await accountService.GetAll(query);

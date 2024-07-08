@@ -48,29 +48,28 @@ public class AccountService(ILogger<AccountService> logger,
         return acc!;
     }
 
-    public async Task<PagedResult<AccountDto>> GetAll(SearchQuery query)
+    public async Task<PagedResult<AccountDto>> GetAll(AccountSearchQuery query)
     {
-        var accountsQueryable= dbContext.Accounts
-                .Skip(query.PageSize * (query.PageNumber - 1))
-                .Take(query.PageSize);
+        var accountsQueryable = dbContext.Accounts
+            .OrderBy(a => a.AccountCreated)
+            .AsQueryable();
 
         if (query.SearchPhrase is not null)
         {
             accountsQueryable = accountsQueryable
-                .Where(a =>
-                    a.Nickname.ToLower().Contains(query.SearchPhrase.ToLower())
-                );
+                .Where(a => a.Nickname.Contains(query.SearchPhrase));
         }
 
         var count = await accountsQueryable.CountAsync();
         
         var currAccId = accountContextService.TryGetAccountId();
-        var accountDtos = await accountsQueryable
-            .ProjectToDto(currAccId)
-            .ToListAsync();
 
         var result = new PagedResult<AccountDto>(
-            accountDtos,
+            await accountsQueryable
+                .ProjectToDto(currAccId)
+                .Skip(query.PageSize * (query.PageNumber - 1))
+                .Take(query.PageSize)
+                .ToListAsync(),
             query.PageNumber,
             query.PageSize,
             count

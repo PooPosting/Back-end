@@ -3,7 +3,7 @@ using PooPosting.Application.Models.Queries;
 
 namespace PooPosting.Api.Models.Queries.Validators;
 
-public class SearchQueryValidator: AbstractValidator<SearchQuery>
+public class SearchQueryValidator: AbstractValidator<PictureSearchQuery>
 {
     private readonly int[] _allowedPageSizes = { 2, 3, 4, 5, 6, 7, 8, 10, 15, 20 };
 

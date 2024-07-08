@@ -68,7 +68,7 @@ public class PictureService(
         );
     }
 
-    public async Task<PagedResult<PictureDto>> GetAll(SearchQuery query)
+    public async Task<PagedResult<PictureDto>> GetAll(PictureSearchQuery query)
     {
         var picQuery = dbContext.Pictures
             .Where(p => 
