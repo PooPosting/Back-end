@@ -130,15 +130,17 @@ public class AccountService(ILogger<AccountService> logger,
 
     public async Task<bool> Delete(int id)
     {
-        var account = await accountContextService.GetTrackedAccountAsync();
-        logger.LogWarning("Account with Nickname: {AccountNickname} DELETE (SOFT) action invoked", account.Nickname);
-        await AuthorizeAccountOperation(account, ResourceOperation.Delete ,"You have no rights to delete this account");
-
-        account.IsDeleted = true;
-        dbContext.Accounts.Update(account);
+        var currentUserAccount = await accountContextService.GetAccountAsync();
+        logger.LogWarning("Account with Nickname: {AccountNickname} DELETE (SOFT) action invoked", currentUserAccount.Nickname);
+        await AuthorizeAccountOperation(currentUserAccount, ResourceOperation.Delete ,"You have no rights to delete this account");
+        
+        var toDelete = await dbContext.Accounts
+            .FirstOrDefaultAsync(a => a.Id == id) ?? throw new NotFoundException($"Could not find account with id {id}");
+        toDelete.IsDeleted = true;
+        dbContext.Accounts.Update(currentUserAccount);
         await dbContext.SaveChangesAsync();
-        logger.LogWarning("Account with Nickname: {AccountNickname}, Id: {AccountId} DELETE (SOFT) action succeed", account.Nickname, account.Id);
-        return account.IsDeleted;
+        logger.LogWarning($"Account with Nickname: {toDelete.Nickname}, Id: {toDelete.Id} DELETE (SOFT) action succeed");
+        return toDelete.IsDeleted;
     }
 
     #region Private methods

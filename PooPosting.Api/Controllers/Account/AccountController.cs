@@ -44,6 +44,7 @@ public class AccountController(
     }
 
     [HttpDelete]
+    [Authorize]
     [Route("{accId}")]
     public async Task<IActionResult> DeleteAccount(
         [FromRoute] string accId
