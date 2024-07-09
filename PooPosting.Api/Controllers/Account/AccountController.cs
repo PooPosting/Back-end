@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
-using PooPosting.Application.Models.Queries;
-using PooPosting.Application.Services.Helpers;
-using PooPosting.Application.Services.Interfaces;
+using PooPosting.Service.Models.Queries;
+using PooPosting.Service.Services.Helpers;
+using PooPosting.Service.Services.Interfaces;
 
 namespace PooPosting.Api.Controllers.Account;
 
@@ -17,11 +17,10 @@ public class AccountController(
     [HttpGet]
     [EnableQuery]
     public async Task<IActionResult> SearchAllAccounts(
-        [FromQuery] AccountSearchQuery query
+        [FromQuery] AccountQueryParams paginationParameters
     )
     {
-        var accounts = await accountService.GetAll(query);
-        return Ok(accounts);
+        return Ok(await accountService.GetAll(paginationParameters));
     }
 
     [HttpGet]
@@ -30,8 +29,7 @@ public class AccountController(
         [FromRoute] string accId
         )
     {
-        var account = await accountService.GetById(IdHasher.DecodeAccountId(accId));
-        return Ok(account);
+        return Ok(await accountService.GetById(IdHasher.DecodeAccountId(accId)));
     }
     
     [HttpGet]
@@ -39,8 +37,7 @@ public class AccountController(
     [Route("me")]
     public async Task<IActionResult> GetCurrentAccount()
     {
-        var account = await accountService.GetCurrent();
-        return Ok(account);
+        return Ok(await accountService.GetCurrent());
     }
 
     [HttpDelete]

@@ -1,6 +1,8 @@
+using System.Reflection;
 using System.Text;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
@@ -8,27 +10,27 @@ using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using NLog.Extensions.Logging;
-using PooPosting.Api.Models.Dtos.Picture;
-using PooPosting.Api.Models.Dtos.Picture.Validators;
-using PooPosting.Api.Models.Queries;
-using PooPosting.Api.Models.Queries.Validators;
-using PooPosting.Application.ActionFilters;
-using PooPosting.Application.Authorization;
-using PooPosting.Application.Middleware;
-using PooPosting.Application.Models.Configuration;
-using PooPosting.Application.Models.Dtos.Account;
-using PooPosting.Application.Models.Dtos.Account.Validators;
-using PooPosting.Application.Models.Dtos.Picture;
-using PooPosting.Application.Models.Dtos.Picture.Validators;
-using PooPosting.Application.Models.Queries;
-using PooPosting.Application.Services;
-using PooPosting.Application.Services.Helpers;
-using PooPosting.Application.Services.Helpers.Interfaces;
-using PooPosting.Application.Services.Interfaces;
-using PooPosting.Application.Services.Startup;
-using PooPosting.Domain.DbContext;
-using PooPosting.Domain.DbContext.Entities;
+using PooPosting.Data.DbContext;
+using PooPosting.Data.DbContext.Entities;
+using PooPosting.Data.DbContext.Pagination;
+using PooPosting.Service.ActionFilters;
+using PooPosting.Service.Authorization;
+using PooPosting.Service.Mappers;
+using PooPosting.Service.Middleware;
+using PooPosting.Service.Models.Configuration;
+using PooPosting.Service.Models.Dtos.Account;
+using PooPosting.Service.Models.Dtos.Account.Validators;
+using PooPosting.Service.Models.Dtos.Picture;
+using PooPosting.Service.Models.Dtos.Picture.Validators;
+using PooPosting.Service.Models.Queries;
+using PooPosting.Service.Models.Queries.Validators;
+using PooPosting.Service.Services;
+using PooPosting.Service.Services.Helpers;
+using PooPosting.Service.Services.Helpers.Interfaces;
+using PooPosting.Service.Services.Interfaces;
+using PooPosting.Service.Services.Startup;
 
 var builder = WebApplication.CreateBuilder();
 
@@ -96,8 +98,8 @@ builder.Services.AddDbContext<PictureDbContext>(options =>
 
 // Validators
 builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddScoped<IValidator<Query>, QueryValidator>();
-builder.Services.AddScoped<IValidator<PictureSearchQuery>, SearchQueryValidator>();
+builder.Services.AddScoped<IValidator<PaginationParameters>, QueryValidator>();
+builder.Services.AddScoped<IValidator<PictureQueryParams>, SearchQueryValidator>();
 builder.Services.AddScoped<IValidator<CreateAccountDto>, CreateAccountDtoValidator>();
 // builder.Services.AddScoped<IValidator<ForgetTokensDto>, ForgetTokensDtoValidator>();
 // builder.Services.AddScoped<IValidator<LoginWithRefreshTokenDto>, LoginWithRefreshTokenDtoValidator>();
@@ -126,7 +128,6 @@ builder.Services.AddScoped<IPictureLikingService, PictureLikingService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IPictureService, PictureService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
-builder.Services.AddScoped<ILikeService, LikeService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IStorageService, StorageService>();
 
@@ -138,7 +139,29 @@ builder.Services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
 builder.Services.AddScoped<PictureSeeder>();
 builder.Services.AddScoped<EnvironmentVariableSetter>();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    var jwtSecurityScheme = new OpenApiSecurityScheme
+    {
+        BearerFormat = "JWT",
+        Name = "JWT Authentication",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = JwtBearerDefaults.AuthenticationScheme,
+
+        Reference = new OpenApiReference
+        {
+            Id = JwtBearerDefaults.AuthenticationScheme,
+            Type = ReferenceType.SecurityScheme
+        }
+    };
+    
+    c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        { jwtSecurityScheme, Array.Empty<string>() }
+    });
+});
 
 IdHasher.Configure(builder.Configuration);
 
@@ -176,6 +199,11 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// Mapping
+AccountMapper.Init(app.Services.GetRequiredService<IHttpContextAccessor>());
+PictureMapper.Init(app.Services.GetRequiredService<IHttpContextAccessor>());
+CommentMapper.Init(app.Services.GetRequiredService<IHttpContextAccessor>());
 
 // Configure
 DirectoryManager.EnsureAllDirectoriesAreCreated();

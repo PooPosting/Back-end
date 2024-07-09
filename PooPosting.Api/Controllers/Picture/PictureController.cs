@@ -2,13 +2,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
-using Newtonsoft.Json;
-using PooPosting.Api.Models.Queries;
-using PooPosting.Application.Models.Dtos.Picture;
-using PooPosting.Application.Models.Dtos.Picture.Validators;
-using PooPosting.Application.Models.Queries;
-using PooPosting.Application.Services.Helpers;
-using PooPosting.Application.Services.Interfaces;
+using PooPosting.Data.DbContext.Pagination;
+using PooPosting.Service.Models.Dtos.Picture;
+using PooPosting.Service.Models.Queries;
+using PooPosting.Service.Services.Helpers;
+using PooPosting.Service.Services.Interfaces;
 
 namespace PooPosting.Api.Controllers.Picture;
 
@@ -24,10 +22,10 @@ public class PictureController(
     [EnableQuery]
     [AllowAnonymous]
     public async Task<IActionResult> GetPictures(
-        [FromQuery] Query query
+        [FromQuery] PaginationParameters paginationParameters
         )
     {
-        var pictures = await pictureService.GetAll(query);
+        var pictures = await pictureService.GetAll(paginationParameters);
         return Ok(pictures);
     }
 
@@ -35,10 +33,10 @@ public class PictureController(
     [EnableQuery]
     [Route("trending")]
     public async Task<IActionResult> GetTrendingPictures(
-        [FromQuery] Query query
+        [FromQuery] PaginationParameters paginationParameters
     )
     {
-        var pictures = await pictureService.GetAll(query);
+        var pictures = await pictureService.GetAll(paginationParameters);
         return Ok(pictures);
     }
 
@@ -47,10 +45,10 @@ public class PictureController(
     [AllowAnonymous]
     [Route("search")]
     public async Task<IActionResult> SearchAllPictures(
-        [FromQuery] PictureSearchQuery query
+        [FromQuery] PictureQueryParams paginationParameters
         )
     {
-        var pictures = await pictureService.GetAll(query);
+        var pictures = await pictureService.GetAll(paginationParameters);
         return Ok(pictures);
     }
 

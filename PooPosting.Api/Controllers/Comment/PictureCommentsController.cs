@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
-using PooPosting.Api.Models.Dtos.Comment;
-using PooPosting.Api.Models.Queries;
-using PooPosting.Application.Services.Helpers;
-using PooPosting.Application.Services.Interfaces;
+using PooPosting.Data.DbContext.Pagination;
+using PooPosting.Service.Models.Dtos.Comment;
+using PooPosting.Service.Services.Helpers;
+using PooPosting.Service.Services.Interfaces;
 
 namespace PooPosting.Api.Controllers.Comment;
 
@@ -18,10 +18,10 @@ public class PictureCommentsController(
     [EnableQuery]
     public async Task<IActionResult> GetPictureComments(
         [FromRoute] string picId,
-        [FromQuery] Query query
+        [FromQuery] PaginationParameters paginationParameters
         )
     {
-        var result = await commentService.GetByPictureId(IdHasher.DecodePictureId(picId), query);
+        var result = await commentService.GetByPictureId(IdHasher.DecodePictureId(picId), paginationParameters);
         return Ok(result);
     }
 

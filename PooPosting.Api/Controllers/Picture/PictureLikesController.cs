@@ -1,34 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
-using PooPosting.Api.Models.Queries;
-using PooPosting.Application.Services.Helpers;
-using PooPosting.Application.Services.Interfaces;
+using PooPosting.Service.Services.Helpers;
+using PooPosting.Service.Services.Interfaces;
 
 namespace PooPosting.Api.Controllers.Picture;
 
 [ApiController]
 [Route("api/picture/{picId}/like")]
-public class PictureLikesController(
-        IPictureLikingService pictureLikingService,
-        ILikeService likeService
-        )
+public class PictureLikesController(IPictureLikingService pictureLikingService)
     : ControllerBase
 {
-    [HttpGet]
-    [EnableQuery]
-    public async Task<IActionResult> GetPictureLikes(
-        [FromRoute] string picId,
-        [FromQuery] Query query
-        )
-    {
-        var likes = await likeService.GetLikesByPictureId(
-            query,
-            IdHasher.DecodePictureId(picId)
-            );
-        return Ok(likes);
-    }
-
     [HttpPatch]
     [Authorize]
     [Route("vote-up")]

@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PooPosting.Api.Models.Dtos.Comment;
-using PooPosting.Application.Services.Helpers;
-using PooPosting.Application.Services.Interfaces;
+using PooPosting.Service.Models.Dtos.Comment;
+using PooPosting.Service.Services.Helpers;
+using PooPosting.Service.Services.Interfaces;
 
 namespace PooPosting.Api.Controllers.Comment;
 

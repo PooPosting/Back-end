@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\PooPosting.Application\PooPosting.Application.csproj" />
+        <ProjectReference Include="..\PooPosting.Service\PooPosting.Service.csproj" />
     </ItemGroup>
 
     <ItemGroup>

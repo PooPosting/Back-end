@@ -2,9 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PooPosting.Api", "PooPosting.Api\PooPosting.Api.csproj", "{6935180E-F641-4E0C-AF92-759FD4D0CF47}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PooPosting.Domain", "PooPosting.Domain\PooPosting.Domain.csproj", "{F2107223-AC0A-4B89-A473-CECDD171A97C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PooPosting.Data", "PooPosting.Data\PooPosting.Data.csproj", "{F2107223-AC0A-4B89-A473-CECDD171A97C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PooPosting.Application", "PooPosting.Application\PooPosting.Application.csproj", "{A9C6A623-ECA0-4631-88D4-59461A18EF0F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PooPosting.Service", "PooPosting.Service\PooPosting.Service.csproj", "{A9C6A623-ECA0-4631-88D4-59461A18EF0F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

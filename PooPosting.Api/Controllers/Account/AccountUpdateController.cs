@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PooPosting.Application.Models.Dtos.Account;
-using PooPosting.Application.Services.Interfaces;
+using PooPosting.Service.Models.Dtos.Account;
+using PooPosting.Service.Services.Interfaces;
 
 namespace PooPosting.Api.Controllers.Account;
 
@@ -28,15 +28,6 @@ public class AccountUpdateController(
     )
     {
         return Ok(await accountService.UpdatePassword(dto));
-    }
-
-    [HttpPatch]
-    [Route("description")]
-    public async Task<IActionResult> UpdateAccountDescription(
-        [FromBody] UpdateAccountDescriptionDto dto
-    )
-    {
-        return Ok(await accountService.UpdateDescription(dto));
     }
 
     [HttpPatch]
