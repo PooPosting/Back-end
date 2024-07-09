@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PooPosting.Data.DbContext;
+using PooPosting.Domain.DbContext;
 
-namespace PooPosting.Service.Services.Helpers;
+namespace PooPosting.Application.Services.Helpers;
 
 public static class DbManager
 {

@@ -1,7 +1,7 @@
-﻿using PooPosting.Data.DbContext.Pagination;
-using PooPosting.Service.Models.Dtos.Like;
+﻿using PooPosting.Application.Models.Dtos.Like;
+using PooPosting.Domain.DbContext.Pagination;
 
-namespace PooPosting.Service.Services.Interfaces;
+namespace PooPosting.Application.Services.Interfaces;
 
 public interface ILikeService
 {

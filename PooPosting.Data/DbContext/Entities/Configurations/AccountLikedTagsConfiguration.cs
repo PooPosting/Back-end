@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PooPosting.Data.DbContext.Entities.Joins;
+using PooPosting.Domain.DbContext.Entities.Joins;
 
-namespace PooPosting.Data.DbContext.Entities.Configurations;
+namespace PooPosting.Domain.DbContext.Entities.Configurations;
 
 public class AccountLikedTagsConfiguration: IEntityTypeConfiguration<AccountLikedTag>
 {

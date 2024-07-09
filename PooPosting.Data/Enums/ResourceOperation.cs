@@ -1,4 +1,4 @@
-﻿namespace PooPosting.Data.Enums;
+﻿namespace PooPosting.Domain.Enums;
 
 public enum ResourceOperation
 {

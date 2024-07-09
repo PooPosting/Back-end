@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
-using PooPosting.Data.DbContext.Entities.Joins;
-using PooPosting.Data.DbContext.Interfaces;
+using PooPosting.Domain.DbContext.Entities.Joins;
+using PooPosting.Domain.DbContext.Interfaces;
 
-namespace PooPosting.Data.DbContext.Entities;
+namespace PooPosting.Domain.DbContext.Entities;
 
 public class Account: IIdentifiable
 {

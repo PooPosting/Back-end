@@ -1,7 +1,7 @@
-﻿using PooPosting.Data.DbContext.Pagination;
-using PooPosting.Data.Enums;
+﻿using PooPosting.Domain.DbContext.Pagination;
+using PooPosting.Domain.Enums;
 
-namespace PooPosting.Service.Models.Queries;
+namespace PooPosting.Application.Models.Queries;
 
 public class PictureQueryParams: PaginationParameters
 {

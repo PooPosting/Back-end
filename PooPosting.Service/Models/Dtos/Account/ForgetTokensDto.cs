@@ -1,4 +1,4 @@
-﻿namespace PooPosting.Service.Models.Dtos.Account;
+﻿namespace PooPosting.Application.Models.Dtos.Account;
 
 public class ForgetTokensDto
 {

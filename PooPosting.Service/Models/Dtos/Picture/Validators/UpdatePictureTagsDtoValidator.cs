@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace PooPosting.Service.Models.Dtos.Picture.Validators;
+namespace PooPosting.Application.Models.Dtos.Picture.Validators;
 
 public class UpdatePictureTagsDtoValidator: AbstractValidator<UpdatePictureTagsDto>
 {

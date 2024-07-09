@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
-using PooPosting.Data.DbContext;
+using PooPosting.Domain.DbContext;
 
-namespace PooPosting.Service.Models.Dtos.Account.Validators;
+namespace PooPosting.Application.Models.Dtos.Account.Validators;
 
 public class CreateAccountDtoValidator : AbstractValidator<CreateAccountDto>
 {

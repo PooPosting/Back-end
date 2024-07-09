@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace PooPosting.Data.DbContext.Pagination;
+namespace PooPosting.Domain.DbContext.Pagination;
 
 public static class DbSetPagination
 {

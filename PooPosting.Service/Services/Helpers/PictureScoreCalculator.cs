@@ -1,6 +1,6 @@
-﻿using PooPosting.Data.DbContext.Entities;
+﻿using PooPosting.Domain.DbContext.Entities;
 
-namespace PooPosting.Service.Services.Helpers;
+namespace PooPosting.Application.Services.Helpers;
 public static class PictureScoreCalculator
 {
     public static long CalcPoints(Picture picture)

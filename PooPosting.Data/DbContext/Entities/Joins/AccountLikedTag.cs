@@ -1,4 +1,4 @@
-﻿namespace PooPosting.Data.DbContext.Entities.Joins;
+﻿namespace PooPosting.Domain.DbContext.Entities.Joins;
 
 public class AccountLikedTag
 {

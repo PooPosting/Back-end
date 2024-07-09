@@ -1,7 +1,7 @@
-﻿using PooPosting.Service.Models;
-using PooPosting.Service.Models.Dtos.Account;
+﻿using PooPosting.Application.Models;
+using PooPosting.Application.Models.Dtos.Account;
 
-namespace PooPosting.Service.Services.Interfaces;
+namespace PooPosting.Application.Services.Interfaces;
 
 public interface IAuthService
 {

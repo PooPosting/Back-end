@@ -1,7 +1,7 @@
-﻿using PooPosting.Data.DbContext;
-using PooPosting.Data.DbContext.Entities;
+﻿using PooPosting.Domain.DbContext;
+using PooPosting.Domain.DbContext.Entities;
 
-namespace PooPosting.Service.Services.Startup;
+namespace PooPosting.Application.Services.Startup;
 
 public class PictureSeeder(
     PictureDbContext dbContext

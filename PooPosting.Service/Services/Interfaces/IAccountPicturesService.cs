@@ -1,7 +1,7 @@
-﻿using PooPosting.Data.DbContext.Pagination;
-using PooPosting.Service.Models.Dtos.Picture;
+﻿using PooPosting.Application.Models.Dtos.Picture;
+using PooPosting.Domain.DbContext.Pagination;
 
-namespace PooPosting.Service.Services.Interfaces;
+namespace PooPosting.Application.Services.Interfaces;
 
 public interface IAccountPicturesService
 {

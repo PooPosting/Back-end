@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using PooPosting.Data.DbContext;
+using PooPosting.Domain.DbContext;
 
 #nullable disable
 
@@ -22,7 +22,7 @@ namespace PooPosting.Domain.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("PooPosting.Data.DbContext.Entities.Account", b =>
+            modelBuilder.Entity("PooPosting.Domain.DbContext.Entities.Account", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -77,7 +77,7 @@ namespace PooPosting.Domain.Migrations
                     b.ToTable("Accounts");
                 });
 
-            modelBuilder.Entity("PooPosting.Data.DbContext.Entities.Comment", b =>
+            modelBuilder.Entity("PooPosting.Domain.DbContext.Entities.Comment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -113,7 +113,7 @@ namespace PooPosting.Domain.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("PooPosting.Data.DbContext.Entities.Joins.AccountLikedTag", b =>
+            modelBuilder.Entity("PooPosting.Domain.DbContext.Entities.Joins.AccountLikedTag", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -136,7 +136,7 @@ namespace PooPosting.Domain.Migrations
                     b.ToTable("AccountsLikedTags");
                 });
 
-            modelBuilder.Entity("PooPosting.Data.DbContext.Entities.Joins.PictureSeenByAccount", b =>
+            modelBuilder.Entity("PooPosting.Domain.DbContext.Entities.Joins.PictureSeenByAccount", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -159,7 +159,7 @@ namespace PooPosting.Domain.Migrations
                     b.ToTable("PicturesSeenByAccounts");
                 });
 
-            modelBuilder.Entity("PooPosting.Data.DbContext.Entities.Joins.PictureTag", b =>
+            modelBuilder.Entity("PooPosting.Domain.DbContext.Entities.Joins.PictureTag", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -182,7 +182,7 @@ namespace PooPosting.Domain.Migrations
                     b.ToTable("PictureTags");
                 });
 
-            modelBuilder.Entity("PooPosting.Data.DbContext.Entities.Like", b =>
+            modelBuilder.Entity("PooPosting.Domain.DbContext.Entities.Like", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -210,7 +210,7 @@ namespace PooPosting.Domain.Migrations
                     b.ToTable("Likes");
                 });
 
-            modelBuilder.Entity("PooPosting.Data.DbContext.Entities.Picture", b =>
+            modelBuilder.Entity("PooPosting.Domain.DbContext.Entities.Picture", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -250,7 +250,7 @@ namespace PooPosting.Domain.Migrations
                     b.ToTable("Pictures");
                 });
 
-            modelBuilder.Entity("PooPosting.Data.DbContext.Entities.Role", b =>
+            modelBuilder.Entity("PooPosting.Domain.DbContext.Entities.Role", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -268,7 +268,7 @@ namespace PooPosting.Domain.Migrations
                     b.ToTable("Roles");
                 });
 
-            modelBuilder.Entity("PooPosting.Data.DbContext.Entities.Tag", b =>
+            modelBuilder.Entity("PooPosting.Domain.DbContext.Entities.Tag", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -288,9 +288,9 @@ namespace PooPosting.Domain.Migrations
                     b.ToTable("Tags");
                 });
 
-            modelBuilder.Entity("PooPosting.Data.DbContext.Entities.Account", b =>
+            modelBuilder.Entity("PooPosting.Domain.DbContext.Entities.Account", b =>
                 {
-                    b.HasOne("PooPosting.Data.DbContext.Entities.Role", "Role")
+                    b.HasOne("PooPosting.Domain.DbContext.Entities.Role", "Role")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -299,15 +299,15 @@ namespace PooPosting.Domain.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("PooPosting.Data.DbContext.Entities.Comment", b =>
+            modelBuilder.Entity("PooPosting.Domain.DbContext.Entities.Comment", b =>
                 {
-                    b.HasOne("PooPosting.Data.DbContext.Entities.Account", "Account")
+                    b.HasOne("PooPosting.Domain.DbContext.Entities.Account", "Account")
                         .WithMany("Comments")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PooPosting.Data.DbContext.Entities.Picture", "Picture")
+                    b.HasOne("PooPosting.Domain.DbContext.Entities.Picture", "Picture")
                         .WithMany("Comments")
                         .HasForeignKey("PictureId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -318,15 +318,15 @@ namespace PooPosting.Domain.Migrations
                     b.Navigation("Picture");
                 });
 
-            modelBuilder.Entity("PooPosting.Data.DbContext.Entities.Joins.AccountLikedTag", b =>
+            modelBuilder.Entity("PooPosting.Domain.DbContext.Entities.Joins.AccountLikedTag", b =>
                 {
-                    b.HasOne("PooPosting.Data.DbContext.Entities.Account", "Account")
+                    b.HasOne("PooPosting.Domain.DbContext.Entities.Account", "Account")
                         .WithMany("LikedTags")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PooPosting.Data.DbContext.Entities.Tag", "Tag")
+                    b.HasOne("PooPosting.Domain.DbContext.Entities.Tag", "Tag")
                         .WithMany("AccountLikedTags")
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -337,15 +337,15 @@ namespace PooPosting.Domain.Migrations
                     b.Navigation("Tag");
                 });
 
-            modelBuilder.Entity("PooPosting.Data.DbContext.Entities.Joins.PictureSeenByAccount", b =>
+            modelBuilder.Entity("PooPosting.Domain.DbContext.Entities.Joins.PictureSeenByAccount", b =>
                 {
-                    b.HasOne("PooPosting.Data.DbContext.Entities.Account", "Account")
+                    b.HasOne("PooPosting.Domain.DbContext.Entities.Account", "Account")
                         .WithMany("PicturesSeen")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PooPosting.Data.DbContext.Entities.Picture", "Picture")
+                    b.HasOne("PooPosting.Domain.DbContext.Entities.Picture", "Picture")
                         .WithMany("SeenByAccount")
                         .HasForeignKey("PictureId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -356,15 +356,15 @@ namespace PooPosting.Domain.Migrations
                     b.Navigation("Picture");
                 });
 
-            modelBuilder.Entity("PooPosting.Data.DbContext.Entities.Joins.PictureTag", b =>
+            modelBuilder.Entity("PooPosting.Domain.DbContext.Entities.Joins.PictureTag", b =>
                 {
-                    b.HasOne("PooPosting.Data.DbContext.Entities.Picture", "Picture")
+                    b.HasOne("PooPosting.Domain.DbContext.Entities.Picture", "Picture")
                         .WithMany("PictureTags")
                         .HasForeignKey("PictureId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PooPosting.Data.DbContext.Entities.Tag", "Tag")
+                    b.HasOne("PooPosting.Domain.DbContext.Entities.Tag", "Tag")
                         .WithMany("PictureTags")
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -375,15 +375,15 @@ namespace PooPosting.Domain.Migrations
                     b.Navigation("Tag");
                 });
 
-            modelBuilder.Entity("PooPosting.Data.DbContext.Entities.Like", b =>
+            modelBuilder.Entity("PooPosting.Domain.DbContext.Entities.Like", b =>
                 {
-                    b.HasOne("PooPosting.Data.DbContext.Entities.Account", "Account")
+                    b.HasOne("PooPosting.Domain.DbContext.Entities.Account", "Account")
                         .WithMany("Likes")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PooPosting.Data.DbContext.Entities.Picture", "Picture")
+                    b.HasOne("PooPosting.Domain.DbContext.Entities.Picture", "Picture")
                         .WithMany("Likes")
                         .HasForeignKey("PictureId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -394,9 +394,9 @@ namespace PooPosting.Domain.Migrations
                     b.Navigation("Picture");
                 });
 
-            modelBuilder.Entity("PooPosting.Data.DbContext.Entities.Picture", b =>
+            modelBuilder.Entity("PooPosting.Domain.DbContext.Entities.Picture", b =>
                 {
-                    b.HasOne("PooPosting.Data.DbContext.Entities.Account", "Account")
+                    b.HasOne("PooPosting.Domain.DbContext.Entities.Account", "Account")
                         .WithMany("Pictures")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -405,7 +405,7 @@ namespace PooPosting.Domain.Migrations
                     b.Navigation("Account");
                 });
 
-            modelBuilder.Entity("PooPosting.Data.DbContext.Entities.Account", b =>
+            modelBuilder.Entity("PooPosting.Domain.DbContext.Entities.Account", b =>
                 {
                     b.Navigation("Comments");
 
@@ -418,7 +418,7 @@ namespace PooPosting.Domain.Migrations
                     b.Navigation("PicturesSeen");
                 });
 
-            modelBuilder.Entity("PooPosting.Data.DbContext.Entities.Picture", b =>
+            modelBuilder.Entity("PooPosting.Domain.DbContext.Entities.Picture", b =>
                 {
                     b.Navigation("Comments");
 
@@ -429,7 +429,7 @@ namespace PooPosting.Domain.Migrations
                     b.Navigation("SeenByAccount");
                 });
 
-            modelBuilder.Entity("PooPosting.Data.DbContext.Entities.Tag", b =>
+            modelBuilder.Entity("PooPosting.Domain.DbContext.Entities.Tag", b =>
                 {
                     b.Navigation("AccountLikedTags");
 

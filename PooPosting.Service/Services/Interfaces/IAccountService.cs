@@ -1,8 +1,8 @@
-﻿using PooPosting.Data.DbContext.Pagination;
-using PooPosting.Service.Models.Dtos.Account;
-using PooPosting.Service.Models.Queries;
+﻿using PooPosting.Application.Models.Dtos.Account;
+using PooPosting.Application.Models.Queries;
+using PooPosting.Domain.DbContext.Pagination;
 
-namespace PooPosting.Service.Services.Interfaces;
+namespace PooPosting.Application.Services.Interfaces;
 
 public interface IAccountService
 {

@@ -1,4 +1,4 @@
-﻿namespace PooPosting.Service.Models;
+﻿namespace PooPosting.Application.Models;
 
 public class EmailData
 {

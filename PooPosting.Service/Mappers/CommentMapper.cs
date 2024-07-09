@@ -1,11 +1,11 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
-using PooPosting.Data.DbContext.Entities;
-using PooPosting.Service.Models.Dtos.Account;
-using PooPosting.Service.Models.Dtos.Comment;
-using PooPosting.Service.Services.Helpers;
+using PooPosting.Application.Models.Dtos.Account;
+using PooPosting.Application.Models.Dtos.Comment;
+using PooPosting.Application.Services.Helpers;
+using PooPosting.Domain.DbContext.Entities;
 
-namespace PooPosting.Service.Mappers;
+namespace PooPosting.Application.Mappers;
 
 public static class CommentMapper
 {

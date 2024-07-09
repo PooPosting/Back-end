@@ -1,9 +1,9 @@
 ﻿using HashidsNet;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using PooPosting.Data.Exceptions;
+using PooPosting.Domain.Exceptions;
 
-namespace PooPosting.Service.Middleware;
+namespace PooPosting.Application.Middleware;
 
 public class ErrorHandlingMiddleware(
     ILogger<ErrorHandlingMiddleware> logger

@@ -1,4 +1,4 @@
-﻿namespace PooPosting.Data.DbContext.Interfaces;
+﻿namespace PooPosting.Domain.DbContext.Interfaces;
 
 public interface IIdentifiable
 {

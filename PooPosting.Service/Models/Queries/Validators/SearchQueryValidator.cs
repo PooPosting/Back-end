@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace PooPosting.Service.Models.Queries.Validators;
+namespace PooPosting.Application.Models.Queries.Validators;
 
 public class SearchQueryValidator: AbstractValidator<PictureQueryParams>
 {

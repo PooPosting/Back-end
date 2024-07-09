@@ -1,4 +1,4 @@
-﻿namespace PooPosting.Service.Models.Configuration;
+﻿namespace PooPosting.Application.Models.Configuration;
 
 public class SupabaseConfig
 {

@@ -1,4 +1,4 @@
-﻿namespace PooPosting.Service.Services.Interfaces;
+﻿namespace PooPosting.Application.Services.Interfaces;
 
 public interface IStorageService
 {

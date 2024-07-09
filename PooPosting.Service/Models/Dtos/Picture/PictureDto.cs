@@ -1,7 +1,7 @@
-﻿using PooPosting.Service.Models.Dtos.Account;
-using PooPosting.Service.Models.Dtos.Comment;
+﻿using PooPosting.Application.Models.Dtos.Account;
+using PooPosting.Application.Models.Dtos.Comment;
 
-namespace PooPosting.Service.Models.Dtos.Picture;
+namespace PooPosting.Application.Models.Dtos.Picture;
 
 public class PictureDto
 {

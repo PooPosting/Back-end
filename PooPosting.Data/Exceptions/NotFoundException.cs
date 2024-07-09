@@ -1,4 +1,4 @@
-﻿namespace PooPosting.Data.Exceptions;
+﻿namespace PooPosting.Domain.Exceptions;
 
 public class NotFoundException : Exception
 {

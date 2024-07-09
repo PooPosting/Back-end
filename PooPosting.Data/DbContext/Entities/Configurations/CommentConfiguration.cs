@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace PooPosting.Data.DbContext.Entities.Configurations;
+namespace PooPosting.Domain.DbContext.Entities.Configurations;
 
 public class CommentConfiguration: IEntityTypeConfiguration<Comment>
 {

@@ -1,7 +1,7 @@
-﻿using PooPosting.Data.Enums;
-using PooPosting.Service.Models.Dtos.Like;
+﻿using PooPosting.Application.Models.Dtos.Like;
+using PooPosting.Domain.Enums;
 
-namespace PooPosting.Service.Models;
+namespace PooPosting.Application.Models;
 
 public class LikeResult
 {

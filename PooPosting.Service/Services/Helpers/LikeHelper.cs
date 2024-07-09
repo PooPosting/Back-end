@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PooPosting.Data.DbContext;
-using PooPosting.Data.DbContext.Entities;
-using PooPosting.Data.DbContext.Entities.Joins;
-using PooPosting.Service.Services.Helpers.Interfaces;
+using PooPosting.Application.Services.Helpers.Interfaces;
+using PooPosting.Domain.DbContext;
+using PooPosting.Domain.DbContext.Entities;
+using PooPosting.Domain.DbContext.Entities.Joins;
 
-namespace PooPosting.Service.Services.Helpers;
+namespace PooPosting.Application.Services.Helpers;
 
 public class LikeHelper(
     PictureDbContext dbContext

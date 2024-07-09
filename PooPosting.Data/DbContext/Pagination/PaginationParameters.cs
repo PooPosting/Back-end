@@ -1,4 +1,4 @@
-﻿namespace PooPosting.Data.DbContext.Pagination;
+﻿namespace PooPosting.Domain.DbContext.Pagination;
 
 public class PaginationParameters
 {

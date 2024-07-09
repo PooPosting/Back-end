@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
-namespace PooPosting.Service.Middleware;
+namespace PooPosting.Application.Middleware;
 
 public class RequestTimeMiddleware(
     ILogger<RequestTimeMiddleware> logger

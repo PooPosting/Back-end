@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PooPosting.Data.DbContext.Entities;
-using PooPosting.Data.DbContext.Entities.Joins;
+using PooPosting.Domain.DbContext.Entities;
+using PooPosting.Domain.DbContext.Entities.Joins;
 
-namespace PooPosting.Data.DbContext;
+namespace PooPosting.Domain.DbContext;
 
 public class PictureDbContext : Microsoft.EntityFrameworkCore.DbContext
 {

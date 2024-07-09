@@ -1,11 +1,11 @@
-﻿using PooPosting.Data.DbContext;
-using PooPosting.Data.DbContext.Pagination;
-using PooPosting.Service.Mappers;
-using PooPosting.Service.Models.Dtos.Picture;
-using PooPosting.Service.Services.Helpers;
-using PooPosting.Service.Services.Interfaces;
+﻿using PooPosting.Application.Mappers;
+using PooPosting.Application.Models.Dtos.Picture;
+using PooPosting.Application.Services.Helpers;
+using PooPosting.Application.Services.Interfaces;
+using PooPosting.Domain.DbContext;
+using PooPosting.Domain.DbContext.Pagination;
 
-namespace PooPosting.Service.Services;
+namespace PooPosting.Application.Services;
 
 public class AccountPicturesService(PictureDbContext dbContext)
     : IAccountPicturesService

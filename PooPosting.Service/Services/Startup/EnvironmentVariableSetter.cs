@@ -1,4 +1,4 @@
-﻿namespace PooPosting.Service.Services.Startup;
+﻿namespace PooPosting.Application.Services.Startup;
 
 public class EnvironmentVariableSetter
 {

@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
-using PooPosting.Data.DbContext.Pagination;
+using PooPosting.Domain.DbContext.Pagination;
 
-namespace PooPosting.Service.Models.Queries.Validators;
+namespace PooPosting.Application.Models.Queries.Validators;
 
 public class QueryValidator: AbstractValidator<PaginationParameters>
 {

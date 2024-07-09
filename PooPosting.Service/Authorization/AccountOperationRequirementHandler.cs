@@ -1,9 +1,9 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using PooPosting.Data.DbContext.Entities;
-using PooPosting.Data.Enums;
+using PooPosting.Domain.DbContext.Entities;
+using PooPosting.Domain.Enums;
 
-namespace PooPosting.Service.Authorization;
+namespace PooPosting.Application.Authorization;
 
 public class AccountOperationRequirementHandler : AuthorizationHandler<AccountOperationRequirement, Account>
 {

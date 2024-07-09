@@ -1,8 +1,8 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc.Filters;
-using PooPosting.Data.Exceptions;
+using PooPosting.Domain.Exceptions;
 
-namespace PooPosting.Service.ActionFilters;
+namespace PooPosting.Application.ActionFilters;
 
 public class IsUserAdminFilter: ActionFilterAttribute
 {

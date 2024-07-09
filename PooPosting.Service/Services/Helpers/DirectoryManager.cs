@@ -1,4 +1,4 @@
-﻿namespace PooPosting.Service.Services.Helpers;
+﻿namespace PooPosting.Application.Services.Helpers;
 
 public static class DirectoryManager
 {

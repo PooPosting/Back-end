@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
-using PooPosting.Service.Services.Helpers;
-using PooPosting.Service.Services.Interfaces;
+using PooPosting.Application.Services.Helpers;
+using PooPosting.Application.Services.Interfaces;
 
 namespace PooPosting.Api.Controllers.Picture;
 

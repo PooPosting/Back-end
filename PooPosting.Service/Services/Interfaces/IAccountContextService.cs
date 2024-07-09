@@ -1,8 +1,8 @@
 ﻿#nullable enable
 using System.Security.Claims;
-using PooPosting.Data.DbContext.Entities;
+using PooPosting.Domain.DbContext.Entities;
 
-namespace PooPosting.Service.Services.Interfaces;
+namespace PooPosting.Application.Services.Interfaces;
 
 public interface IAccountContextService
 {

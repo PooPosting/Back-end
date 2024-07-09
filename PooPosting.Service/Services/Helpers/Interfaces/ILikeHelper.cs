@@ -1,6 +1,6 @@
-﻿using PooPosting.Data.DbContext.Entities;
+﻿using PooPosting.Domain.DbContext.Entities;
 
-namespace PooPosting.Service.Services.Helpers.Interfaces;
+namespace PooPosting.Application.Services.Helpers.Interfaces;
 
 public interface ILikeHelper
 {

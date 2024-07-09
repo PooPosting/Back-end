@@ -1,8 +1,8 @@
 ﻿using HashidsNet;
 using Microsoft.Extensions.Configuration;
-using PooPosting.Service.Models.Configuration;
+using PooPosting.Application.Models.Configuration;
 
-namespace PooPosting.Service.Services.Helpers;
+namespace PooPosting.Application.Services.Helpers;
 
 public static class IdHasher
 {

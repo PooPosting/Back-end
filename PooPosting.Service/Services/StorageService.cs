@@ -1,8 +1,8 @@
 ﻿using System.Net.Http.Headers;
-using PooPosting.Service.Models.Configuration;
-using PooPosting.Service.Services.Interfaces;
+using PooPosting.Application.Models.Configuration;
+using PooPosting.Application.Services.Interfaces;
 
-namespace PooPosting.Service.Services;
+namespace PooPosting.Application.Services;
 
 public class StorageService(
     SupabaseConfig supabaseConfig, 

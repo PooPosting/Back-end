@@ -1,6 +1,6 @@
-﻿using PooPosting.Service.Models.Dtos.Account;
+﻿using PooPosting.Application.Models.Dtos.Account;
 
-namespace PooPosting.Service.Models.Dtos.Like;
+namespace PooPosting.Application.Models.Dtos.Like;
 
 public class LikeDto
 {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using PooPosting.Data.Enums;
+using PooPosting.Domain.Enums;
 
-namespace PooPosting.Service.Authorization;
+namespace PooPosting.Application.Authorization;
 
 public class AccountOperationRequirement : IAuthorizationRequirement
 {

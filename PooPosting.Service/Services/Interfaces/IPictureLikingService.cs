@@ -1,6 +1,6 @@
-﻿using PooPosting.Service.Models.Dtos.Picture;
+﻿using PooPosting.Application.Models.Dtos.Picture;
 
-namespace PooPosting.Service.Services.Interfaces;
+namespace PooPosting.Application.Services.Interfaces;
 
 public interface IPictureLikingService
 {

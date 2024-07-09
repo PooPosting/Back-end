@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using PooPosting.Data.DbContext.Interfaces;
+using PooPosting.Domain.DbContext.Interfaces;
 
-namespace PooPosting.Data.DbContext.Entities;
+namespace PooPosting.Domain.DbContext.Entities;
 
 public class Comment: IIdentifiable
 {

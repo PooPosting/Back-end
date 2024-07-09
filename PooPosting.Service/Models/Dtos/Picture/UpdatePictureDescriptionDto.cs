@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PooPosting.Service.Models.Dtos.Picture;
+namespace PooPosting.Application.Models.Dtos.Picture;
 
 public class UpdatePictureDescriptionDto
 {

@@ -2,13 +2,13 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using PooPosting.Data.DbContext;
-using PooPosting.Data.DbContext.Entities;
-using PooPosting.Data.Exceptions;
-using PooPosting.Service.Services.Helpers;
-using PooPosting.Service.Services.Interfaces;
+using PooPosting.Application.Services.Helpers;
+using PooPosting.Application.Services.Interfaces;
+using PooPosting.Domain.DbContext;
+using PooPosting.Domain.DbContext.Entities;
+using PooPosting.Domain.Exceptions;
 
-namespace PooPosting.Service.Services;
+namespace PooPosting.Application.Services;
 
 public class AccountContextService(
         IHttpContextAccessor httpContextAccessor,

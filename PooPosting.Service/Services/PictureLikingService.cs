@@ -1,14 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PooPosting.Data.DbContext;
-using PooPosting.Data.DbContext.Entities;
-using PooPosting.Data.DbContext.Entities.Joins;
-using PooPosting.Data.Exceptions;
-using PooPosting.Service.Mappers;
-using PooPosting.Service.Models.Dtos.Picture;
-using PooPosting.Service.Services.Helpers;
-using PooPosting.Service.Services.Interfaces;
+using PooPosting.Application.Mappers;
+using PooPosting.Application.Models.Dtos.Picture;
+using PooPosting.Application.Services.Helpers;
+using PooPosting.Application.Services.Interfaces;
+using PooPosting.Domain.DbContext;
+using PooPosting.Domain.DbContext.Entities;
+using PooPosting.Domain.DbContext.Entities.Joins;
+using PooPosting.Domain.Exceptions;
 
-namespace PooPosting.Service.Services;
+namespace PooPosting.Application.Services;
 
 public class PictureLikingService(
         IAccountContextService accountContextService,

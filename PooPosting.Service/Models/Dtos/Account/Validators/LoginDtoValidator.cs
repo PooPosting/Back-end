@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace PooPosting.Service.Models.Dtos.Account.Validators;
+namespace PooPosting.Application.Models.Dtos.Account.Validators;
 
 public class LoginDtoValidator : AbstractValidator<LoginWithAuthCredsDto>
 {
