@@ -1,5 +1,7 @@
-﻿using PooPosting.Api.Models.Dtos.Comment;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 using PooPosting.Application.Models.Dtos.Account;
+using PooPosting.Application.Models.Dtos.Comment;
 using PooPosting.Application.Services.Helpers;
 using PooPosting.Domain.DbContext.Entities;
 
@@ -7,6 +9,14 @@ namespace PooPosting.Application.Mappers;
 
 public static class CommentMapper
 {
+    private static IHttpContextAccessor httpCtx = null!;
+    private static int? CurrAccId => int.Parse(httpCtx.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? string.Empty);
+    
+    public static void Init(IHttpContextAccessor httpContextAccessor)
+    {
+        httpCtx = httpContextAccessor;
+    }
+    
     public static IQueryable<CommentDto> ProjectToDto(this IQueryable<Comment> queryable)
     {
         return queryable

@@ -1,6 +1,7 @@
-﻿using PooPosting.Api.Models.Dtos.Comment;
-using PooPosting.Api.Models.Dtos.Picture;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 using PooPosting.Application.Models.Dtos.Account;
+using PooPosting.Application.Models.Dtos.Comment;
 using PooPosting.Application.Models.Dtos.Picture;
 using PooPosting.Application.Services.Helpers;
 using PooPosting.Domain.DbContext.Entities;
@@ -9,7 +10,18 @@ namespace PooPosting.Application.Mappers;
 
 public static class PictureMapper
 {
-    public static IQueryable<PictureDto> ProjectToDto(this IQueryable<Picture> queryable, int? currAccId)
+    private static IHttpContextAccessor? httpCtx;
+    private static int? CurrAccId()
+    {
+        var userIdClaim = httpCtx?.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        return int.TryParse(userIdClaim, out var accountId) ? accountId : null;
+    }
+    public static void Init(IHttpContextAccessor httpContextAccessor)
+    {
+        httpCtx = httpContextAccessor;
+    }
+    
+    public static IQueryable<PictureDto> ProjectToDto(this IQueryable<Picture> queryable)
     {
         return queryable
             .Select(p => new PictureDto
@@ -49,12 +61,12 @@ public static class PictureMapper
                     PictureAdded = p.PictureAdded,
                     LikeCount = p.Likes.Count, 
                     CommentCount = p.Comments.Count, 
-                    IsLiked = currAccId != null && p.Likes.Any(l => l.AccountId == currAccId)
+                    IsLiked = CurrAccId() != null && p.Likes.Any(l => l.AccountId == CurrAccId())
                 }
             );
     }
     
-    public static PictureDto MapToDto(this Picture p, int? accountId)
+    public static PictureDto MapToDto(this Picture p)
     {
         var pictureDto = new PictureDto()
         {
@@ -90,7 +102,7 @@ public static class PictureMapper
             PictureAdded = p.PictureAdded,
             LikeCount = p.Likes.Count, 
             CommentCount = p.Comments.Count, 
-            IsLiked = accountId != null && p.Likes.Any(l => l.AccountId == accountId)
+            IsLiked = CurrAccId() != null && p.Likes.Any(l => l.AccountId == CurrAccId())
         };
 
         return pictureDto;
