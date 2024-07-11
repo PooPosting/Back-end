@@ -3,7 +3,6 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using PooPosting.Application.Services.Helpers;
-using PooPosting.Application.Services.Interfaces;
 using PooPosting.Domain.DbContext;
 using PooPosting.Domain.DbContext.Entities;
 using PooPosting.Domain.Exceptions;
@@ -14,7 +13,6 @@ public class AccountContextService(
         IHttpContextAccessor httpContextAccessor,
         PictureDbContext dbContext
         )
-    : IAccountContextService
 {
     public ClaimsPrincipal User => httpContextAccessor.HttpContext!.User;
 

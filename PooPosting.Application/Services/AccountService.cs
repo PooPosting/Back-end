@@ -5,9 +5,10 @@ using Microsoft.Extensions.Logging;
 using PooPosting.Application.Authorization;
 using PooPosting.Application.Mappers;
 using PooPosting.Application.Models.Dtos.Account;
+using PooPosting.Application.Models.Dtos.Account.In;
+using PooPosting.Application.Models.Dtos.Account.Out;
 using PooPosting.Application.Models.Queries;
 using PooPosting.Application.Services.Helpers;
-using PooPosting.Application.Services.Interfaces;
 using PooPosting.Domain.DbContext;
 using PooPosting.Domain.DbContext.Entities;
 using PooPosting.Domain.DbContext.Pagination;
@@ -19,10 +20,10 @@ namespace PooPosting.Application.Services;
 public class AccountService(
         ILogger<AccountService> logger,
         PictureDbContext dbContext,
-        IAccountContextService accountContextService,
+        AccountContextService accountContextService,
         IAuthorizationService authorizationService,
         IPasswordHasher<Account> passwordHasher
-        ) : IAccountService
+        )
 {
     public async Task<AccountDto> GetById(int id)
     {

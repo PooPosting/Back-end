@@ -1,17 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PooPosting.Application.Models.Dtos.Picture;
+using PooPosting.Application.Models.Dtos.Picture.In;
+using PooPosting.Application.Services;
 using PooPosting.Application.Services.Helpers;
-using PooPosting.Application.Services.Interfaces;
 
 namespace PooPosting.Api.Controllers.Picture;
 
 [ApiController]
 [Authorize]
 [Route("api/picture/{picId}")]
-public class PictureUpdateController(
-    IPictureService pictureService
-    ) : ControllerBase
+public class PictureUpdateController(PictureService pictureService) : ControllerBase
 {
     [HttpPatch]
     [Route("name")]

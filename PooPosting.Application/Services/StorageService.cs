@@ -1,13 +1,12 @@
 ﻿using System.Net.Http.Headers;
 using PooPosting.Application.Models.Configuration;
-using PooPosting.Application.Services.Interfaces;
 
 namespace PooPosting.Application.Services;
 
 public class StorageService(
     SupabaseConfig supabaseConfig, 
     IHttpClientFactory httpClientFactory
-    ) : IStorageService
+    )
 {
     private readonly HttpClient httpClient = httpClientFactory.CreateClient("SupabaseClient");
 

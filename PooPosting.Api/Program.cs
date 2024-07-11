@@ -12,24 +12,28 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NLog.Extensions.Logging;
+using PooPosting.Api.Validators.Dtos.Account;
+using PooPosting.Api.Validators.Dtos.Auth;
+using PooPosting.Api.Validators.Dtos.Picture;
+using PooPosting.Api.Validators.Queries;
 using PooPosting.Application.ActionFilters;
 using PooPosting.Application.Authorization;
 using PooPosting.Application.Mappers;
 using PooPosting.Application.Middleware;
 using PooPosting.Application.Models.Configuration;
 using PooPosting.Application.Models.Dtos.Account;
-using PooPosting.Application.Models.Dtos.Account.Validators;
+using PooPosting.Application.Models.Dtos.Account.In;
+using PooPosting.Application.Models.Dtos.Auth;
+using PooPosting.Application.Models.Dtos.Auth.In;
 using PooPosting.Application.Models.Dtos.Picture;
-using PooPosting.Application.Models.Dtos.Picture.Validators;
+using PooPosting.Application.Models.Dtos.Picture.In;
 using PooPosting.Application.Models.Queries;
-using PooPosting.Application.Models.Queries.Validators;
 using PooPosting.Application.Services;
 using PooPosting.Application.Services.Helpers;
-using PooPosting.Application.Services.Helpers.Interfaces;
-using PooPosting.Application.Services.Interfaces;
 using PooPosting.Application.Services.Startup;
 using PooPosting.Domain.DbContext;
 using PooPosting.Domain.DbContext.Entities;
+using PooPosting.Domain.DbContext.Interfaces;
 using PooPosting.Domain.DbContext.Pagination;
 
 var builder = WebApplication.CreateBuilder();
@@ -98,41 +102,26 @@ builder.Services.AddDbContext<PictureDbContext>(options =>
 
 // Validators
 builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddScoped<IValidator<PaginationParameters>, QueryValidator>();
-builder.Services.AddScoped<IValidator<PictureQueryParams>, SearchQueryValidator>();
-builder.Services.AddScoped<IValidator<CreateAccountDto>, CreateAccountDtoValidator>();
-// builder.Services.AddScoped<IValidator<ForgetTokensDto>, ForgetTokensDtoValidator>();
-// builder.Services.AddScoped<IValidator<LoginWithRefreshTokenDto>, LoginWithRefreshTokenDtoValidator>();
-
-builder.Services.AddScoped<IValidator<UpdateAccountEmailDto>, UpdateAccountEmailDtoValidator>();
-builder.Services.AddScoped<IValidator<UpdateAccountPasswordDto>, UpdateAccountPasswordDtoValidator>();
-builder.Services.AddScoped<IValidator<UpdateAccountDescriptionDto>, UpdateAccountDescriptionDtoValidator>();
-builder.Services.AddScoped<IValidator<UpdateAccountPictureDto>, UpdateAccountPictureDtoValidator>();
-
-builder.Services.AddScoped<IValidator<CreatePictureDto>, CreatePictureDtoValidator>();
-builder.Services.AddScoped<IValidator<UpdatePictureNameDto>, UpdatePictureNameDtoValidator>();
-builder.Services.AddScoped<IValidator<UpdatePictureDescriptionDto>, UpdatePictureDescriptionDtoValidator>();
-builder.Services.AddScoped<IValidator<UpdatePictureTagsDto>, UpdatePictureTagsDtoValidator>();
+builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
 // Middleware
 builder.Services.AddScoped<ErrorHandlingMiddleware>();
 builder.Services.AddScoped<RequestTimeMiddleware>();
 builder.Services.AddScoped<HttpLoggingMiddleware>();
-
 builder.Services.AddScoped<IsUserAdminFilter>();
 
 // Services
-builder.Services.AddScoped<IAccountContextService, AccountContextService>();
-builder.Services.AddScoped<IAccountPicturesService, AccountPicturesService>();
-builder.Services.AddScoped<IPictureLikingService, PictureLikingService>();
-builder.Services.AddScoped<IAccountService, AccountService>();
-builder.Services.AddScoped<IPictureService, PictureService>();
-builder.Services.AddScoped<ICommentService, CommentService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IStorageService, StorageService>();
+builder.Services.AddScoped<AccountContextService>();
+builder.Services.AddScoped<AccountPicturesService>();
+builder.Services.AddScoped<PictureLikingService>();
+builder.Services.AddScoped<AccountService>();
+builder.Services.AddScoped<PictureService>();
+builder.Services.AddScoped<CommentService>();
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<StorageService>();
 
 // Helpers
-builder.Services.AddScoped<ILikeHelper, LikeHelper>();
+builder.Services.AddScoped<LikeHelper>();
 
 // Other stuff
 builder.Services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
@@ -201,9 +190,7 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Mapping
-AccountMapper.Init(app.Services.GetRequiredService<IHttpContextAccessor>());
-PictureMapper.Init(app.Services.GetRequiredService<IHttpContextAccessor>());
-CommentMapper.Init(app.Services.GetRequiredService<IHttpContextAccessor>());
+MapperContext.Initialize(app.Services.GetRequiredService<IHttpContextAccessor>());
 
 // Configure
 DirectoryManager.EnsureAllDirectoriesAreCreated();

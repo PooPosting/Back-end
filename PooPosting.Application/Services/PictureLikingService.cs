@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PooPosting.Application.Mappers;
 using PooPosting.Application.Models.Dtos.Picture;
+using PooPosting.Application.Models.Dtos.Picture.Out;
 using PooPosting.Application.Services.Helpers;
-using PooPosting.Application.Services.Interfaces;
 using PooPosting.Domain.DbContext;
 using PooPosting.Domain.DbContext.Entities;
 using PooPosting.Domain.DbContext.Entities.Joins;
@@ -11,10 +11,9 @@ using PooPosting.Domain.Exceptions;
 namespace PooPosting.Application.Services;
 
 public class PictureLikingService(
-        IAccountContextService accountContextService,
-        PictureDbContext dbContext
-        )
-    : IPictureLikingService
+    AccountContextService accountContextService,
+    PictureDbContext dbContext
+    )
 {
     public async Task<PictureDto> Like(int pictureId)
     {

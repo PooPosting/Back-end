@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PooPosting.Application.Services.Helpers.Interfaces;
 using PooPosting.Domain.DbContext;
 using PooPosting.Domain.DbContext.Entities;
 using PooPosting.Domain.DbContext.Entities.Joins;
@@ -8,7 +7,7 @@ namespace PooPosting.Application.Services.Helpers;
 
 public class LikeHelper(
     PictureDbContext dbContext
-    ) : ILikeHelper
+    )
 {
     public async Task<Picture> LikeAsync(
         int picId,

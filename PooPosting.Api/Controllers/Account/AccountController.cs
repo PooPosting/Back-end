@@ -3,16 +3,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using PooPosting.Application.Models.Queries;
+using PooPosting.Application.Services;
 using PooPosting.Application.Services.Helpers;
-using PooPosting.Application.Services.Interfaces;
 
 namespace PooPosting.Api.Controllers.Account;
 
 [ApiController]
 [Route("api/account")]
-public class AccountController(
-    IAccountService accountService
-    ) : ControllerBase
+public class AccountController(AccountService accountService) : ControllerBase
 {
     [HttpGet]
     [EnableQuery]

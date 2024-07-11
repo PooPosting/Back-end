@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using PooPosting.Application.Models.Dtos.Picture;
+using PooPosting.Application.Models.Dtos.Picture.In;
 using PooPosting.Application.Models.Queries;
+using PooPosting.Application.Services;
 using PooPosting.Application.Services.Helpers;
-using PooPosting.Application.Services.Interfaces;
+using PooPosting.Domain.DbContext.Interfaces;
 using PooPosting.Domain.DbContext.Pagination;
 
 namespace PooPosting.Api.Controllers.Picture;
@@ -13,16 +15,13 @@ namespace PooPosting.Api.Controllers.Picture;
 [ApiController]
 [Authorize]
 [Route("api/picture")]
-public class PictureController(
-    IPictureService pictureService
-    ) 
-    : ControllerBase
+public class PictureController(PictureService pictureService) : ControllerBase
 {
     [HttpGet]
     [EnableQuery]
     [AllowAnonymous]
     public async Task<IActionResult> GetPictures(
-        [FromQuery] PaginationParameters paginationParameters
+        [FromQuery] IPaginationParameters paginationParameters
         )
     {
         var pictures = await pictureService.GetAll(paginationParameters);
@@ -33,7 +32,7 @@ public class PictureController(
     [EnableQuery]
     [Route("trending")]
     public async Task<IActionResult> GetTrendingPictures(
-        [FromQuery] PaginationParameters paginationParameters
+        [FromQuery] IPaginationParameters paginationParameters
     )
     {
         var pictures = await pictureService.GetAll(paginationParameters);

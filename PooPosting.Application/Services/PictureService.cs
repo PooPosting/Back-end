@@ -4,12 +4,14 @@ using Microsoft.Extensions.Logging;
 using PooPosting.Application.Authorization;
 using PooPosting.Application.Mappers;
 using PooPosting.Application.Models.Dtos.Picture;
+using PooPosting.Application.Models.Dtos.Picture.In;
+using PooPosting.Application.Models.Dtos.Picture.Out;
 using PooPosting.Application.Models.Queries;
 using PooPosting.Application.Services.Helpers;
-using PooPosting.Application.Services.Interfaces;
 using PooPosting.Domain.DbContext;
 using PooPosting.Domain.DbContext.Entities;
 using PooPosting.Domain.DbContext.Entities.Joins;
+using PooPosting.Domain.DbContext.Interfaces;
 using PooPosting.Domain.DbContext.Pagination;
 using PooPosting.Domain.Enums;
 using PooPosting.Domain.Exceptions;
@@ -17,13 +19,12 @@ using PooPosting.Domain.Exceptions;
 namespace PooPosting.Application.Services;
 
 public class PictureService(
-        ILogger<PictureService> logger,
-        IAuthorizationService authorizationService,
-        IAccountContextService accountContextService,
-        PictureDbContext dbContext,
-        IStorageService storageService
-        )
-    : IPictureService
+    ILogger<PictureService> logger,
+    IAuthorizationService authorizationService,
+    AccountContextService accountContextService,
+    PictureDbContext dbContext,
+    StorageService storageService
+    )
 {
     public async Task<PictureDto> GetById(int id)
     {
@@ -35,7 +36,7 @@ public class PictureService(
         return picture ?? throw new NotFoundException();
     }
 
-    public async Task<PagedResult<PictureDto>> GetAll(PaginationParameters paginationParameters)
+    public async Task<PagedResult<PictureDto>> GetAll(IPaginationParameters paginationParameters)
     {
         var currAccId = accountContextService.TryGetAccountId();
 
@@ -82,7 +83,7 @@ public class PictureService(
             .Paginate(paginationParameters);
     }
     
-    public async Task<PagedResult<PictureDto>> GetTrending(PaginationParameters paginationParameters)
+    public async Task<PagedResult<PictureDto>> GetTrending(IPaginationParameters paginationParameters)
     {
         var pictureDtos = dbContext.Pictures
             .OrderByDescending(p => p.Likes.Count)

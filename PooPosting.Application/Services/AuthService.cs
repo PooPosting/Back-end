@@ -7,6 +7,9 @@ using Microsoft.IdentityModel.Tokens;
 using PooPosting.Application.Models;
 using PooPosting.Application.Models.Configuration;
 using PooPosting.Application.Models.Dtos.Account;
+using PooPosting.Application.Models.Dtos.Auth;
+using PooPosting.Application.Models.Dtos.Auth.In;
+using PooPosting.Application.Models.Dtos.Auth.Out;
 using PooPosting.Application.Services.Helpers;
 using PooPosting.Domain.DbContext;
 using PooPosting.Domain.DbContext.Entities;
@@ -19,9 +22,8 @@ public class AuthService(
         AuthenticationSettings authenticationSettings,
         PictureDbContext dbContext
         )
-    : Interfaces.IAuthService
 {
-    public async Task<string> RegisterAccount(CreateAccountDto dto)
+    public async Task<string> RegisterAccount(RegisterDto dto)
     {
         var newAccount = new Account()
         {
@@ -40,7 +42,7 @@ public class AuthService(
         return IdHasher.EncodeAccountId(account.Entity.Id);
     }
 
-    public async Task<AuthSuccessResult> GenerateJwt(LoginWithAuthCredsDto dto)
+    public async Task<AuthSuccessResult> GenerateJwt(LoginDto dto)
     {
         var account = await dbContext.Accounts.FirstOrDefaultAsync(a => a.Nickname == dto.Nickname);
         if (account is null) throw new UnauthorizedException("Invalid nickname or password");
@@ -51,7 +53,7 @@ public class AuthService(
         return await GenerateAuthResult(account);
     }
     
-    public async Task<AuthSuccessResult> GenerateJwt(LoginWithRefreshTokenDto dto)
+    public async Task<AuthSuccessResult> GenerateJwt(RefreshSessionDto dto)
     {
         var account = await dbContext.Accounts.FirstOrDefaultAsync(a => a.Id == IdHasher.DecodeAccountId(dto.Uid));
         
@@ -62,7 +64,7 @@ public class AuthService(
         return await GenerateAuthResult(account);
     }
     
-    public async Task Forget(ForgetTokensDto dto)
+    public async Task Forget(ForgetSessionDto dto)
     {
         var account = await dbContext.Accounts.FirstOrDefaultAsync(a => a.Id == IdHasher.DecodeAccountId(dto.Uid));
         

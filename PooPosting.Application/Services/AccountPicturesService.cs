@@ -1,16 +1,16 @@
 ﻿using PooPosting.Application.Mappers;
 using PooPosting.Application.Models.Dtos.Picture;
+using PooPosting.Application.Models.Dtos.Picture.Out;
 using PooPosting.Application.Services.Helpers;
-using PooPosting.Application.Services.Interfaces;
 using PooPosting.Domain.DbContext;
+using PooPosting.Domain.DbContext.Interfaces;
 using PooPosting.Domain.DbContext.Pagination;
 
 namespace PooPosting.Application.Services;
 
 public class AccountPicturesService(PictureDbContext dbContext)
-    : IAccountPicturesService
 {
-    public async Task<PagedResult<PictureDto>> GetPaged(PaginationParameters paginationParameters, string accountId)
+    public async Task<PagedResult<PictureDto>> GetPaged(IPaginationParameters paginationParameters, string accountId)
     {
         return await dbContext.Pictures
             .OrderByDescending(p => p.PictureAdded)
@@ -19,7 +19,7 @@ public class AccountPicturesService(PictureDbContext dbContext)
             .Paginate(paginationParameters);
     }
     
-    public async Task<PagedResult<PictureDto>> GetLikedPaged(PaginationParameters paginationParameters, string accountId)
+    public async Task<PagedResult<PictureDto>> GetLikedPaged(IPaginationParameters paginationParameters, string accountId)
     {
         return await dbContext.Likes
             .OrderByDescending(l => l.Liked)

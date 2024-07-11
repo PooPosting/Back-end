@@ -1,16 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PooPosting.Application.Models.Dtos.Account;
-using PooPosting.Application.Services.Interfaces;
+using PooPosting.Application.Models.Dtos.Account.In;
+using PooPosting.Application.Services;
 
 namespace PooPosting.Api.Controllers.Account;
 
 [ApiController]
 [Authorize]
 [Route("api/account/update")]
-public class AccountUpdateController(
-    IAccountService accountService
-    ) : ControllerBase
+public class AccountUpdateController(AccountService accountService) : ControllerBase
 {
     [HttpPost]
     [Route("email")]

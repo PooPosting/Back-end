@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PooPosting.Domain.DbContext.Interfaces;
 
 namespace PooPosting.Domain.DbContext.Pagination;
 
@@ -6,7 +7,7 @@ public static class DbSetPagination
 {
     public static async Task<PagedResult<T>> Paginate<T>(
         this IQueryable<T> query,
-        PaginationParameters pagination
+        IPaginationParameters pagination
     ) where T : class
     {
         var items = await query

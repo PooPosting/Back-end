@@ -1,15 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OData.Query;
+using PooPosting.Application.Services;
 using PooPosting.Application.Services.Helpers;
-using PooPosting.Application.Services.Interfaces;
 
 namespace PooPosting.Api.Controllers.Picture;
 
 [ApiController]
 [Route("api/picture/{picId}/like")]
-public class PictureLikesController(IPictureLikingService pictureLikingService)
-    : ControllerBase
+public class PictureLikesController(PictureLikingService pictureLikingService) : ControllerBase
 {
     [HttpPatch]
     [Authorize]

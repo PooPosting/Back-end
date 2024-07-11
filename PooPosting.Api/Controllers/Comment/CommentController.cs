@@ -1,17 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PooPosting.Application.Models.Dtos.Comment;
+using PooPosting.Application.Models.Dtos.Comment.In;
+using PooPosting.Application.Services;
 using PooPosting.Application.Services.Helpers;
-using PooPosting.Application.Services.Interfaces;
 
 namespace PooPosting.Api.Controllers.Comment;
 
 [ApiController]
 [Authorize]
 [Route("api/comment")]
-public class CommentController(
-    ICommentService commentService
-    ) : ControllerBase
+public class CommentController(CommentService commentService) : ControllerBase
 {
     [HttpPatch]
     [Route("{commId}")]
