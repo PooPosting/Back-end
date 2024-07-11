@@ -8,7 +8,18 @@ namespace PooPosting.Application.Mappers;
 public static class AccountMapper
 {
     public static IQueryable<AccountDto> ProjectToDto(this IQueryable<Account> queryable) 
-        => queryable.Select(a => a.MapToDto());
+        => queryable.Select(a => new AccountDto()
+        {
+            Id = IdHasher.EncodeAccountId(a.Id),
+            Nickname = a.Nickname,
+            Email = a.Email,
+            ProfilePicUrl = a.ProfilePicUrl,
+            RoleId = a.RoleId,
+            AccountCreated = a.AccountCreated,
+            PictureCount = a.Pictures.Count,
+            LikeCount = a.Pictures.Sum(p => p.Likes.Count),
+            CommentCount = a.Pictures.Sum(p => p.Comments.Count)
+        });
 
 
     public static AccountDto MapToDto(this Account a)

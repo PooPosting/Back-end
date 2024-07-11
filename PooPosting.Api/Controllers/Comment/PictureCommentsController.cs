@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using PooPosting.Application.Models.Dtos.Comment;
 using PooPosting.Application.Models.Dtos.Comment.In;
+using PooPosting.Application.Models.Queries;
 using PooPosting.Application.Services;
 using PooPosting.Application.Services.Helpers;
 using PooPosting.Domain.DbContext.Interfaces;
@@ -18,7 +19,7 @@ public class PictureCommentsController(CommentService commentService) : Controll
     [EnableQuery]
     public async Task<IActionResult> GetPictureComments(
         [FromRoute] string picId,
-        [FromQuery] IPaginationParameters paginationParameters
+        [FromQuery] PictureQueryParams paginationParameters
         )
     {
         var result = await commentService.GetByPictureId(IdHasher.DecodePictureId(picId), paginationParameters);

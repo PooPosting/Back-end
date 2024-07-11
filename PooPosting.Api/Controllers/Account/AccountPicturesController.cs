@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using PooPosting.Application.Models.Queries;
 using PooPosting.Application.Services;
 using PooPosting.Domain.DbContext.Interfaces;
 using PooPosting.Domain.DbContext.Pagination;
@@ -14,7 +15,7 @@ public class AccountPicturesController(AccountPicturesService accountPicService)
     [HttpGet]
     [EnableQuery]
     public async Task<IActionResult> GetAccountPictures(
-        [FromQuery] IPaginationParameters paginationParameters,
+        [FromQuery] AccountQueryParams paginationParameters,
         [FromRoute] string accId
     )
     {
@@ -26,7 +27,7 @@ public class AccountPicturesController(AccountPicturesService accountPicService)
     [EnableQuery]
     [Route("liked")]
     public async Task<IActionResult> GetLikedPictures(
-        [FromQuery] IPaginationParameters paginationParameters,
+        [FromQuery] PictureQueryParams paginationParameters,
         [FromRoute] string accId
     )
     {

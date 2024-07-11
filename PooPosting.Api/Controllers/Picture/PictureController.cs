@@ -21,7 +21,7 @@ public class PictureController(PictureService pictureService) : ControllerBase
     [EnableQuery]
     [AllowAnonymous]
     public async Task<IActionResult> GetPictures(
-        [FromQuery] IPaginationParameters paginationParameters
+        [FromQuery] PictureQueryParams paginationParameters
         )
     {
         var pictures = await pictureService.GetAll(paginationParameters);
@@ -32,7 +32,7 @@ public class PictureController(PictureService pictureService) : ControllerBase
     [EnableQuery]
     [Route("trending")]
     public async Task<IActionResult> GetTrendingPictures(
-        [FromQuery] IPaginationParameters paginationParameters
+        [FromQuery] PictureQueryParams paginationParameters
     )
     {
         var pictures = await pictureService.GetAll(paginationParameters);
