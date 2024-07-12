@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using PooPosting.Application.Models.Dtos.Comment;
 using PooPosting.Application.Models.Dtos.Comment.In;
 
 namespace PooPosting.Api.Validators.Dtos.Comment;

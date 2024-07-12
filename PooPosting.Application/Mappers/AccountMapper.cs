@@ -1,5 +1,4 @@
-﻿using PooPosting.Application.Models.Dtos.Account;
-using PooPosting.Application.Models.Dtos.Account.Out;
+﻿using PooPosting.Application.Models.Dtos.Account.Out;
 using PooPosting.Application.Services.Helpers;
 using PooPosting.Domain.DbContext.Entities;
 

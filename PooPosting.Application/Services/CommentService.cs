@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using PooPosting.Application.Authorization;
 using PooPosting.Application.Mappers;
-using PooPosting.Application.Models.Dtos.Comment;
 using PooPosting.Application.Models.Dtos.Comment.Out;
 using PooPosting.Domain.DbContext;
 using PooPosting.Domain.DbContext.Entities;
@@ -21,24 +20,11 @@ public class CommentService(
 {
     public async Task<PagedResult<CommentDto>> GetByPictureId(int picId, IPaginationParameters paginationParameters)
     {
-        var commentsQuery = dbContext.Comments
+        return await dbContext.Comments
             .Where(c => c.PictureId == picId)
-            .OrderByDescending(c => c.Id);
-
-        var comments = await commentsQuery
+            .OrderByDescending(c => c.Id)
             .ProjectToDto()
-            .Skip(paginationParameters.PageSize * (paginationParameters.PageNumber - 1))
-            .Take(paginationParameters.PageSize)
-            .ToListAsync();
-
-        var totalComments = await commentsQuery.CountAsync();
-
-        return new PagedResult<CommentDto>(
-            comments,
-            paginationParameters.PageNumber,
-            paginationParameters.PageSize,
-            totalComments
-        );
+            .Paginate(paginationParameters);
     }
 
     public async Task<CommentDto> Create(int picId, string text)
@@ -78,7 +64,7 @@ public class CommentService(
         return comment.MapToDto();
     }
 
-    public async Task<bool> Delete(int commId)
+    public async Task Delete(int commId)
     {
         await AuthorizeCommentOperation(commId, ResourceOperation.Delete, "You have no rights to delete this comment");
 
@@ -87,8 +73,6 @@ public class CommentService(
 
         comment.IsDeleted = true;
         await dbContext.SaveChangesAsync();
-
-        return true;
     }
 
     private async Task AuthorizeCommentOperation(int commId, ResourceOperation operation, string message)

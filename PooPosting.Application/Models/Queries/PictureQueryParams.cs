@@ -1,5 +1,4 @@
 ﻿using PooPosting.Domain.DbContext.Interfaces;
-using PooPosting.Domain.DbContext.Pagination;
 using PooPosting.Domain.Enums;
 
 namespace PooPosting.Application.Models.Queries;

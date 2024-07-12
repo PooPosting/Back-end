@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using PooPosting.Application.Models.Dtos.Auth;
 using PooPosting.Application.Models.Dtos.Auth.In;
 
 namespace PooPosting.Api.Validators.Dtos.Auth;

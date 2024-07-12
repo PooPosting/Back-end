@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PooPosting.Application.Models.Dtos.Account;
 using PooPosting.Application.Models.Dtos.Account.In;
 using PooPosting.Application.Services;
 

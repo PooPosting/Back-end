@@ -1,6 +1,4 @@
-﻿using System.Data;
-using FluentValidation;
-using PooPosting.Application.Models.Dtos.Auth;
+﻿using FluentValidation;
 using PooPosting.Application.Models.Dtos.Auth.In;
 using PooPosting.Domain.DbContext;
 

@@ -45,7 +45,8 @@ public class AccountController(AccountService accountService) : ControllerBase
         [FromRoute] string accId
     )
     {
-        return Ok(await accountService.Delete(IdHasher.DecodeAccountId(accId)));
+        await accountService.Delete(IdHasher.DecodeAccountId(accId));
+        return Ok();
     }
 
 }

@@ -1,6 +1,4 @@
-﻿using PooPosting.Application.Models.Dtos.Picture.Out;
-
-namespace PooPosting.Application.Models.Dtos.Account.Out;
+﻿namespace PooPosting.Application.Models.Dtos.Account.Out;
 
 public class AccountDto
 {
@@ -10,7 +8,6 @@ public class AccountDto
 
     public string? ProfilePicUrl { get; init; }
 
-    public IEnumerable<PictureDto> Pictures { get; init; } = null!;
     public int PictureCount { get; init; }
     public int LikeCount { get; init; }
     public int CommentCount { get; init; }

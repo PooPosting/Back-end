@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using PooPosting.Application.Authorization;
 using PooPosting.Application.Mappers;
-using PooPosting.Application.Models.Dtos.Account;
 using PooPosting.Application.Models.Dtos.Account.In;
 using PooPosting.Application.Models.Dtos.Account.Out;
 using PooPosting.Application.Models.Queries;
@@ -18,7 +16,6 @@ using PooPosting.Domain.Exceptions;
 namespace PooPosting.Application.Services;
 
 public class AccountService(
-        ILogger<AccountService> logger,
         PictureDbContext dbContext,
         AccountContextService accountContextService,
         IAuthorizationService authorizationService,
@@ -101,10 +98,9 @@ public class AccountService(
         return account.MapToDto();
     }
 
-    public async Task<bool> Delete(int id)
+    public async Task Delete(int id)
     {
         var currentUserAccount = await accountContextService.GetAccountAsync();
-        logger.LogWarning("Account with Nickname: {AccountNickname} DELETE (SOFT) action invoked", currentUserAccount.Nickname);
         await AuthorizeAccountOperation(currentUserAccount, ResourceOperation.Delete ,"You have no rights to delete this account");
         
         var toDelete = await dbContext.Accounts
@@ -112,8 +108,6 @@ public class AccountService(
         toDelete.IsDeleted = true;
         dbContext.Accounts.Update(currentUserAccount);
         await dbContext.SaveChangesAsync();
-        logger.LogWarning($"Account with Nickname: {toDelete.Nickname}, Id: {toDelete.Id} DELETE (SOFT) action succeed");
-        return toDelete.IsDeleted;
     }
 
     #region Private methods

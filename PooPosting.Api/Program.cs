@@ -12,20 +12,19 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NLog.Extensions.Logging;
+using PooPosting.Api.ActionFilters;
 using PooPosting.Api.Validators.Dtos.Account;
 using PooPosting.Api.Validators.Dtos.Auth;
+using PooPosting.Api.Validators.Dtos.Comment;
 using PooPosting.Api.Validators.Dtos.Picture;
 using PooPosting.Api.Validators.Queries;
-using PooPosting.Application.ActionFilters;
 using PooPosting.Application.Authorization;
 using PooPosting.Application.Mappers;
 using PooPosting.Application.Middleware;
 using PooPosting.Application.Models.Configuration;
-using PooPosting.Application.Models.Dtos.Account;
 using PooPosting.Application.Models.Dtos.Account.In;
-using PooPosting.Application.Models.Dtos.Auth;
 using PooPosting.Application.Models.Dtos.Auth.In;
-using PooPosting.Application.Models.Dtos.Picture;
+using PooPosting.Application.Models.Dtos.Comment.In;
 using PooPosting.Application.Models.Dtos.Picture.In;
 using PooPosting.Application.Models.Queries;
 using PooPosting.Application.Services;
@@ -33,8 +32,6 @@ using PooPosting.Application.Services.Helpers;
 using PooPosting.Application.Services.Startup;
 using PooPosting.Domain.DbContext;
 using PooPosting.Domain.DbContext.Entities;
-using PooPosting.Domain.DbContext.Interfaces;
-using PooPosting.Domain.DbContext.Pagination;
 
 var builder = WebApplication.CreateBuilder();
 
@@ -102,13 +99,31 @@ builder.Services.AddDbContext<PictureDbContext>(options =>
 
 // Validators
 builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+builder.Services.AddScoped<IValidator<UpdateAccountDescriptionDto>, UpdateAccountDescriptionDtoValidator>();
+builder.Services.AddScoped<IValidator<UpdateAccountEmailDto>, UpdateAccountEmailDtoValidator>();
+builder.Services.AddScoped<IValidator<UpdateAccountPasswordDto>, UpdateAccountPasswordDtoValidator>();
+builder.Services.AddScoped<IValidator<UpdateAccountPictureDto>, UpdateAccountPictureDtoValidator>();
+
+builder.Services.AddScoped<IValidator<ForgetSessionDto>, ForgetSessionDtoValidator>();
+builder.Services.AddScoped<IValidator<LoginDto>, LoginDtoValidator>();
+builder.Services.AddScoped<IValidator<RefreshSessionDto>, RefreshSessionDtoValidator>();
+builder.Services.AddScoped<IValidator<RegisterDto>, RegisterDtoValidator>();
+
+builder.Services.AddScoped<IValidator<PostPutCommentDto>, PostPutCommentDtoValidator>();
+
+builder.Services.AddScoped<IValidator<CreatePictureDto>, CreatePictureDtoValidator>();
+builder.Services.AddScoped<IValidator<UpdatePictureDescriptionDto>, UpdatePictureDescriptionDtoValidator>();
+builder.Services.AddScoped<IValidator<UpdatePictureNameDto>, UpdatePictureNameDtoValidator>();
+builder.Services.AddScoped<IValidator<UpdatePictureTagsDto>, UpdatePictureTagsDtoValidator>();
+
+builder.Services.AddScoped<IValidator<AccountQueryParams>, AccountQueryParamsValidator>();
+builder.Services.AddScoped<IValidator<PictureQueryParams>, PictureQueryParamsValidator>();
 
 // Middleware
 builder.Services.AddScoped<ErrorHandlingMiddleware>();
 builder.Services.AddScoped<RequestTimeMiddleware>();
 builder.Services.AddScoped<HttpLoggingMiddleware>();
-builder.Services.AddScoped<IsUserAdminFilter>();
+builder.Services.AddScoped<RequireAdminRole>();
 
 // Services
 builder.Services.AddScoped<AccountContextService>();

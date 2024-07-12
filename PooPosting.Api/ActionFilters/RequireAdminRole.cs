@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using PooPosting.Domain.Exceptions;
 
-namespace PooPosting.Application.ActionFilters;
+namespace PooPosting.Api.ActionFilters;
 
-public class IsUserAdminFilter: ActionFilterAttribute
+public class RequireAdminRole: ActionFilterAttribute
 {
     private const string Msg = "You have no rights to do that.";
     

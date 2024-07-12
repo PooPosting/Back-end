@@ -10,7 +10,7 @@ public class Comment: IIdentifiable
     
     [Required]
     [MinLength(2)]
-    [MaxLength(250)]
+    [MaxLength(1500)]
     public string Text { get; set; } = null!;
     
     [Required]

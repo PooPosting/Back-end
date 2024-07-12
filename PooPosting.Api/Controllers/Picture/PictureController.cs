@@ -2,13 +2,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
-using PooPosting.Application.Models.Dtos.Picture;
 using PooPosting.Application.Models.Dtos.Picture.In;
 using PooPosting.Application.Models.Queries;
 using PooPosting.Application.Services;
 using PooPosting.Application.Services.Helpers;
-using PooPosting.Domain.DbContext.Interfaces;
-using PooPosting.Domain.DbContext.Pagination;
 
 namespace PooPosting.Api.Controllers.Picture;
 

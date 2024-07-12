@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PooPosting.Application.Authorization;
 using PooPosting.Application.Mappers;
-using PooPosting.Application.Models.Dtos.Picture;
 using PooPosting.Application.Models.Dtos.Picture.In;
 using PooPosting.Application.Models.Dtos.Picture.Out;
 using PooPosting.Application.Models.Queries;
@@ -81,23 +80,6 @@ public class PictureService(
         return await picQuery
             .ProjectToDto()
             .Paginate(paginationParameters);
-    }
-    
-    public async Task<PagedResult<PictureDto>> GetTrending(IPaginationParameters paginationParameters)
-    {
-        var pictureDtos = dbContext.Pictures
-            .OrderByDescending(p => p.Likes.Count)
-            .Where(p => p.PictureAdded.AddDays(3) < DateTime.UtcNow)
-            .Skip(paginationParameters.PageSize * (paginationParameters.PageNumber - 1))
-            .Take(paginationParameters.PageSize)
-            .ProjectToDto();
-        
-        return new PagedResult<PictureDto>(
-            await pictureDtos.ToListAsync(),
-            paginationParameters.PageNumber,
-            paginationParameters.PageSize,
-            await dbContext.Pictures.CountAsync()
-        );
     }
     
     public async Task<PictureDto> UpdateName(int picId, UpdatePictureNameDto dto)
