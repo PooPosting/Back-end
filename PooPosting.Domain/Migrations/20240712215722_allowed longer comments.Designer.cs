@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PooPosting.Domain.DbContext;
@@ -11,9 +12,11 @@ using PooPosting.Domain.DbContext;
 namespace PooPosting.Domain.Migrations
 {
     [DbContext(typeof(PictureDbContext))]
-    partial class PictureDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240712215722_allowed longer comments")]
+    partial class allowedlongercomments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
