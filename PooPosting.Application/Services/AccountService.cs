@@ -100,13 +100,15 @@ public class AccountService(
 
     public async Task Delete(int id)
     {
-        var currentUserAccount = await accountContextService.GetAccountAsync();
-        await AuthorizeAccountOperation(currentUserAccount, ResourceOperation.Delete ,"You have no rights to delete this account");
-        
         var toDelete = await dbContext.Accounts
             .FirstOrDefaultAsync(a => a.Id == id) ?? throw new NotFoundException($"Could not find account with id {id}");
+        
+        var currentUserAccount = await accountContextService.GetAccountAsync();
+        await AuthorizeAccountOperation(toDelete, ResourceOperation.Delete ,"You have no rights to delete this account");
+        
         toDelete.IsDeleted = true;
         dbContext.Accounts.Update(currentUserAccount);
+        
         await dbContext.SaveChangesAsync();
     }
 
