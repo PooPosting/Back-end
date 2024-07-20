@@ -1,7 +1,10 @@
 ﻿namespace PooPosting.Domain.DbContext.Interfaces;
 
-public interface IPaginationParameters
+public interface IQueryParams
 {
     public int PageSize { get; set; }
     public int PageNumber { get; set; }
+    
+    public string? OrderBy { get; set; }
+    public string? Direction { get; set; }
 }

@@ -15,7 +15,6 @@ namespace PooPosting.Api.Controllers.Picture;
 public class PictureController(PictureService pictureService) : ControllerBase
 {
     [HttpGet]
-    [EnableQuery]
     [AllowAnonymous]
     public async Task<IActionResult> GetPictures(
         [FromQuery] PictureQueryParams paginationParameters
@@ -26,7 +25,6 @@ public class PictureController(PictureService pictureService) : ControllerBase
     }
 
     [HttpGet]
-    [EnableQuery]
     [Route("trending")]
     public async Task<IActionResult> GetTrendingPictures(
         [FromQuery] PictureQueryParams paginationParameters
@@ -37,7 +35,6 @@ public class PictureController(PictureService pictureService) : ControllerBase
     }
 
     [HttpGet]
-    [EnableQuery]
     [AllowAnonymous]
     [Route("search")]
     public async Task<IActionResult> SearchAllPictures(

@@ -12,7 +12,7 @@ public class Account: IIdentifiable
     public int Id { get; set; }
     
     [Required]
-    [MaxLength(16)]
+    [MaxLength(25)]
     public string Nickname { get; set; } = null!;
     
     [Required]

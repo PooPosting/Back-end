@@ -13,7 +13,6 @@ namespace PooPosting.Api.Controllers.Comment;
 public class PictureCommentsController(CommentService commentService) : ControllerBase
 {
     [HttpGet]
-    [EnableQuery]
     public async Task<IActionResult> GetPictureComments(
         [FromRoute] string picId,
         [FromQuery] PictureQueryParams paginationParameters

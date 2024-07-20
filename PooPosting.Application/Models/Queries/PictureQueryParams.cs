@@ -1,12 +1,12 @@
 ﻿using PooPosting.Domain.DbContext.Interfaces;
-using PooPosting.Domain.Enums;
 
 namespace PooPosting.Application.Models.Queries;
 
-public class PictureQueryParams: IPaginationParameters
+public class PictureQueryParams: IQueryParams
 {
-    public string? SearchPhrase { get; set; }
-    public OrderBy OrderBy { get; set; }
     public int PageSize { get; set; }
     public int PageNumber { get; set; }
+    
+    public string? OrderBy { get; set; }
+    public string? Direction { get; set; }
 }

@@ -1,14 +1,32 @@
 ﻿using FluentValidation;
-using PooPosting.Domain.DbContext.Interfaces;
+using PooPosting.Application.Models.Queries;
 
 namespace PooPosting.Api.Validators.Queries;
 
-public class PictureQueryParamsValidator: AbstractValidator<IPaginationParameters>
+public class PictureQueryParamsValidator: AbstractValidator<PictureQueryParams>
 {
     private readonly int[] allowedPageSizes = { 2, 3, 4, 5, 6, 7, 8, 10, 15, 20 };
+    private readonly string[] allowedOrderValues = { "asc", "desc" };
 
     public PictureQueryParamsValidator()
     {
+        RuleFor(p => p.OrderBy)
+            .NotEqual("id", StringComparer.CurrentCultureIgnoreCase);
+
+        RuleFor(p => p)
+            .Custom((value, context) =>
+            {
+                if (value.OrderBy is null) return;
+                
+                if (!allowedOrderValues.Contains(value.Direction?.ToLower()))
+                {
+                    context.AddFailure(
+                        "Direction",
+                        $"When OrderBy is not null, Direction must be in [{string.Join(",", allowedOrderValues)}]"
+                    );
+                }
+            });
+        
         RuleFor(p => p.PageNumber)
             .NotEmpty()
             .Must(pn => pn > 0);

@@ -35,7 +35,7 @@ public class PictureService(
         return picture ?? throw new NotFoundException();
     }
 
-    public async Task<PagedResult<PictureDto>> GetAll(IPaginationParameters paginationParameters)
+    public async Task<PagedResult<PictureDto>> GetAll(IQueryParams paginationParameters)
     {
         var currAccId = accountContextService.TryGetAccountId();
 
@@ -61,23 +61,7 @@ public class PictureService(
 
     public async Task<PagedResult<PictureDto>> GetAll(PictureQueryParams paginationParameters)
     {
-        var picQuery = dbContext.Pictures.AsQueryable();
-        
-        switch (paginationParameters.OrderBy)
-        {
-            case OrderBy.Newest:
-                picQuery = picQuery.OrderByDescending(p => p.PictureAdded.Ticks);
-                break;
-            case OrderBy.MostLikes:
-                picQuery = picQuery.OrderByDescending(p => p.Likes.Count);
-                break;
-            case OrderBy.MostPopular:
-            default:
-                picQuery = picQuery.OrderByDescending(p => p.PopularityScore);
-                break;
-        }
-
-        return await picQuery
+        return await dbContext.Pictures
             .ProjectToDto()
             .Paginate(paginationParameters);
     }

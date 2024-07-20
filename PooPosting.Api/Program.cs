@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Text;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -6,7 +5,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
@@ -36,8 +34,7 @@ using PooPosting.Domain.DbContext.Entities;
 var builder = WebApplication.CreateBuilder();
 
 builder.Services
-    .AddControllers()
-    .AddOData(options => options.Select().Filter().OrderBy());
+    .AddControllers();
 
 // Auth
 var authenticationSettings = new AuthenticationSettings();
@@ -217,7 +214,6 @@ app.UseFileServer(
         RequestPath = "/api/wwwroot",
         EnableDefaultFiles = true
     });
-
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseMiddleware<RequestTimeMiddleware>();

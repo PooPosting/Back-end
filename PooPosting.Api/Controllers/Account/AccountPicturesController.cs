@@ -11,7 +11,6 @@ namespace PooPosting.Api.Controllers.Account;
 public class AccountPicturesController(AccountPicturesService accountPicService) : ControllerBase
 {
     [HttpGet]
-    [EnableQuery]
     public async Task<IActionResult> GetAccountPictures(
         [FromQuery] AccountQueryParams paginationParameters,
         [FromRoute] string accId
@@ -22,7 +21,6 @@ public class AccountPicturesController(AccountPicturesService accountPicService)
     }
     
     [HttpGet]
-    [EnableQuery]
     [Route("liked")]
     public async Task<IActionResult> GetLikedPictures(
         [FromQuery] PictureQueryParams paginationParameters,

@@ -18,7 +18,7 @@ public class CommentService(
     IAuthorizationService authorizationService
 )
 {
-    public async Task<PagedResult<CommentDto>> GetByPictureId(int picId, IPaginationParameters paginationParameters)
+    public async Task<PagedResult<CommentDto>> GetByPictureId(int picId, IQueryParams paginationParameters)
     {
         return await dbContext.Comments
             .Where(c => c.PictureId == picId)

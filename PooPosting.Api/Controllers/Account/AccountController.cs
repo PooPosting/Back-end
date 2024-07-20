@@ -13,7 +13,6 @@ namespace PooPosting.Api.Controllers.Account;
 public class AccountController(AccountService accountService) : ControllerBase
 {
     [HttpGet]
-    [EnableQuery]
     public async Task<IActionResult> SearchAllAccounts(
         [FromQuery] AccountQueryParams paginationParameters
     )
