@@ -20,11 +20,14 @@ public class CommentService(
 {
     public async Task<PagedResult<CommentDto>> GetByPictureId(int picId, IQueryParams paginationParameters)
     {
-        return await dbContext.Comments
-            .Where(c => c.PictureId == picId)
-            .OrderByDescending(c => c.Id)
-            .ProjectToDto()
-            .Paginate(paginationParameters);
+        return await dbContext.Comments.GetPageAsync<Comment, CommentDto>(
+            paginationParameters,
+            filter: q => q.Where(c => c.PictureId == picId),
+            orderBy: q => q.OrderByDescending(c => c.Id),
+            projector: q => q.ProjectToDto(),
+            asNoTracking: true,
+            asSplitQuery: false
+        );
     }
 
     public async Task<CommentDto> Create(int picId, string text)

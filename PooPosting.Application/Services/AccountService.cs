@@ -41,20 +41,18 @@ public class AccountService(
 
     public async Task<PagedResult<AccountDto>> GetAll(AccountQueryParams paginationParameters)
     {
-        var accountsQueryable = dbContext.Accounts
-            .AsQueryable();
-
-        if (paginationParameters.SearchPhrase is not null)
-        {
-            accountsQueryable = accountsQueryable
-                .Where(a => a.Nickname.Contains(paginationParameters.SearchPhrase));
-        }
-
-        return await accountsQueryable
-            .OrderBy(x => x.Id)
-            .ProjectToDto()
-            .Paginate(paginationParameters);
+        return await dbContext.Accounts.GetPageAsync<Account, AccountDto>(
+            paginationParameters,
+            filter: string.IsNullOrWhiteSpace(paginationParameters.SearchPhrase)
+                ? null
+                : q => q.Where(a => a.Nickname.Contains(paginationParameters.SearchPhrase)),
+            orderBy: q => q.OrderBy(a => a.Id),
+            projector: q => q.ProjectToDto(),
+            asNoTracking: true,
+            asSplitQuery: true
+        );
     }
+
 
     public async Task<AccountDto> UpdateEmail(UpdateAccountEmailDto dto)
     {

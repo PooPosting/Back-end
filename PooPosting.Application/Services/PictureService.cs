@@ -38,14 +38,17 @@ public class PictureService(
     public async Task<PagedResult<PictureDto>> GetAll(IQueryParams paginationParameters)
     {
         var currAccId = accountContextService.TryGetAccountId();
-
-        var pictureDtos = await dbContext.Pictures
+        
+        var pictureDtos = await dbContext.Pictures.GetPageAsync<Picture, PictureDto>(
+            paginationParameters,
+            orderBy: q => q
                 // .Where(p => p.SeenByAccount.All(sa => sa.AccountId != currAccId))
                 .OrderByDescending(p => p.PopularityScore)
-                .ThenByDescending(p => p.Id)
-                .ProjectToDto()
-                .Paginate(paginationParameters);
-        
+                .ThenBy(p => p.Id),
+            projector: q => q.ProjectToDto(),
+            asNoTracking: true,
+            asSplitQuery: true
+        );
 
         if (currAccId is not null)
         {
@@ -61,9 +64,16 @@ public class PictureService(
 
     public async Task<PagedResult<PictureDto>> GetAll(PictureQueryParams paginationParameters)
     {
-        return await dbContext.Pictures
-            .ProjectToDto()
-            .Paginate(paginationParameters);
+        return await dbContext.Pictures.GetPageAsync<Picture, PictureDto>(
+            paginationParameters,
+            orderBy: q => q
+                .OrderByDescending(p => p.PictureAdded)
+                .ThenBy(p => p.Id),
+            projector: q => q.ProjectToDto(),
+            asNoTracking: true,
+            asSplitQuery: true
+        );
+        
     }
     
     public async Task<PictureDto> UpdateName(int picId, UpdatePictureNameDto dto)
